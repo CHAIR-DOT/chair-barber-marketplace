@@ -14,19 +14,20 @@ import {
   UserRound,
 } from "lucide-react";
 import { useMock } from "./provider";
+import { useI18n } from "@/i18n/provider";
 const customerLinks = [
-  ["Overview", "/account", LayoutDashboard],
-  ["Appointments", "/account/appointments", CalendarDays],
-  ["Favorites", "/account/favorites", Heart],
-  ["My reviews", "/account/reviews", MessageSquare],
-  ["Profile settings", "/account/settings", Settings2],
+  ["dashboard.nav.overview", "/account", LayoutDashboard],
+  ["dashboard.nav.appointments", "/account/appointments", CalendarDays],
+  ["dashboard.nav.favorites", "/account/favorites", Heart],
+  ["dashboard.nav.reviews", "/account/reviews", MessageSquare],
+  ["dashboard.nav.settings", "/account/settings", Settings2],
 ] as const;
 const barberLinks = [
-  ["Overview", "/barber/dashboard", LayoutDashboard],
-  ["My profile", "/barber/profile", UserRound],
-  ["Portfolio", "/barber/portfolio", Image],
-  ["Services & prices", "/barber/services", Scissors],
-  ["Schedule", "/barber/schedule", Clock3],
+  ["dashboard.nav.overview", "/barber/dashboard", LayoutDashboard],
+  ["dashboard.nav.profile", "/barber/profile", UserRound],
+  ["dashboard.nav.portfolio", "/barber/portfolio", Image],
+  ["dashboard.nav.services", "/barber/services", Scissors],
+  ["dashboard.nav.schedule", "/barber/schedule", Clock3],
 ] as const;
 export function DashboardShell({
   barber = false,
@@ -35,17 +36,20 @@ export function DashboardShell({
   barber?: boolean;
   children: React.ReactNode;
 }) {
+  const { t: tr, barberTitle } = useI18n();
   const path = usePathname(),
     { state } = useMock();
   return (
     <div className="container dashboard-layout">
       <aside className="dashboard-sidebar">
         <div className="workspace-label">
-          {barber ? "YOUR BARBER WORKSPACE" : "YOUR PERSONAL CORNER"}
+          {barber
+            ? tr("dashboard.workspaceLabel")
+            : tr("dashboard.personalLabel")}
         </div>
         <div className="dashboard-person">
           {barber ? (
-            <img src={state.barbers[0].image} alt="Giorgi Kapanadze" />
+            <img src={state.barbers[0].image} alt={state.barbers[0].name} />
           ) : (
             <span className="initial-avatar">AC</span>
           )}
@@ -57,10 +61,16 @@ export function DashboardShell({
                   ? state.user.name
                   : "Alex Chikovani"}
             </strong>
-            <span>{barber ? "Senior barber" : "A good hair day regular"}</span>
+            <span>
+              {barber ? barberTitle(state.barbers[0]) : tr("dashboard.regular")}
+            </span>
           </div>
         </div>
-        <nav aria-label={barber ? "Barber workspace" : "Customer account"}>
+        <nav
+          aria-label={
+            barber ? tr("dashboard.workspaceAria") : tr("dashboard.accountAria")
+          }
+        >
           {(barber ? barberLinks : customerLinks).map(([label, href, Icon]) => (
             <Link
               key={href}
@@ -68,22 +78,22 @@ export function DashboardShell({
               href={href}
             >
               <Icon size={17} />
-              {label}
+              {tr(label)}
             </Link>
           ))}
         </nav>
         <div className="workspace-note">
-          <span className="badge green">Local demo</span>
+          <span className="badge green">{tr("dashboard.localDemo")}</span>
           <p>
             {barber
-              ? "Your craft, your space. Edits stay in this browser."
-              : "All appointments and activity here are simulated."}
+              ? tr("dashboard.barberNotice")
+              : tr("dashboard.customerNotice")}
           </p>
           <Link
             href={barber ? `/barbers/${state.barbers[0].slug}` : "/discover"}
             className="text-link"
           >
-            {barber ? "View public profile" : "Find your next barber"}
+            {barber ? tr("dashboard.viewProfile") : tr("dashboard.findBarber")}
             <ArrowUpRight size={15} />
           </Link>
         </div>

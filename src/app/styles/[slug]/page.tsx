@@ -1,3 +1,4 @@
+import { createDisplay } from "@/i18n/display";
 import { notFound } from "next/navigation";
 import { styles } from "@/lib/data";
 import { StylePage } from "@/components/style-page";
@@ -11,8 +12,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const style = styles.find((s) => s.slug === slug);
+  const { t, styleName } = createDisplay("ka");
   return {
-    title: `${styles.find((s) => s.slug === slug)?.name ?? "Haircut style"} specialists`,
+    title: style
+      ? t("metadata.style", { style: styleName(style) })
+      : t("metadata.notFound"),
   };
 }
 export default async function Page({

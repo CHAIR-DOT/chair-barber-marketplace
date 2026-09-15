@@ -16,7 +16,7 @@ Continue the existing application; do not create a new scaffold. Root `AGENTS.md
 
 **Frontend prototype using local mock data.** Discovery, profiles, booking, customer accounts, and barber management work within the prototype's limits. Preview: `http://127.0.0.1:3000`. No public site deployment or backend implementation is authorized by the current task.
 
-**Current status:** Mandatory project memory and private GitHub version control are established. The existing frontend and its history are uploaded to [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Authentication succeeded as **CHAIR-DOT**; `main` tracks `origin/main`. The source upload was verified against local commit/file hashes. No application feature is pending from this setup task; continue with the user’s next requested improvement.
+**Current status:** Complete Georgian/English/Russian frontend localization is implemented and verified. Georgian is the first-visit default. Language selection, metadata, app-controlled dates/numbers and UI feedback update immediately; the separate local preference survives navigation and refresh. All 22 main screens were checked in all three languages and at 375/768/1024/1440px. TypeScript, 26 tests, production build and route/image checks pass. Existing routes, design, canonical entities, booking rules and the user’s port-3000 browser data are preserved. Continue with the next user-requested improvement using the existing private repository; Git state is authoritative for the latest commit/upstream.
 
 ## Mandatory Development Workflow
 
@@ -36,15 +36,16 @@ For a new chat, use this folder or provide the repository and say: **“Read PRO
 
 ## Tech Stack
 
-| Technology | Version / role |
-| --- | --- |
-| Next.js | 16.3.5, App Router |
-| React / React DOM | 19.3.0 |
-| TypeScript | 7.0.2 |
-| Tailwind CSS / PostCSS plugin | 4.3.3 |
-| Lucide React | 1.46.0 |
-| DM Sans / DM Serif Display | 5.3.0 packages, local fonts |
-| tsx / Prettier | 4.23.13 / 3.9.6 |
+| Technology                    | Version / role                            |
+| ----------------------------- | ----------------------------------------- |
+| Next.js                       | 16.3.5, App Router                        |
+| React / React DOM             | 19.3.0                                    |
+| TypeScript                    | 7.0.2                                     |
+| Tailwind CSS / PostCSS plugin | 4.3.3                                     |
+| Lucide React                  | 1.46.0                                    |
+| DM Sans / DM Serif Display    | 5.3.0 packages, original Latin typography |
+| Noto Sans / Serif Georgian    | 5.3.0 packages, local Georgian fallbacks  |
+| tsx / Prettier                | 4.23.13 / 3.9.6                           |
 
 `package.json` and `package-lock.json` are authoritative. Documented minimum: Node >=20.9; current machine: Node 25.2.1/npm 11.6.2. Do not upgrade just to resume work.
 
@@ -57,27 +58,29 @@ Install only when dependencies are missing or a clean install is needed. Checks:
 
 ## Project Structure
 
-| Path | Responsibility |
-| --- | --- |
-| `src/app/` | Routes, metadata, layout, loading/error/not-found boundaries |
-| `src/app/globals.css` | Theme, component styles, responsive layouts |
-| `src/components/` | Shared UI and marketplace/customer/barber surfaces |
-| `src/lib/types.ts`, `data.ts` | Domain contracts and interconnected fixtures |
-| `src/lib/booking.ts` | Availability, price, ratings, booking/review rules |
-| `src/lib/dates.ts`, `i18n.ts` | Tbilisi/GEL formatting and initial EN/KA dictionary |
-| `public/images/`, `public/favicon.svg` | 25 local stock JPGs and brand icon |
-| `tests/domain.test.ts` | Domain and fixture checks |
-| `scripts/check-routes.ts` | Valid/invalid-route and image HTTP checks |
-| `PROJECT_MEMORY.md`, `AGENTS.override.md` | Current project truth and mandatory workflow |
-| `PROJECT_BRIEF.md` | Verbatim original product brief |
-| `README.md`, `DESIGN_SYSTEM.md`, `VERIFICATION.md` | Setup, visual conventions, validation evidence |
-| `ASSET-SOURCES.md`, `BACKEND_PLAN.md` | Photography credits and future integration plan |
+| Path                                               | Responsibility                                                                                        |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `src/app/`                                         | Routes, metadata, layout, loading/error/not-found boundaries                                          |
+| `src/app/globals.css`                              | Theme, component styles, responsive layouts                                                           |
+| `src/components/`                                  | Shared UI and marketplace/customer/barber surfaces                                                    |
+| `src/lib/types.ts`, `data.ts`                      | Domain contracts and interconnected fixtures                                                          |
+| `src/lib/booking.ts`                               | Availability, price, ratings, booking/review rules                                                    |
+| `src/lib/dates.ts`                                 | Canonical Tbilisi date arithmetic and time helpers                                                    |
+| `src/i18n/`                                        | Three-language catalogs, context, date/number/entity display and metadata helpers                     |
+| `src/lib/i18n.ts`                                  | Compatibility exports for the localization boundary                                                   |
+| `public/images/`, `public/favicon.svg`             | 25 local stock JPGs and brand icon                                                                    |
+| `tests/domain.test.ts`, `tests/i18n.test.ts`       | Domain/fixtures, locale defaults/catalog parity, formatting, preservation and route-title regressions |
+| `scripts/check-routes.ts`                          | Valid/invalid-route and image HTTP checks                                                             |
+| `PROJECT_MEMORY.md`, `AGENTS.override.md`          | Current project truth and mandatory workflow                                                          |
+| `PROJECT_BRIEF.md`                                 | Verbatim original product brief                                                                       |
+| `README.md`, `DESIGN_SYSTEM.md`, `VERIFICATION.md` | Setup, visual conventions, validation evidence                                                        |
+| `ASSET-SOURCES.md`, `BACKEND_PLAN.md`              | Photography credits and future integration plan                                                       |
 
 Dependencies, build output, generated `next-env.d.ts`, caches, local configuration and synced reference material are ignored by Git. Empty `sources/` is not application source; preserve local synced references without uploading them automatically.
 
 ## Architecture
 
-- `MockProvider` in `provider.tsx` owns shared state and mutations. Screens consume common entities/actions; this is the future asynchronous repository/API boundary.
+- `LocaleProvider` wraps `MockProvider` and supplies language/display helpers without remounting the store. `MockProvider` in `provider.tsx` owns shared state and mutations. Screens consume common entities/actions; this is the future asynchronous repository/API boundary.
 - Storage key: **`chair.prototype.v1`**, shape `{version: 1, data: MockState}`. Persistent collections: favorites, appointments, reviews, barbers, services, portfolio, availability, user. Comparison is temporary in-memory state, capped at 3 barbers.
 - Preserve the provider's `ready` gate and synchronous `stateRef`; they prevent hydration problems and stale editor defaults overwriting saved details. Mount dependent editors after hydration.
 - Services have global definitions and barber eligibility/price relationships. Appointments snapshot price/duration; reviews link a completed visit, customer, and barber.
@@ -86,6 +89,20 @@ Dependencies, build output, generated `next-env.d.ts`, caches, local configurati
 - Detail/section routes use static parameters and `dynamicParams = false` for correct unknown-path 404s.
 - Preserve **`agentRules: false`** in `next.config.ts`: Next otherwise tried to append generated instructions to the protected `AGENTS.md` and failed with EACCES. `poweredByHeader` and `devIndicators` are also disabled.
 - The route checker wraps work in `async main()` for the installed tsx execution mode and reads images relative to the project root.
+
+## Localization Architecture
+
+- **Locales:** `ka` / ქართული (default), `en` / English, `ru` / Русский. Never choose the first-visit language from browser settings. Invalid/unavailable saved preferences resolve to Georgian.
+- **Preference:** `chair.locale.v1` stores only the selected locale in localStorage; storage events synchronize tabs. It is independent of `chair.prototype.v1` and survives the demo-data reset. Storage failure keeps the chosen language for the session and shows localized feedback.
+- **Provider/control:** `src/i18n/provider.tsx` exports `LocaleProvider` / `useI18n()` (`locale`, `setLocale`, `t`, display helpers). `src/components/language-selector.tsx` supplies the labeled native select/Languages icon in `shell.tsx`, including the existing mobile menu. Keyboard focus, native selection and document `lang` follow the selected language.
+- **Catalogs:** `src/i18n/messages/{core,entities,discovery,journey,workspace,calendar}.ts`, merged in `messages/index.ts`. Semantic namespaces cover navigation/shared UI/home/about/errors/toasts, canonical-entity display fields, marketplace/profiles, booking/auth/account, barber/reviews/portfolio and calendar labels. `defineMessages` rows are `[English, Georgian, Russian]`; explicit locale maps are also used. Add the same keys and placeholders in all three languages.
+- **Interpolation/plurals:** `translate.ts` supports `{name}` values, numeric count/plural variants through Intl, English fallback, and development warnings for missing keys. Pass raw numeric counts so plural selection works; do not concatenate English nouns. Error/toast state stores semantic keys, so already-visible feedback updates when language changes.
+- **Canonical content:** one fixture/state entity per shop/barber/service/style. `display.ts` translates generic seed fields only when the ID and original field still match. Names, brands, addresses, emails, URLs, IDs/slugs, prices, relationships and stored dates are untouched. Seed portfolio titles matching a generic style are translated; intentionally named works and user-edited/custom fields remain verbatim.
+- **Reviews:** customer-written text is user content and never automatically translated. Labels, dimensions, dates, service display and verification messages translate around it. No translate-review feature exists.
+- **Formatting:** display helpers use `ka-GE`, `en-GB`, `ru-RU`, preserve GEL `₾`, and display dates in `Asia/Tbilisi` without changing stored `YYYY-MM-DD` values. Lightweight Georgian calendar/number fallbacks cover browsers missing Georgian Intl data. Shared booking date arithmetic remains in `src/lib/dates.ts`.
+- **Metadata/validation:** server titles start in Georgian; a cleaned-up, idempotent head observer preserves selected-language titles/descriptions after Next streams metadata. Exact route checks retain localized 404 titles. Native form constraints stay intact; their validation messages are localized. Native date/time picker chrome and OS file-selection dialogs follow browser/OS language; app-owned labels, calendar buttons and chosen-file text are localized.
+- **Fonts/layout:** original DM fonts remain for Latin. Local Noto Sans/Serif Georgian render Georgian; Arial/Georgia system fallback supplies Cyrillic. Only required spacing/font fallback and contained profile-tab scrolling changed; routes and page composition stay intact.
+- **Development rule:** Every newly introduced user-facing UI string must be added to the localization system in Georgian, English, and Russian. Do not introduce new hardcoded interface text.
 
 ## Data Models
 
@@ -99,25 +116,26 @@ Entities: `User`, `Customer`, `Barber`, `BarberShop`, `Service`, `Appointment`, 
 
 ## Routes
 
-| Routes | Purpose |
-| --- | --- |
-| `/`, `/discover` | Home and filtered/sorted discovery |
-| `/shops`, `/shops/[slug]` | Shop directory and profiles |
-| `/barbers`, `/barbers/[slug]` | Barber directory, portfolio, services, reputation, availability |
-| `/styles`, `/styles/[slug]` | Haircut inspiration and matching specialists |
-| `/booking` | Selection flow, review, confirmation, rescheduling |
-| `/login`, `/register` | Mock sign-in and role onboarding |
-| `/account` | Customer overview |
-| `/account/appointments`, `/account/favorites` | Appointments/actions and saved entities |
-| `/account/reviews`, `/account/settings` | Reviews and customer settings |
-| `/barber/dashboard`, `/barber/profile` | Appointment overview and profile editor |
-| `/barber/portfolio`, `/barber/services`, `/barber/schedule` | Portfolio, menus/prices, hours/days off |
-| `/about` | Prototype explanation and confirmed local reset |
+| Routes                                                      | Purpose                                                         |
+| ----------------------------------------------------------- | --------------------------------------------------------------- |
+| `/`, `/discover`                                            | Home and filtered/sorted discovery                              |
+| `/shops`, `/shops/[slug]`                                   | Shop directory and profiles                                     |
+| `/barbers`, `/barbers/[slug]`                               | Barber directory, portfolio, services, reputation, availability |
+| `/styles`, `/styles/[slug]`                                 | Haircut inspiration and matching specialists                    |
+| `/booking`                                                  | Selection flow, review, confirmation, rescheduling              |
+| `/login`, `/register`                                       | Mock sign-in and role onboarding                                |
+| `/account`                                                  | Customer overview                                               |
+| `/account/appointments`, `/account/favorites`               | Appointments/actions and saved entities                         |
+| `/account/reviews`, `/account/settings`                     | Reviews and customer settings                                   |
+| `/barber/dashboard`, `/barber/profile`                      | Appointment overview and profile editor                         |
+| `/barber/portfolio`, `/barber/services`, `/barber/schedule` | Portfolio, menus/prices, hours/days off                         |
+| `/about`                                                    | Prototype explanation and confirmed local reset                 |
 
 Examples: `/shops/gentlemans-corner`, `/barbers/giorgi-kapanadze`, `/styles/skin-fade`. Booking query parameters use IDs: `shop`, `barber`, `service`, `reschedule`. Discovery accepts `q`, `location`, `service`, `style`, `date`, `availability`.
 
 ## Implemented Features
 
+- Complete Georgian/English/Russian interface localization, native header/mobile language selector, persistent independent locale preference, localized metadata and form feedback.
 - Responsive editorial home, shop/barber/style directories and profiles; discovery filters (location/distance, service/style, price/rating, date/availability/experience), sorting, mobile filters and empty-state recovery.
 - Locally persistent favorites, up-to-3 barber comparison, portfolio tag filters/lightbox, review/rating breakdowns.
 - Booking: shop → specific/any barber → service → date → time → review → local confirmation. Customer history, repeat booking, cancellation and same-ID rescheduling.
@@ -127,7 +145,6 @@ Examples: `/shops/gentlemans-corner`, `/barbers/giorgi-kapanadze`, `/styles/skin
 
 ## Partially Implemented Features
 
-- EN/KA navigation dictionary and localization boundary; most page copy remains English.
 - Account onboarding and role UI; independent account provisioning, shop ownership and production permissions are absent.
 - Local JPG/PNG/WebP uploads up to **600 KB** as data URLs; remote storage/image processing is absent.
 - Responsive and keyboard behavior tested; no comprehensive automated visual regression suite or formal accessibility audit.
@@ -138,7 +155,7 @@ All shops, barbers, reviews and appointments are fictional/demo state. Profile-v
 
 ## Not Implemented Yet
 
-Real database/API storage, secure authentication/server permissions, concurrent booking protection, remote uploads, payment collection/refunds/payouts, email/SMS, analytics, full Georgian localization and production hosting. The original brief defers backend work. **Private GitHub source upload is authorized; public website deployment is not part of this request.**
+Real database/API storage, secure authentication/server permissions, concurrent booking protection, remote uploads, payment collection/refunds/payouts, email/SMS, analytics and production hosting. The original brief defers backend work. **Private GitHub source upload is authorized; public website deployment is not part of this request.**
 
 ## Known Issues
 
@@ -151,22 +168,23 @@ Real database/API storage, secure authentication/server permissions, concurrent 
 
 ## UI / Design System
 
-Premium editorial barber culture: cream `#f8f7f3`, charcoal `#262821`, copper `#a56041`, availability green `#537452`, muted gray `#75766e`, borders `#dedfd7`, soft fill `#eeeee6`. DM Sans interface text, DM Serif Display/italic display accents, Lucide icons, generous spacing, restrained borders and clear hierarchy.
+Premium editorial barber culture: cream `#f8f7f3`, charcoal `#262821`, copper `#a56041`, availability green `#537452`, muted gray `#75766e`, borders `#dedfd7`, soft fill `#eeeee6`. DM Sans interface text, DM Serif Display/italic display accents, local Noto Georgian fallbacks and system Cyrillic fallbacks, Lucide icons, generous spacing, restrained borders and clear hierarchy.
 
 Emphasize individual reputation and portfolios alongside shop identity. Georgian names/neighborhoods, GEL `₾`, Tbilisi dates. Local images: 1 hero, 4 shops, 8 portraits, 12 haircuts. Preserve correspondence between style tags/photos; buzz cut, French crop, long hair and mid fade imagery was refined after review. Maintain illustrative-use disclosures. Main surfaces were checked at **375/768/1024/1440px**. See [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 
 ## Important Components
 
-| Files in `src/components/` | Responsibility |
-| --- | --- |
-| `provider.tsx` | Shared persistence/actions, hydration gate, synchronous state reference |
-| `shell.tsx`, `ui.tsx`, `cards.tsx` | Navigation/footer, shared controls/dialogs/states, marketplace cards |
-| `discovery.tsx`, `compare.tsx`, `style-page.tsx` | Filters/sorts, comparison, style matching |
-| `profiles.tsx`, `portfolio.tsx`, `reviews.tsx` | Profiles/booking panels, tagged lightbox, ratings/review form |
-| `booking-flow.tsx` | Selections/validation and saved-appointment confirmation |
-| `auth.tsx`, `account.tsx`, `dashboard-shell.tsx` | Mock roles and customer workspace |
-| `barber-workspace.tsx` | Barber appointments/profile/services/portfolio/schedule |
-| `webmcp.tsx`, `reset-demo.tsx` | Optional favorite integration and confirmed reset |
+| Files in `src/components/`                       | Responsibility                                                          |
+| ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `provider.tsx`                                   | Shared persistence/actions, hydration gate, synchronous state reference |
+| `language-selector.tsx`, `about-preview.tsx`     | Header/mobile locale control and localized About client content         |
+| `shell.tsx`, `ui.tsx`, `cards.tsx`               | Navigation/footer, shared controls/dialogs/states, marketplace cards    |
+| `discovery.tsx`, `compare.tsx`, `style-page.tsx` | Filters/sorts, comparison, style matching                               |
+| `profiles.tsx`, `portfolio.tsx`, `reviews.tsx`   | Profiles/booking panels, tagged lightbox, ratings/review form           |
+| `booking-flow.tsx`                               | Selections/validation and saved-appointment confirmation                |
+| `auth.tsx`, `account.tsx`, `dashboard-shell.tsx` | Mock roles and customer workspace                                       |
+| `barber-workspace.tsx`                           | Barber appointments/profile/services/portfolio/schedule                 |
+| `webmcp.tsx`, `reset-demo.tsx`                   | Optional favorite integration and confirmed reset                       |
 
 ## Important Product Rules
 
@@ -209,6 +227,12 @@ No backend provider/account is connected. Browser localStorage remains prototype
 
 ## Verification
 
+**Fresh for localization, 2026-09-16:** TypeScript passed; **26/26 tests** (9 domain + 17 localization/formatting/metadata checks) passed; production build passed with 57 generated pages. Production HTTP checks passed for **55 valid routes, 5 expected 404s and 25 images**. Initial restricted HTTP access failed with EPERM; the approved run passed. No lint script is configured. The known Next `NoFallbackError` diagnostics still accompany intentionally invalid static routes.
+
+Browser QA on isolated `127.0.0.1:3011`: Georgian first visit; all 22 page surfaces in KA/EN/RU; 264 route/locale/width measurements at 375/768/1024/1440, with the sole discovered profile overflow fixed and retested. Sixteen additional date-heavy final-build responsive checks passed. Visual inspections covered desktop/tablet/home/profile/dashboard/mobile navigation and Cyrillic/Georgian fonts. English/Russian persisted across navigation and refresh; localized page titles remained correct after the streaming fix. Favorites and four Skin Fade specialists remained unchanged through all locale switches. A new test booking (Giorgi, haircut, 17 September 10:45, ₾35/45min) remained identical across switching, confirmation, account navigation and refresh. Registration, localized native validation, comparison, review/portfolio dialogs, empty states and cross-tab locale changes with an open review/error/draft were checked. Customer review text stayed verbatim. Final observed browser console had no errors/warnings. Georgian review dates/calendar labels and decimal separators were confirmed after the Intl fallbacks.
+
+Only isolated QA-origin demo data was changed; the user’s existing port-3000 data and preview were preserved. Browser viewport overrides and temporary tabs were cleaned up. The separate production listener was stopped. See [VERIFICATION.md](VERIFICATION.md) for scope and native-browser-control limits.
+
 **Fresh during Git preparation, 2026-09-15:** dependency consistency passed; TypeScript passed; **9/9 tests**; production build passed (57 generated pages); HTTP checks passed for **55 valid routes, 5 expected 404s, 25 images**. Own test server on 3011 was stopped; existing development server on 3000 preserved. No lint command exists. The updated `next typegen && tsc --noEmit` command also passed after the baseline checks. All 20 required memory sections and local documentation links were checked. A clean `git archive` of the committed sources (reusing installed dependencies) successfully generated Next declarations and passed typechecking without pre-existing build output.
 
 Upload audit: no real credential candidates/URLs, env files, private keys/certificates, source symlinks or sensitive JPG metadata found. Stock credit tags are expected. `.DS_Store` is now ignored. Original `AGENTS.md` remains mode 444. The staged audit passed for all 85 files: memory included, 25 images included, no forbidden/generated/env files or credential signatures found. `git diff --cached --check` passed. The local baseline commit succeeded. GitHub upload verification confirmed matching branch commit IDs and all 85 file paths, modes and content hashes, including memory and 25 images; no forbidden generated/environment paths were present. Private visibility and `origin/main` tracking were also confirmed. Application tests were not repeated for this authentication/documentation-only completion.
@@ -216,6 +240,14 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 **Earlier browser checks, 2026-09-15:** filters/reset/no-results, favorites after refresh, comparison/lightbox Escape, mobile filters, any-barber booking → same-ID reschedule → cancel, one eligible review, price/service/schedule/portfolio/profile edits, role navigation/sign-out and optional WebMCP. Seven main surfaces measured at 375/768/1024/1440px without page overflow after the mobile table fix. Production home/profile had no observed browser console errors/warnings. These interaction checks were not rerun for Git preparation. See [VERIFICATION.md](VERIFICATION.md) for details and limits.
 
 ## Recent Changes
+
+### 2026-09-16
+
+- Implemented complete Georgian-default / English / Russian frontend localization with semantic catalogs, independent locale persistence, header/mobile selector, interpolation/plural variants, entity display helpers, translated metadata and native form validation messages.
+- Preserved canonical names, IDs/slugs, prices, bookings and user-written reviews/custom content. Translated generic services/styles/descriptions without duplicating entities. Added local Georgian fonts while retaining the visual identity.
+- Browser QA caught and fixed streamed metadata reverting after refresh, Georgian profile overflow at 375px, and browsers missing Georgian Intl date/number data. A search-scope regression found during review was corrected; 55 original canonical queries retain their original result IDs.
+- Verified 22 main screens × 3 languages × 4 widths, then retested affected date-heavy views on the final build. Confirmed keyboard/mobile selector, preferences after refresh, favorites, preserved form/review drafts, comparison, booking selections/confirmation/saved appointment, dialogs and empty states.
+- Final checks: TypeScript, 26/26 tests, production build (57 generated pages), 55 valid routes, 5 expected 404s and 25 images all pass. No missing translation calls or secret/generated-file candidates found. Updated memory, README, design/backend docs and the mandatory three-language authoring rule for the existing repository workflow.
 
 ### 2026-09-15
 
@@ -229,11 +261,10 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 
 ## Next Recommended Steps
 
-1. **Setup complete:** Use the existing private GitHub repository for future meaningful development work; maintain memory and commit/push reviewed changes together.
-2. Review the localhost prototype with the user and implement their next requested improvement while preserving data/design.
-3. When requested, finish Georgian localization or add focused accessibility/interaction coverage.
-4. When requested, begin schema/permissions/authentication then transactional bookings; keep payments/notifications/deployment deferred until authorized.
+1. Localization is complete. Continue the user’s next requested improvement in the existing repository; maintain memory and commit/push meaningful reviewed changes together.
+2. For future UI changes, add Georgian/English/Russian semantic messages together and rerun relevant checks. Preserve the current design and state.
+3. When requested, expand accessibility/interaction coverage or begin backend schema/permissions/authentication and transactional bookings. Payments/notifications/public deployment remain deferred.
 
 ## Last Updated
 
-**2026-09-15 (Asia/Tbilisi)** — Private GitHub source hosting is established under `CHAIR-DOT/chair-barber-marketplace`; `main` was pushed and verified. Project memory and mandatory future Git workflow are tracked. No authentication/setup blocker remains; the application stays a localhost frontend prototype.
+**2026-09-16 (Asia/Tbilisi)** — Georgian-default, English and Russian frontend localization is complete and verified. All 26 tests, TypeScript, production build and HTTP checks pass; multilingual/responsive/persistence/booking checks passed. Memory and translation-authoring rules are current. Use the existing `main` / `origin/main` workflow and preserve port-3000 browser data.

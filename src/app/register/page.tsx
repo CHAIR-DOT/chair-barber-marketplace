@@ -1,5 +1,6 @@
+import { translate } from "@/i18n/translate";
 import { AuthPage } from "@/components/auth";
-export const metadata = { title: "Create an account" };
+export const metadata = { title: translate("ka", "metadata.register") };
 export default async function Page({
   searchParams,
 }: {

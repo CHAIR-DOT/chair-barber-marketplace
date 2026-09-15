@@ -36,3 +36,9 @@ This directory is a local mirror of the ChatGPT project “BARBER”. Treat ever
 ## Current implementation boundaries
 
 The authorized application is a localhost-only frontend prototype using mock data. A backend, real authentication, payments, messaging, and public deployment are future possibilities, not currently authorized implementation work. Preserve user-created browser data and existing edits. Do not reset local storage just to reproduce the initial demo.
+
+## Localization
+
+Every newly introduced user-facing UI string must be added to the localization system in Georgian, English, and Russian. Do not introduce new hardcoded interface text.
+
+Use `src/i18n/` semantic message catalogs and `useI18n()` display helpers. Georgian (`ka`) is the first-visit default. Preserve canonical names, identifiers, prices, stored dates and user-written reviews/custom content when translating presentation.

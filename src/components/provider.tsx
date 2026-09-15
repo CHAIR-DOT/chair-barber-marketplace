@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { useI18n } from "@/i18n/provider";
+import type { Values } from "@/i18n/config";
 import * as fixture from "@/lib/data";
 import { canReview, getPrice, validateAppointment } from "@/lib/booking";
 import { today } from "@/lib/dates";
@@ -39,7 +41,7 @@ interface Store {
   compare: string[];
   toggleCompare: (id: string) => void;
   clearCompare: () => void;
-  notify: (text: string) => void;
+  notify: (text: string, values?: Values) => void;
   update: (patch: Partial<MockState>) => void;
   favorite: (type: Favorite["type"], id: string) => void;
   isFavorite: (type: Favorite["type"], id: string) => boolean;
@@ -55,16 +57,17 @@ interface Store {
 }
 const Context = createContext<Store | null>(null);
 export function MockProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const [state, setState] = useState<MockState>(initialState),
     [ready, setReady] = useState(false),
     [compare, setCompare] = useState<string[]>([]),
-    [toast, setToast] = useState("");
+    [toast, setToast] = useState<{ key: string; values?: Values } | null>(null);
   const stateRef = useRef(state),
     toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const notify = useCallback((text: string) => {
-    setToast(text);
+  const notify = useCallback((text: string, values?: Values) => {
+    setToast({ key: text, values });
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 4500);
+    toastTimer.current = setTimeout(() => setToast(null), 4500);
   }, []);
   useEffect(() => {
     try {
@@ -104,9 +107,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {
-      notify(
-        "Saved demo data could not be loaded. Starting with fresh sample data.",
-      );
+      notify("notifications.storageLoad");
     }
     setReady(true);
     return () => {
@@ -121,9 +122,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         JSON.stringify({ version: 1, data: state }),
       );
     } catch {
-      notify(
-        "Browser storage is full or unavailable. Changes will last for this session.",
-      );
+      notify("notifications.storageFull");
     }
   }, [state, ready, notify]);
   const update = useCallback((patch: Partial<MockState>) => {
@@ -139,12 +138,12 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         ? list.filter((f) => !(f.type === type && f.entityId === id))
         : [...list, { type, entityId: id }],
     });
-    notify(exists ? "Removed from your favorites" : "Saved to your favorites");
+    notify(exists ? "notifications.unsaved" : "notifications.saved");
   };
   const toggleCompare = (id: string) => {
     if (compare.includes(id)) setCompare(compare.filter((x) => x !== id));
     else if (compare.length < 3) setCompare([...compare, id]);
-    else notify("You can compare up to 3 barbers. Remove one to add another.");
+    else notify("notifications.compareLimit");
   };
   const book = (input: BookingInput, rescheduleId?: string) => {
     const current = stateRef.current;
@@ -160,7 +159,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         existing.status !== "upcoming" ||
         existing.customerId !== fixture.customer.id)
     )
-      throw new Error("This appointment cannot be rescheduled.");
+      throw new Error("errors.reschedule");
     const id = existing?.id ?? `appointment-${crypto.randomUUID()}`;
     const appointment: Appointment = {
       ...input,
@@ -186,7 +185,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
       appointment.customerId !== fixture.customer.id ||
       appointment.status !== "upcoming"
     ) {
-      notify("This appointment cannot be cancelled.");
+      notify("errors.cancel");
       return;
     }
     update({
@@ -198,7 +197,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
           : a,
       ),
     });
-    notify("Your demo appointment has been cancelled.");
+    notify("notifications.cancelled");
   };
   const review = (
     appointmentId: string,
@@ -208,13 +207,10 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
   ) => {
     const current = stateRef.current;
     if (!canReview(current, appointmentId, fixture.customer.id))
-      throw new Error(
-        "Only an unreviewed, completed appointment can receive a review.",
-      );
+      throw new Error("errors.reviewEligible");
     if (!Number.isInteger(rating) || rating < 1 || rating > 5)
-      throw new Error("Choose an overall rating from 1 to 5.");
-    if (text.trim().length < 10)
-      throw new Error("Write at least 10 characters about your visit.");
+      throw new Error("errors.rating");
+    if (text.trim().length < 10) throw new Error("errors.reviewLength");
     const appointment = current.appointments.find(
       (a) => a.id === appointmentId,
     )!;
@@ -233,7 +229,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         },
       ],
     });
-    notify("Your demo review is published. Thank you!");
+    notify("notifications.reviewPublished");
   };
   return (
     <Context.Provider
@@ -241,7 +237,7 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
         reset: () => {
           update(initialState);
           setCompare([]);
-          notify("Sample data restored. Your demo is ready for a fresh start.");
+          notify("notifications.reset");
         },
         state,
         ready,
@@ -272,16 +268,16 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
             CHAIR<span>.</span>
           </div>
           <div className="skeleton startup-skeleton" />
-          <p>Finding your chair…</p>
+          <p>{t("common.finding")}</p>
         </div>
       )}
       {toast && (
         <div className="toast" role="status">
           <span>✓</span>
-          {toast}
+          {t(toast.key, toast.values)}
           <button
-            aria-label="Dismiss notification"
-            onClick={() => setToast("")}
+            aria-label={t("common.dismiss")}
+            onClick={() => setToast(null)}
           >
             ×
           </button>

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -7,7 +7,6 @@ import {
   Check,
   Clock3,
   Eye,
-  ImagePlus,
   Pencil,
   Plus,
   Scissors,
@@ -15,19 +14,12 @@ import {
   Trash2,
   TrendingUp,
 } from "lucide-react";
-import { customer, customers, shops, SLOT_TIMES, styles } from "@/lib/data";
-import {
-  addDays,
-  currentMinutes,
-  formatDate,
-  minutes,
-  money,
-  relativeDate,
-  today,
-} from "@/lib/dates";
+import { customers, SLOT_TIMES, styles } from "@/lib/data";
+import { addDays, currentMinutes, minutes, today } from "@/lib/dates";
 import { getPrice, ratingFor } from "@/lib/booking";
 import type { Service } from "@/lib/types";
 import { useMock } from "./provider";
+import { useI18n } from "@/i18n/provider";
 import {
   Badge,
   EmptyState,
@@ -37,15 +29,6 @@ import {
   SkeletonCard,
 } from "./ui";
 import { DashboardShell } from "./dashboard-shell";
-const DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 export function BarberWorkspace({
   section = "dashboard",
 }: {
@@ -65,6 +48,20 @@ function BarberWorkspaceContent({
 }: {
   section?: string;
 }) {
+  const {
+    t,
+    date,
+    relativeDate,
+    money,
+    number,
+    serviceName: displayServiceName,
+    serviceDescription,
+    styleName,
+    barberBio,
+    portfolioTitle: displayPortfolioTitle,
+    label,
+  } = useI18n();
+  const portfolioFileInput = useRef<HTMLInputElement>(null);
   const { state, update, updateBarber, notify } = useMock(),
     barber = state.barbers.find((b) => b.id === "barber-1")!,
     schedule = state.availability.find((a) => a.barberId === barber.id)!,
@@ -94,6 +91,7 @@ function BarberWorkspaceContent({
     [portfolioTitle, setPortfolioTitle] = useState(""),
     [portfolioStyle, setPortfolioStyle] = useState(barber.styleIds[0]),
     [portfolioImage, setPortfolioImage] = useState("/images/cut-1.jpg"),
+    [portfolioFileName, setPortfolioFileName] = useState(""),
     [removeId, setRemoveId] = useState<string | null>(null),
     [workingDays, setWorkingDays] = useState(schedule.workingDays),
     [start, setStart] = useState(schedule.start),
@@ -117,9 +115,7 @@ function BarberWorkspaceContent({
       !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
       file.size > 600000
     ) {
-      setError(
-        "Choose a JPG, PNG, or WebP image smaller than 600 KB for this local demo.",
-      );
+      setError("workspace.error.imageType");
       return;
     }
     const reader = new FileReader();
@@ -127,8 +123,7 @@ function BarberWorkspaceContent({
       done(String(reader.result));
       setError("");
     };
-    reader.onerror = () =>
-      setError("This image could not be read. Please choose another.");
+    reader.onerror = () => setError("workspace.error.imageRead");
     reader.readAsDataURL(file);
   };
   const appointmentTable = (list: typeof appointments) =>
@@ -137,11 +132,11 @@ function BarberWorkspaceContent({
         <table className="appointment-table">
           <thead>
             <tr>
-              <th>When</th>
-              <th>Customer</th>
-              <th>Service</th>
-              <th>Price</th>
-              <th>Status</th>
+              <th>{t("workspace.table.when")}</th>
+              <th>{t("workspace.table.customer")}</th>
+              <th>{t("workspace.table.service")}</th>
+              <th>{t("workspace.table.price")}</th>
+              <th>{t("workspace.table.status")}</th>
             </tr>
           </thead>
           <tbody>
@@ -153,16 +148,25 @@ function BarberWorkspaceContent({
                 </td>
                 <td>
                   {customers.find((c) => c.id === a.customerId)?.name ??
-                    "Demo customer"}
+                    t("workspace.demoCustomer")}
                 </td>
                 <td>
-                  {state.services.find((s) => s.id === a.serviceId)?.name}
-                  <span>{a.duration} min</span>
+                  {(() => {
+                    const service = state.services.find(
+                      (s) => s.id === a.serviceId,
+                    );
+                    return service ? displayServiceName(service) : "";
+                  })()}
+                  <span>
+                    {t("workspace.minutesShort", { count: a.duration })}
+                  </span>
                 </td>
                 <td>{money(a.price)}</td>
                 <td>
                   <Badge tone={a.status === "completed" ? "" : "green"}>
-                    {a.status === "upcoming" ? "Confirmed" : a.status}
+                    {a.status === "upcoming"
+                      ? t("workspace.confirmed")
+                      : label(a.status)}
                   </Badge>
                   {a.status === "upcoming" &&
                     (a.date < today() ||
@@ -176,10 +180,10 @@ function BarberWorkspaceContent({
                               x.id === a.id ? { ...x, status: "completed" } : x,
                             ),
                           });
-                          notify("Demo appointment marked completed.");
+                          notify("workspace.toast.completed");
                         }}
                       >
-                        Mark completed
+                        {t("workspace.markCompleted")}
                       </button>
                     )}
                 </td>
@@ -190,9 +194,9 @@ function BarberWorkspaceContent({
       </div>
     ) : (
       <EmptyState
-        title="A little breathing room"
-        text="No appointments here yet. New demo bookings with you will appear automatically."
-        action="Preview your booking flow"
+        title={t("workspace.emptyAppointments.title")}
+        text={t("workspace.emptyAppointments.text")}
+        action={t("workspace.emptyAppointments.action")}
         href={`/booking?barber=${barber.id}`}
       />
     );
@@ -203,26 +207,25 @@ function BarberWorkspaceContent({
   return (
     <DashboardShell barber>
       <PageHeader
-        eyebrow="YOUR CRAFT. YOUR BUSINESS."
+        eyebrow={t("workspace.eyebrow")}
         title={
           {
-            dashboard: `A good day to create, ${barber.name.split(" ")[0]}`,
-            profile: "Make a good first impression",
-            portfolio: "Let your work speak",
-            services: "The grooming menu",
-            schedule: "Your time, considered",
-          }[section] ?? "Your workspace"
+            dashboard: t("workspace.heading.dashboard", {
+              name: barber.name.split(" ")[0],
+            }),
+            profile: t("workspace.heading.profile"),
+            portfolio: t("workspace.heading.portfolio"),
+            services: t("workspace.heading.services"),
+            schedule: t("workspace.heading.schedule"),
+          }[section] ?? t("workspace.heading.default")
         }
         description={
           {
-            dashboard:
-              "A clear view of your chair, your clients, and what’s next.",
-            profile: "Give people a reason to choose your chair.",
-            portfolio:
-              "The details, the texture, the finish. Show your signature work.",
-            services: "Clear choices and transparent prices for every client.",
-            schedule:
-              "Make room for good work. Set the hours that work for you.",
+            dashboard: t("workspace.intro.dashboard"),
+            profile: t("workspace.intro.profile"),
+            portfolio: t("workspace.intro.portfolio"),
+            services: t("workspace.intro.services"),
+            schedule: t("workspace.intro.schedule"),
           }[section]
         }
       >
@@ -236,7 +239,7 @@ function BarberWorkspaceContent({
             }}
           >
             <Plus size={16} />
-            Add a look
+            {t("workspace.addLook")}
           </button>
         ) : section === "services" ? (
           <button
@@ -244,14 +247,15 @@ function BarberWorkspaceContent({
             onClick={() => openService(null)}
           >
             <Plus size={16} />
-            Add service
+            {t("workspace.addService")}
           </button>
         ) : (
           <Link
             className="button button-outline"
             href={`/barbers/${barber.slug}`}
           >
-            View profile <ArrowUpRight size={15} />
+            {t("workspace.viewProfile")}
+            <ArrowUpRight size={15} />
           </Link>
         )}
       </PageHeader>
@@ -261,17 +265,25 @@ function BarberWorkspaceContent({
             {[
               [
                 Star,
-                rating.value.toFixed(1),
-                "Average rating",
-                `${rating.count} sample reviews`,
+                number(rating.value, {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                }),
+                t("workspace.metric.rating"),
+                t("workspace.metric.reviews", { count: rating.count }),
               ],
               [
                 CalendarDays,
-                monthAppointments.length,
-                "Bookings this month",
-                "From demo appointments",
+                number(monthAppointments.length),
+                t("workspace.metric.bookings"),
+                t("workspace.metric.demoAppointments"),
               ],
-              [Eye, "1,240", "Profile views", "Illustrative metric"],
+              [
+                Eye,
+                number(1240),
+                t("workspace.metric.views"),
+                t("workspace.metric.illustrative"),
+              ],
               [
                 TrendingUp,
                 money(
@@ -279,8 +291,8 @@ function BarberWorkspaceContent({
                     .filter((a) => a.status === "completed")
                     .reduce((n, a) => n + a.price, 0),
                 ),
-                "Completed revenue",
-                "Demo amounts · no payment",
+                t("workspace.metric.revenue"),
+                t("workspace.metric.noPayment"),
               ],
             ].map(([Icon, value, label, detail]) => {
               const I = Icon as typeof Star;
@@ -295,16 +307,17 @@ function BarberWorkspaceContent({
             })}
           </div>
           <div className="dashboard-section-title">
-            <h2>Today in your chair.</h2>
+            <h2>{t("workspace.today")}</h2>
             <span className="muted small-text">
-              {formatDate(today(), { weekday: "long" })}
+              {date(today(), { weekday: "long" })}
             </span>
           </div>
           {appointmentTable(todays)}
           <div className="dashboard-section-title">
-            <h2>Next through the door.</h2>
+            <h2>{t("workspace.next")}</h2>
             <Link href="/barber/schedule" className="text-link">
-              Manage schedule <ArrowUpRight size={15} />
+              {t("workspace.manageSchedule")}
+              <ArrowUpRight size={15} />
             </Link>
           </div>
           {appointmentTable(upcoming.slice(0, 6))}
@@ -313,9 +326,9 @@ function BarberWorkspaceContent({
           ) && (
             <>
               <div className="dashboard-section-title">
-                <h2>Ready to wrap up.</h2>
+                <h2>{t("workspace.wrapUp")}</h2>
                 <span className="muted small-text">
-                  Past visits awaiting completion
+                  {t("workspace.awaitingCompletion")}
                 </span>
               </div>
               {appointmentTable(
@@ -327,29 +340,34 @@ function BarberWorkspaceContent({
           )}
           <div className="workspace-bottom-grid">
             <div className="workspace-mini-panel">
-              <span className="eyebrow">YOUR DIGITAL FIRST IMPRESSION</span>
-              <h3>Make your next look count.</h3>
+              <span className="eyebrow">{t("workspace.portfolioEyebrow")}</span>
+              <h3>{t("workspace.portfolioTitle")}</h3>
               <div className="mini-portfolio">
                 {portfolio.slice(0, 3).map((p) => (
-                  <img src={p.image} alt={p.title} key={p.id} />
+                  <img
+                    src={p.image}
+                    alt={displayPortfolioTitle(p)}
+                    key={p.id}
+                  />
                 ))}
               </div>
               <Link href="/barber/portfolio" className="text-link">
-                Manage your portfolio <ArrowUpRight size={15} />
+                {t("workspace.managePortfolio")}
+                <ArrowUpRight size={15} />
               </Link>
             </div>
             <div className="workspace-mini-panel">
-              <span className="eyebrow">YOUR CLIENTS, IN THEIR WORDS</span>
+              <span className="eyebrow">{t("workspace.reviewsEyebrow")}</span>
               <Rating value={rating.value} count={rating.count} />
               <blockquote>
-                “{reviews[0]?.text ?? "Your first review is waiting to happen."}
-                ”
+                “{reviews[0]?.text ?? t("workspace.firstReview")}”
               </blockquote>
               <Link
                 href={`/barbers/${barber.slug}#reviews`}
                 className="text-link"
               >
-                Read your reviews <ArrowUpRight size={15} />
+                {t("workspace.readReviews")}
+                <ArrowUpRight size={15} />
               </Link>
             </div>
           </div>
@@ -361,13 +379,11 @@ function BarberWorkspaceContent({
           onSubmit={(e) => {
             e.preventDefault();
             if (name.trim().length < 2 || bio.trim().length < 20) {
-              setError(
-                "Add your name and a biography of at least 20 characters.",
-              );
+              setError("workspace.error.profile");
               return;
             }
             if (!specialties.length) {
-              setError("Choose at least one specialty.");
+              setError("workspace.error.specialty");
               return;
             }
             updateBarber(barber.id, {
@@ -378,16 +394,16 @@ function BarberWorkspaceContent({
               image: photo,
             });
             setError("");
-            notify("Your public demo profile has been updated.");
+            notify("workspace.toast.profile");
           }}
         >
           <div className="profile-photo-edit">
-            <img src={photo} alt="Profile preview" />
+            <img src={photo} alt={t("workspace.profilePreview")} />
             <div>
-              <h3>A face to remember.</h3>
-              <p>Choose a demo portrait or upload a small photo.</p>
+              <h3>{t("workspace.faceTitle")}</h3>
+              <p>{t("workspace.photoHint")}</p>
               <label className="button button-outline upload-button">
-                Change photo
+                {t("workspace.changePhoto")}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -404,7 +420,9 @@ function BarberWorkspaceContent({
               <button
                 type="button"
                 key={url}
-                aria-label={`Choose sample portrait ${i + 1}`}
+                aria-label={t("workspace.choosePortrait", {
+                  count: i + 1,
+                })}
                 aria-pressed={photo === url}
                 className={photo === url ? "selected" : ""}
                 onClick={() => setPhoto(url)}
@@ -415,7 +433,7 @@ function BarberWorkspaceContent({
           </div>
           <div className="field-row">
             <label className="field">
-              Full name
+              {t("workspace.fullName")}
               <input
                 required
                 minLength={2}
@@ -425,7 +443,7 @@ function BarberWorkspaceContent({
               />
             </label>
             <label className="field">
-              Years of experience
+              {t("workspace.experience")}
               <input
                 type="number"
                 required
@@ -437,21 +455,18 @@ function BarberWorkspaceContent({
             </label>
           </div>
           <label className="field">
-            Your story
+            {t("workspace.story")}
             <textarea
               required
               minLength={20}
               maxLength={1200}
-              value={bio}
+              value={barberBio({ ...barber, bio })}
               onChange={(e) => setBio(e.target.value)}
             />
-            <span className="hint">
-              What do you love about your craft? What makes your approach
-              personal?
-            </span>
+            <span className="hint">{t("workspace.storyHint")}</span>
           </label>
           <fieldset className="specialty-field">
-            <legend>Your specialties</legend>
+            <legend>{t("workspace.specialties")}</legend>
             <div className="specialty-checkboxes">
               {styles.map((s) => (
                 <label
@@ -469,18 +484,19 @@ function BarberWorkspaceContent({
                       )
                     }
                   />
-                  {s.name}
+                  {styleName(s)}
                 </label>
               ))}
             </div>
           </fieldset>
           {error && (
             <p className="error-message" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
           <button className="button button-dark" type="submit">
-            Save profile <Check size={16} />
+            {t("workspace.saveProfile")}
+            <Check size={16} />
           </button>
         </form>
       )}
@@ -490,19 +506,24 @@ function BarberWorkspaceContent({
             <div className="managed-portfolio">
               {portfolio.map((p) => (
                 <article key={p.id}>
-                  <img src={p.image} alt={p.title} />
+                  <img src={p.image} alt={displayPortfolioTitle(p)} />
                   <div>
                     <div>
-                      <h3>{p.title}</h3>
+                      <h3>{displayPortfolioTitle(p)}</h3>
                       <span>
                         {p.styleIds
-                          .map((id) => styles.find((s) => s.id === id)?.name)
+                          .map((id) => {
+                            const style = styles.find((s) => s.id === id);
+                            return style ? styleName(style) : "";
+                          })
                           .join(", ")}
                       </span>
                     </div>
                     <button
                       className="icon-button"
-                      aria-label={`Remove ${p.title}`}
+                      aria-label={t("workspace.removeNamedLook", {
+                        title: displayPortfolioTitle(p),
+                      })}
                       onClick={() => setRemoveId(p.id)}
                     >
                       <Trash2 size={15} />
@@ -513,16 +534,13 @@ function BarberWorkspaceContent({
             </div>
           ) : (
             <EmptyState
-              title="Your first look starts here"
-              text="Add a photo of your work and help the right client find you."
-              action="Add a look"
+              title={t("workspace.emptyPortfolio.title")}
+              text={t("workspace.emptyPortfolio.text")}
+              action={t("workspace.addLook")}
               onAction={() => setPortfolioModal(true)}
             />
           )}
-          <p className="notice">
-            Sample photographs illustrate a portfolio. Uploaded images stay on
-            this device; no file is sent to a server.
-          </p>
+          <p className="notice">{t("workspace.portfolioNotice")}</p>
         </>
       )}
       {section === "services" && (
@@ -534,11 +552,11 @@ function BarberWorkspaceContent({
                   <Scissors size={21} />
                 </div>
                 <div>
-                  <h3>{s.name}</h3>
-                  <p>{s.description}</p>
+                  <h3>{displayServiceName(s)}</h3>
+                  <p>{serviceDescription(s)}</p>
                   <span>
                     <Clock3 size={12} />
-                    {s.duration} minutes
+                    {t("workspace.minutes", { count: s.duration })}
                   </span>
                 </div>
                 <strong>{money(getPrice(barber, s.id, state))}</strong>
@@ -547,15 +565,12 @@ function BarberWorkspaceContent({
                   onClick={() => openService(s)}
                 >
                   <Pencil size={13} />
-                  Edit price
+                  {t("workspace.editPrice")}
                 </button>
               </div>
             ))}
           </div>
-          <p className="notice">
-            Service changes update your public profile and new demo bookings.
-            Existing appointments keep their original price.
-          </p>
+          <p className="notice">{t("workspace.servicesNotice")}</p>
         </>
       )}
       {section === "schedule" && (
@@ -564,7 +579,7 @@ function BarberWorkspaceContent({
           onSubmit={(e) => {
             e.preventDefault();
             if (minutes(start) >= minutes(end)) {
-              setError("Closing time must be after opening time.");
+              setError("workspace.error.hours");
               return;
             }
             update({
@@ -582,17 +597,12 @@ function BarberWorkspaceContent({
               ),
             });
             setError("");
-            notify(
-              "Your schedule is updated. Booking availability now reflects these hours.",
-            );
+            notify("workspace.toast.schedule");
           }}
         >
           <div className="schedule-section">
-            <h3>Your working week</h3>
-            <p>
-              Choose the days you’re in the chair. Your shop is closed on
-              Sundays.
-            </p>
+            <h3>{t("workspace.week")}</h3>
+            <p>{t("workspace.weekHint")}</p>
             <div className="working-days">
               {[1, 2, 3, 4, 5, 6, 0].map((d) => (
                 <label
@@ -611,14 +621,18 @@ function BarberWorkspaceContent({
                       )
                     }
                   />
-                  <span>{DAYS[d].slice(0, 3)}</span>
-                  <strong>{workingDays.includes(d) ? "Working" : "Off"}</strong>
+                  <span>{t(`workspace.weekday.${d}`)}</span>
+                  <strong>
+                    {workingDays.includes(d)
+                      ? t("workspace.working")
+                      : t("workspace.off")}
+                  </strong>
                 </label>
               ))}
             </div>
             <div className="field-row">
               <label className="field">
-                Start time
+                {t("workspace.startTime")}
                 <input
                   type="time"
                   value={start}
@@ -629,7 +643,7 @@ function BarberWorkspaceContent({
                 />
               </label>
               <label className="field">
-                Finish time
+                {t("workspace.finishTime")}
                 <input
                   type="time"
                   value={end}
@@ -640,43 +654,44 @@ function BarberWorkspaceContent({
                 />
               </label>
             </div>
-            <p className="small-text muted">
-              Appointments must finish within your hours and the shop’s
-              10:00–20:00 opening hours.
-            </p>
+            <p className="small-text muted">{t("workspace.hoursHint")}</p>
           </div>
           <div className="schedule-section">
-            <h3>Make space for a break</h3>
-            <p>Block starting times from your daily availability.</p>
+            <h3>{t("workspace.breakTitle")}</h3>
+            <p>{t("workspace.breakHint")}</p>
             <div className="break-slots">
-              {SLOT_TIMES.map((t) => (
+              {SLOT_TIMES.map((time) => (
                 <label
-                  key={t}
-                  className={`break-slot ${blockedSlots.includes(t) ? "blocked" : ""}`}
+                  key={time}
+                  className={`break-slot ${blockedSlots.includes(time) ? "blocked" : ""}`}
                 >
                   <input
                     type="checkbox"
-                    checked={blockedSlots.includes(t)}
+                    checked={blockedSlots.includes(time)}
                     onChange={() =>
                       setBlockedSlots(
-                        blockedSlots.includes(t)
-                          ? blockedSlots.filter((x) => x !== t)
-                          : [...blockedSlots, t],
+                        blockedSlots.includes(time)
+                          ? blockedSlots.filter((x) => x !== time)
+                          : [...blockedSlots, time],
                       )
                     }
                   />
-                  {t}
-                  <span>{blockedSlots.includes(t) ? "Blocked" : "Open"}</span>
+                  {time}
+                  <span>
+                    {blockedSlots.includes(time)
+                      ? t("workspace.blocked")
+                      : t("workspace.open")}
+                  </span>
                 </label>
               ))}
             </div>
           </div>
           <div className="schedule-section">
-            <h3>Time away</h3>
-            <p>Block a whole day for rest, travel, or something good.</p>
+            <h3>{t("workspace.timeAway")}</h3>
+            <p>{t("workspace.timeAwayHint")}</p>
             <div className="block-date-row">
               <label className="field">
-                Date off
+                {t("workspace.dateOff")}
                 <input
                   type="date"
                   min={today()}
@@ -695,16 +710,16 @@ function BarberWorkspaceContent({
                   setBlockedDate("");
                 }}
               >
-                Add day off
+                {t("workspace.addDayOff")}
               </button>
             </div>
             <div className="blocked-date-list">
               {blockedDates.map((d) => (
                 <span className="badge" key={d}>
-                  {formatDate(d, { weekday: "short" })}
+                  {date(d, { weekday: "short" })}
                   <button
                     type="button"
-                    aria-label={`Remove day off ${d}`}
+                    aria-label={t("workspace.removeDayOff", { date: date(d) })}
                     onClick={() =>
                       setBlockedDates(blockedDates.filter((x) => x !== d))
                     }
@@ -717,22 +732,22 @@ function BarberWorkspaceContent({
           </div>
           {error && (
             <p className="error-message" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
-          <p className="notice">
-            Existing confirmed appointments stay on your calendar. Schedule
-            changes only affect new bookings.
-          </p>
+          <p className="notice">{t("workspace.scheduleNotice")}</p>
           <button className="button button-dark" type="submit">
-            Save schedule <Check size={16} />
+            {t("workspace.saveSchedule")}
+            <Check size={16} />
           </button>
         </form>
       )}
       <Modal
         open={serviceModal}
         onClose={() => setServiceModal(false)}
-        title={editing ? "A considered price" : "Add to your menu"}
+        title={
+          editing ? t("workspace.priceTitle") : t("workspace.addMenuTitle")
+        }
       >
         <form
           onSubmit={(e) => {
@@ -741,9 +756,7 @@ function BarberWorkspaceContent({
               !editing &&
               (serviceName.trim().length < 2 || description.trim().length < 10)
             ) {
-              setError(
-                "Add a service name and a description of at least 10 characters.",
-              );
+              setError("workspace.error.service");
               return;
             }
             if (
@@ -754,9 +767,7 @@ function BarberWorkspaceContent({
               duration < 5 ||
               duration > 180
             ) {
-              setError(
-                "Use a price of ₾5–₾500 and a duration of 5–180 minutes.",
-              );
+              setError("workspace.error.price");
               return;
             }
             if (editing) {
@@ -789,24 +800,22 @@ function BarberWorkspaceContent({
             }
             setServiceModal(false);
             notify(
-              editing
-                ? "Your price has been updated."
-                : "New service added to your profile.",
+              editing ? "workspace.toast.price" : "workspace.toast.service",
             );
           }}
         >
           <label className="field">
-            Service name
+            {t("workspace.serviceName")}
             <input
               required
-              value={serviceName}
+              value={editing ? displayServiceName(editing) : serviceName}
               disabled={!!editing}
               onChange={(e) => setServiceName(e.target.value)}
             />
           </label>
           <div className="field-row">
             <label className="field">
-              Price (GEL)
+              {t("workspace.priceGel")}
               <input
                 required
                 type="number"
@@ -817,7 +826,7 @@ function BarberWorkspaceContent({
               />
             </label>
             <label className="field">
-              Duration (minutes)
+              {t("workspace.duration")}
               <input
                 required
                 disabled={!!editing}
@@ -832,36 +841,36 @@ function BarberWorkspaceContent({
           </div>
           {!editing && (
             <label className="field">
-              Description
+              {t("workspace.description")}
               <textarea
                 required
                 minLength={10}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell clients what’s included."
+                placeholder={t("workspace.descriptionPlaceholder")}
               />
             </label>
           )}
           {error && (
             <p className="error-message" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
           <button className="button button-dark button-full">
-            {editing ? "Save price" : "Add service"}
+            {editing ? t("workspace.savePrice") : t("workspace.addService")}
           </button>
         </form>
       </Modal>
       <Modal
         open={portfolioModal}
         onClose={() => setPortfolioModal(false)}
-        title="Add a signature look"
+        title={t("workspace.addSignature")}
       >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             if (portfolioTitle.trim().length < 3) {
-              setError("Add a title of at least 3 characters.");
+              setError("workspace.error.lookTitle");
               return;
             }
             update({
@@ -878,16 +887,16 @@ function BarberWorkspaceContent({
               ],
             });
             setPortfolioModal(false);
-            notify("Your new look is live on your demo profile.");
+            notify("workspace.toast.lookAdded");
           }}
         >
           <img
             className="portfolio-upload-preview"
             src={portfolioImage}
-            alt="New portfolio preview"
+            alt={t("workspace.newPreview")}
           />
           <label className="field">
-            Choose a sample photo
+            {t("workspace.chooseSample")}
             <select
               value={
                 portfolioImage.startsWith("/images/")
@@ -897,76 +906,98 @@ function BarberWorkspaceContent({
               onChange={(e) => setPortfolioImage(e.target.value)}
             >
               {portfolioImage.startsWith("data:") && (
-                <option value="upload">Your uploaded image</option>
+                <option value="upload">{t("workspace.uploadedImage")}</option>
               )}
               {Array.from({ length: 8 }, (_, i) => (
                 <option key={i} value={`/images/cut-${i + 1}.jpg`}>
-                  Portfolio sample {i + 1}
+                  {t("workspace.portfolioSample", { count: i + 1 })}
                 </option>
               ))}
             </select>
           </label>
-          <label className="field">
-            Or upload your photo
+          <div className="field">
+            <span>{t("workspace.uploadPhoto")}</span>
+            <button
+              type="button"
+              className="button button-outline"
+              aria-describedby="portfolio-upload-selection"
+              onClick={() => portfolioFileInput.current?.click()}
+            >
+              {t("workspace.chooseFile")}
+            </button>
             <input
+              ref={portfolioFileInput}
+              className="sr-only"
               type="file"
+              tabIndex={-1}
+              aria-label={t("workspace.uploadPhoto")}
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) =>
-                readPhoto(e.target.files?.[0], setPortfolioImage)
-              }
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                readPhoto(file, (url) => {
+                  setPortfolioImage(url);
+                  setPortfolioFileName(file?.name ?? "");
+                });
+              }}
             />
-            <span className="hint">
-              JPG, PNG, or WebP · up to 600 KB · local only
+            <span
+              className="hint"
+              id="portfolio-upload-selection"
+              role="status"
+              style={{ overflowWrap: "anywhere" }}
+            >
+              {portfolioFileName && portfolioImage.startsWith("data:")
+                ? t("workspace.selectedFile", { name: portfolioFileName })
+                : t("workspace.noFileSelected")}
             </span>
-          </label>
+            <span className="hint">{t("workspace.uploadHint")}</span>
+          </div>
           <label className="field">
-            Look title
+            {t("workspace.lookTitle")}
             <input
               required
               minLength={3}
               maxLength={80}
               value={portfolioTitle}
               onChange={(e) => setPortfolioTitle(e.target.value)}
-              placeholder="Skin fade with a textured top"
+              placeholder={t("workspace.lookPlaceholder")}
             />
           </label>
           <label className="field">
-            Haircut style
+            {t("workspace.haircutStyle")}
             <select
               value={portfolioStyle}
               onChange={(e) => setPortfolioStyle(e.target.value)}
             >
               {styles.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.name}
+                  {styleName(s)}
                 </option>
               ))}
             </select>
           </label>
           {error && (
             <p className="error-message" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
           <button className="button button-dark button-full">
-            Add to portfolio
+            {t("workspace.addPortfolio")}
           </button>
         </form>
       </Modal>
       <Modal
         open={!!removeId}
         onClose={() => setRemoveId(null)}
-        title="Remove this look?"
+        title={t("workspace.removeTitle")}
       >
-        <p className="small-text muted">
-          This will remove the image from your local demo portfolio.
-        </p>
+        <p className="small-text muted">{t("workspace.removeHint")}</p>
         <div className="modal-actions">
           <button
             className="button button-outline"
             onClick={() => setRemoveId(null)}
           >
-            Keep look
+            {t("workspace.keepLook")}
           </button>
           <button
             className="button button-dark"
@@ -975,10 +1006,10 @@ function BarberWorkspaceContent({
                 portfolio: state.portfolio.filter((p) => p.id !== removeId),
               });
               setRemoveId(null);
-              notify("Look removed from your portfolio.");
+              notify("workspace.toast.lookRemoved");
             }}
           >
-            Remove look
+            {t("workspace.removeLook")}
           </button>
         </div>
       </Modal>

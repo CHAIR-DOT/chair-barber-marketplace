@@ -7,7 +7,19 @@ CHAIR. currently runs with local fixture data and browser state. No database, AP
 - `src/lib/types.ts` defines the domain entities. IDs link shops, barbers, services, customers, appointments, reviews, and portfolio items.
 - `src/lib/data.ts` contains fixtures; `src/lib/booking.ts` owns pure booking rules.
 - `src/components/provider.tsx` is the local state/action boundary. Replace these actions with an async repository without changing page composition.
-- User-visible language can move into locale dictionaries. Preserve stable IDs; localize labels and route-independent service/style descriptions. Format GEL and dates through shared helpers. Booking dates use `Asia/Tbilisi`.
+- Frontend localization is implemented in `src/i18n/`: Georgian (`ka`) is the first-visit default, with English (`en`) and Russian (`ru`). Locale selection is independent of the data/action boundary and does not change routes or canonical records.
+
+## Existing localization boundary
+
+`LocaleProvider` supplies semantic translations and display helpers. Dictionaries live in `src/i18n/messages/`; configuration, interpolation/plurals, fixture display rules, and metadata live beside them. Language preference is browser-local under `chair.locale.v1`, separately from mock application data under `chair.prototype.v1`. No backend locale storage or translation service is connected.
+
+Keep this presentation boundary when replacing mock repositories. Barber/shop/customer names, IDs, slugs, prices, relationship keys, and authored review text remain canonical. Generic service/style names and original fixture descriptions translate for display; ID/original-value matching preserves edits and custom content. Generic seed portfolio category titles can translate, while intentionally named works stay unchanged. Any later replacement for fixture translations must preserve that distinction rather than translating or duplicating entire domain records.
+
+Shared `Intl` helpers use `ka-GE`, `en-GB`, and `ru-RU`, retain GEL **₾**, and display booking dates in **Asia/Tbilisi**. Language selection must not alter date/time values, prices, slot eligibility, identity, or booking ownership. Stable error codes cross the domain boundary and become localized messages in the UI; a future API should retain that separation.
+
+**Every newly introduced user-facing UI string must be added to the localization system in Georgian, English, and Russian. Do not introduce new hardcoded interface text.** Add semantic keys to the appropriate message group, provide all three translations with matching interpolation fields, and use the existing display helpers. [README.md](README.md#localization) documents the full workflow. Native picker and browser chrome language remains browser/OS-controlled; server integration does not require replacing those controls.
+
+The current interface retains DM Sans/DM Serif Display, with locally bundled Noto Sans/Serif Georgian and system Arial/Georgia Cyrillic fallbacks. Backend migration should preserve these assets and the existing visual design. Backend translation storage, account-level locale preferences, and localized outbound notifications are future work only when authorized.
 
 ## PostgreSQL / Supabase
 

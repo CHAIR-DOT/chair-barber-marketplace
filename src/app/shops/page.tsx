@@ -1,5 +1,6 @@
+import { translate } from "@/i18n/translate";
 import { Discovery } from "@/components/discovery";
-export const metadata = { title: "Barber shops" };
+export const metadata = { title: translate("ka", "metadata.shops") };
 export default function Page() {
   return <Discovery mode="shops" />;
 }

@@ -6,9 +6,10 @@ import { useMock } from "./provider";
 import { Modal, Rating } from "./ui";
 import { shops, styles } from "@/lib/data";
 import { getPrice, ratingFor } from "@/lib/booking";
-import { money } from "@/lib/dates";
+import { useI18n } from "@/i18n/provider";
 import { NextSlot } from "./cards";
 export function CompareDock() {
+  const { t, money, number, styleName, label } = useI18n();
   const { state, compare, clearCompare, toggleCompare } = useMock(),
     [open, setOpen] = useState(false),
     barbers = state.barbers.filter((b) => compare.includes(b.id));
@@ -22,7 +23,7 @@ export function CompareDock() {
             <button
               key={b.id}
               onClick={() => toggleCompare(b.id)}
-              aria-label={`Remove ${b.name} from comparison`}
+              aria-label={t("compare.remove", { name: b.name })}
             >
               <img src={b.image} alt={b.name} />
               <X size={12} />
@@ -30,20 +31,20 @@ export function CompareDock() {
           ))}
         </div>
         <span>
-          {compare.length} / 3{" "}
-          <span className="hide-mobile">barbers selected</span>
+          {number(compare.length)} / {number(3)}{" "}
+          <span className="hide-mobile">{t("compare.selected")}</span>
         </span>
         <button
           disabled={compare.length < 2}
           className="button button-dark"
           onClick={() => setOpen(true)}
         >
-          Compare
+          {t("compare.compare")}
         </button>
         <button
           className="icon-button"
           onClick={clearCompare}
-          aria-label="Clear comparison"
+          aria-label={t("compare.clear")}
         >
           <X size={18} />
         </button>
@@ -51,12 +52,10 @@ export function CompareDock() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Find your kind of barber"
+        title={t("compare.title")}
         wide
       >
-        <p className="muted small-text">
-          A little side-by-side clarity for your next haircut.
-        </p>
+        <p className="muted small-text">{t("compare.description")}</p>
         <div
           className="compare-grid"
           style={{
@@ -72,23 +71,26 @@ export function CompareDock() {
                 <h3>{b.name}</h3>
                 <Rating value={rating.value} count={rating.count} />
                 <dl>
-                  <dt>Experience</dt>
-                  <dd>{b.experience} years</dd>
-                  <dt>Haircut from</dt>
+                  <dt>{t("compare.experience")}</dt>
+                  <dd>{t("compare.years", { count: b.experience })}</dd>
+                  <dt>{t("compare.haircutFrom")}</dt>
                   <dd>{money(getPrice(b, "haircut", state))}</dd>
-                  <dt>Best at</dt>
+                  <dt>{t("compare.bestAt")}</dt>
                   <dd>
                     {b.styleIds
-                      .map((id) => styles.find((s) => s.id === id)?.name)
+                      .map((id) => {
+                        const style = styles.find((s) => s.id === id);
+                        return style ? styleName(style) : "";
+                      })
                       .join(", ")}
                   </dd>
-                  <dt>Location</dt>
+                  <dt>{t("compare.location")}</dt>
                   <dd>
                     {shop.name}
                     <br />
-                    {shop.neighborhood}
+                    {label(shop.neighborhood)}
                   </dd>
-                  <dt>Next available</dt>
+                  <dt>{t("compare.nextAvailable")}</dt>
                   <dd>
                     <NextSlot barberId={b.id} />
                   </dd>
@@ -98,14 +100,14 @@ export function CompareDock() {
                   onClick={() => setOpen(false)}
                   className="button button-dark"
                 >
-                  Book {b.name.split(" ")[0]}
+                  {t("compare.book", { name: b.name.split(" ")[0] })}
                 </Link>
                 <Link
                   href={`/barbers/${b.slug}`}
                   onClick={() => setOpen(false)}
                   className="text-link"
                 >
-                  View profile
+                  {t("compare.viewProfile")}
                 </Link>
               </div>
             );

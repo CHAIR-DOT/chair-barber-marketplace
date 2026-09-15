@@ -10,6 +10,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { customer } from "@/lib/data";
+import { useI18n } from "@/i18n/provider";
 import type { Role } from "@/lib/types";
 import { useMock } from "./provider";
 export function AuthPage({
@@ -19,6 +20,7 @@ export function AuthPage({
   register?: boolean;
   initialRole?: string;
 }) {
+  const { t: tr } = useI18n();
   const router = useRouter(),
     { update, notify } = useMock(),
     [role, setRole] = useState<Role>(
@@ -31,43 +33,36 @@ export function AuthPage({
   return (
     <div className="auth-page">
       <div className="auth-visual">
-        <img
-          src="/images/shop-3.jpg"
-          alt="Warm, welcoming barbershop interior"
-        />
+        <img src="/images/shop-3.jpg" alt={tr("auth.imageAlt")} />
         <div>
-          <div className="eyebrow">FIND YOUR PEOPLE</div>
+          <div className="eyebrow">{tr("auth.visualEyebrow")}</div>
           <h2>
-            A good haircut
+            {tr("auth.visualLine1")}
             <br />
-            changes your day.
+            {tr("auth.visualLine2")}
             <br />
             <em>
-              A good barber
+              {tr("auth.visualLine3")}
               <br />
-              makes it yours.
+              {tr("auth.visualLine4")}
             </em>
           </h2>
-          <span>CRAFT. CHARACTER. CONNECTION.</span>
+          <span>{tr("auth.visualTagline")}</span>
         </div>
       </div>
       <div className="auth-content">
-        <div className="eyebrow">WELCOME TO CHAIR.</div>
+        <div className="eyebrow">{tr("auth.welcome")}</div>
         <h1>
           {register
             ? stage === 0
-              ? "Make yourself at home."
-              : "Let’s make it yours."
-            : "Good to see you."}
+              ? tr("auth.titleRole")
+              : tr("auth.titleRegister")
+            : tr("auth.titleLogin")}
         </h1>
-        <p>
-          {register
-            ? "A better connection starts here."
-            : "Your next good hair day is waiting."}
-        </p>
+        <p>{register ? tr("auth.introRegister") : tr("auth.introLogin")}</p>
         {stage === 0 ? (
           <>
-            <h3 className="auth-question">How will you use the platform?</h3>
+            <h3 className="auth-question">{tr("auth.question")}</h3>
             <div className="role-options">
               {(["customer", "barber"] as Role[]).map((r) => (
                 <button
@@ -84,13 +79,13 @@ export function AuthPage({
                   <div>
                     <strong>
                       {r === "customer"
-                        ? "I’m looking for a barber"
-                        : "I am a barber"}
+                        ? tr("auth.role.customerTitle")
+                        : tr("auth.role.barberTitle")}
                     </strong>
                     <span>
                       {r === "customer"
-                        ? "Find your style. Find your person."
-                        : "Show your craft. Build your clientele."}
+                        ? tr("auth.role.customerDescription")
+                        : tr("auth.role.barberDescription")}
                     </span>
                   </div>
                   <span className="radio-indicator">
@@ -103,7 +98,8 @@ export function AuthPage({
               className="button button-dark button-full"
               onClick={() => setStage(1)}
             >
-              Continue <ArrowRight size={16} />
+              {tr("auth.continue")}
+              <ArrowRight size={16} />
             </button>
           </>
         ) : (
@@ -121,9 +117,9 @@ export function AuthPage({
                 },
               });
               setPassword("");
-              notify(
-                `Welcome${name ? `, ${name.split(" ")[0]}` : ""}. You’re in the ${role} demo.`,
-              );
+              notify(`auth.${name ? "welcomeNamed" : "welcome"}.${role}`, {
+                name: name.split(" ")[0],
+              });
               router.push(role === "barber" ? "/barber/dashboard" : "/account");
             }}
           >
@@ -133,7 +129,7 @@ export function AuthPage({
                 className="link-button auth-role-back"
                 onClick={() => setStage(0)}
               >
-                <ArrowLeft size={13} /> Joining as a {role} · change
+                <ArrowLeft size={13} /> {tr(`auth.joining.${role}`)}
               </button>
             )}
             {!register && (
@@ -143,20 +139,20 @@ export function AuthPage({
                   className={role === "customer" ? "active" : ""}
                   onClick={() => setRole("customer")}
                 >
-                  Customer
+                  {tr("auth.customer")}
                 </button>
                 <button
                   type="button"
                   className={role === "barber" ? "active" : ""}
                   onClick={() => setRole("barber")}
                 >
-                  Barber
+                  {tr("auth.barber")}
                 </button>
               </div>
             )}
             {register && (
               <label className="field">
-                Your name
+                {tr("auth.name")}
                 <input
                   required
                   autoComplete="name"
@@ -167,7 +163,7 @@ export function AuthPage({
               </label>
             )}
             <label className="field">
-              Email address
+              {tr("auth.email")}
               <input
                 required
                 type="email"
@@ -178,42 +174,37 @@ export function AuthPage({
               />
             </label>
             <label className="field">
-              Demo password
+              {tr("auth.password")}
               <input
                 required
                 type="password"
                 autoComplete="off"
                 minLength={4}
-                placeholder="Any 4+ characters for this preview"
+                placeholder={tr("auth.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <span className="hint">
-                Use a made-up password. It is never stored or sent.
-              </span>
+              <span className="hint">{tr("auth.passwordHint")}</span>
             </label>
             <button className="button button-dark button-full" type="submit">
-              {register ? "Create demo account" : "Enter the demo"}{" "}
+              {register ? tr("auth.createDemo") : tr("auth.enterDemo")}{" "}
               <ArrowRight size={16} />
             </button>
           </form>
         )}
         <div className="auth-switch">
-          {register ? "Already have a chair?" : "New around here?"}{" "}
+          {register ? tr("auth.existingAccount") : tr("auth.newAccount")}{" "}
           <Link href={register ? "/login" : "/register"}>
-            {register ? "Sign in" : "Create an account"}
+            {register ? tr("auth.signIn") : tr("auth.createAccount")}
           </Link>
         </div>
-        <div className="notice">
-          Frontend preview only. There’s no real authentication. This opens a
-          sample {role === "barber" ? "Giorgi barber" : "Alex customer"}{" "}
-          workspace, with changes saved in this browser.
-        </div>
+        <div className="notice">{tr(`auth.notice.${role}`)}</div>
         <Link
           href={role === "barber" ? "/barber/dashboard" : "/account"}
           className="auth-preview-link"
         >
-          Explore the demo without signing in <ArrowRight size={14} />
+          {tr("auth.exploreDemo")}
+          <ArrowRight size={14} />
         </Link>
       </div>
     </div>

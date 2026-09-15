@@ -2,17 +2,18 @@
 import { useState } from "react";
 import { BadgeCheck, Star } from "lucide-react";
 import { customers } from "@/lib/data";
-import { formatDate } from "@/lib/dates";
+import { useI18n } from "@/i18n/provider";
 import type { Review } from "@/lib/types";
 import { useMock } from "./provider";
 import { Badge, EmptyState, Modal, Rating } from "./ui";
 const dimensionLabels = {
-  quality: "Haircut quality",
-  detail: "Attention to detail",
-  communication: "Communication",
-  punctuality: "Punctuality",
+  quality: "reviews.dimension.quality",
+  detail: "reviews.dimension.detail",
+  communication: "reviews.dimension.communication",
+  punctuality: "reviews.dimension.punctuality",
 };
 export function ReviewCard({ review }: { review: Review }) {
+  const { t, date, serviceName } = useI18n();
   const { state } = useMock(),
     customer = customers.find((c) => c.id === review.customerId),
     barber = state.barbers.find((b) => b.id === review.barberId),
@@ -26,26 +27,26 @@ export function ReviewCard({ review }: { review: Review }) {
     <article className="review-card">
       <div className="review-heading">
         <span className="initial-avatar">
-          {(customer?.name ?? "Guest")
+          {(customer?.name ?? t("reviews.guest"))
             .split(" ")
             .map((x) => x[0])
             .join("")}
         </span>
         <div>
-          <strong>{customer?.name ?? "Demo customer"}</strong>
-          <span>{formatDate(review.date, { year: "numeric" })}</span>
+          <strong>{customer?.name ?? t("reviews.demoCustomer")}</strong>
+          <span>{date(review.date, { year: "numeric" })}</span>
         </div>
         <Rating value={review.rating} />
       </div>
       <p>{review.text}</p>
       <div className="review-footer">
         <span>
-          {service?.name} · {barber?.name.split(" ")[0]}
+          {service ? serviceName(service) : ""} · {barber?.name.split(" ")[0]}
         </span>
         {verified && (
           <Badge tone="green">
             <BadgeCheck size={12} />
-            Verified appointment
+            {t("reviews.verified")}
           </Badge>
         )}
       </div>
@@ -53,29 +54,34 @@ export function ReviewCard({ review }: { review: Review }) {
   );
 }
 export function RatingBreakdown({ reviews }: { reviews: Review[] }) {
+  const { t, number } = useI18n();
+  const ratingNumber = (n: number) =>
+    number(n, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const value = reviews.length
     ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : 0;
   return (
     <div className="rating-breakdown">
       <div className="rating-overall">
-        <strong>{value ? value.toFixed(1) : "—"}</strong>
+        <strong>{value ? ratingNumber(value) : "—"}</strong>
         <div>
           <div
             className="review-stars"
-            aria-label={`${value.toFixed(1)} out of 5 stars`}
+            aria-label={t("reviews.outOfFive", { value: ratingNumber(value) })}
           >
             ★★★★★
           </div>
           <span>
-            {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
+            {t(reviews.length === 1 ? "reviews.count.one" : "reviews.count", {
+              count: reviews.length,
+            })}
           </span>
         </div>
       </div>
       <div className="rating-distribution">
         {[5, 4, 3, 2, 1].map((n) => (
           <div key={n}>
-            <span>{n}</span>
+            <span>{number(n)}</span>
             <Star size={11} />
             <div className="progress-track">
               <i
@@ -84,7 +90,7 @@ export function RatingBreakdown({ reviews }: { reviews: Review[] }) {
                 }}
               />
             </div>
-            <span>{reviews.filter((r) => r.rating === n).length}</span>
+            <span>{number(reviews.filter((r) => r.rating === n).length)}</span>
           </div>
         ))}
       </div>
@@ -97,10 +103,10 @@ export function RatingBreakdown({ reviews }: { reviews: Review[] }) {
           });
           return (
             <div key={key}>
-              <span>{label}</span>
+              <span>{t(label)}</span>
               <strong>
                 {list.length
-                  ? (list.reduce((a, b) => a + b, 0) / list.length).toFixed(1)
+                  ? ratingNumber(list.reduce((a, b) => a + b, 0) / list.length)
                   : "—"}
               </strong>
             </div>
@@ -111,15 +117,20 @@ export function RatingBreakdown({ reviews }: { reviews: Review[] }) {
   );
 }
 export function ReviewsSection({ reviews }: { reviews: Review[] }) {
+  const { t } = useI18n();
   const [all, setAll] = useState(false);
   return (
     <section className="profile-section" id="reviews">
       <div className="section-heading">
         <div>
-          <div className="eyebrow">FROM THE OTHER SIDE OF THE CHAIR</div>
-          <h2>Good words. Great cuts.</h2>
+          <div className="eyebrow">{t("reviews.eyebrow")}</div>
+          <h2>{t("reviews.heading")}</h2>
         </div>
-        <Badge>{reviews.length} reviews</Badge>
+        <Badge>
+          {t(reviews.length === 1 ? "reviews.count.one" : "reviews.count", {
+            count: reviews.length,
+          })}
+        </Badge>
       </div>
       {reviews.length ? (
         <>
@@ -135,15 +146,15 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
               onClick={() => setAll(!all)}
             >
               {all
-                ? "Show fewer reviews"
-                : `Read all ${reviews.length} reviews`}
+                ? t("reviews.showLess")
+                : t("reviews.readAll", { count: reviews.length })}
             </button>
           )}
         </>
       ) : (
         <EmptyState
-          title="Every reputation starts somewhere"
-          text="This barber has no reviews yet. Reviews will appear after customers complete an appointment."
+          title={t("reviews.emptyTitle")}
+          text={t("reviews.emptyText")}
         />
       )}
     </section>
@@ -156,6 +167,7 @@ export function ReviewDialog({
   appointmentId: string | null;
   onClose: () => void;
 }) {
+  const { t, number, errorText } = useI18n();
   const { state, review } = useMock(),
     [rating, setRating] = useState(0),
     [text, setText] = useState(""),
@@ -169,7 +181,9 @@ export function ReviewDialog({
     <Modal
       open={!!appointment}
       onClose={onClose}
-      title={`How was your cut with ${barber?.name.split(" ")[0] ?? "your barber"}?`}
+      title={t("reviews.dialogTitle", {
+        name: barber?.name.split(" ")[0] ?? t("reviews.yourBarber"),
+      })}
     >
       <form
         onSubmit={(e) => {
@@ -182,16 +196,14 @@ export function ReviewDialog({
           }
         }}
       >
-        <p className="small-text muted">
-          Your completed appointment helps keep reviews meaningful.
-        </p>
+        <p className="small-text muted">{t("reviews.completedHint")}</p>
         <fieldset className="star-field">
           <legend>
-            Overall rating <span aria-hidden="true">*</span>
+            {t("reviews.overallRating")} <span aria-hidden="true">*</span>
           </legend>
           <div
             role="radiogroup"
-            aria-label="Overall rating"
+            aria-label={t("reviews.overallRating")}
             onKeyDown={(event) => {
               if (
                 !["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(
@@ -217,7 +229,9 @@ export function ReviewDialog({
                 role="radio"
                 tabIndex={(rating || 1) === n ? 0 : -1}
                 aria-checked={rating === n}
-                aria-label={`${n} ${n === 1 ? "star" : "stars"}`}
+                aria-label={t(n === 1 ? "reviews.stars.one" : "reviews.stars", {
+                  count: n,
+                })}
                 onClick={() => setRating(n)}
               >
                 <Star size={30} fill={n <= rating ? "currentColor" : "none"} />
@@ -228,7 +242,7 @@ export function ReviewDialog({
         <div className="review-dimension-fields">
           {Object.entries(dimensionLabels).map(([key, label]) => (
             <label className="field" key={key}>
-              {label}
+              {t(label)}
               <select
                 value={dimensions[key as keyof typeof dimensions] ?? ""}
                 onChange={(e) =>
@@ -238,10 +252,10 @@ export function ReviewDialog({
                   })
                 }
               >
-                <option value="">Optional</option>
+                <option value="">{t("reviews.optional")}</option>
                 {[5, 4, 3, 2, 1].map((n) => (
                   <option key={n} value={n}>
-                    {n} / 5
+                    {number(n)} / {number(5)}
                   </option>
                 ))}
               </select>
@@ -249,27 +263,25 @@ export function ReviewDialog({
           ))}
         </div>
         <label className="field">
-          Your experience
+          {t("reviews.experience")}
           <textarea
             required
             minLength={10}
             maxLength={2000}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="What made your visit memorable?"
+            placeholder={t("reviews.placeholder")}
           />
         </label>
         {error && (
           <p role="alert" className="error-message">
-            {error}
+            {errorText(error)}
           </p>
         )}
         <button className="button button-dark button-full" type="submit">
-          Post demo review
+          {t("reviews.post")}
         </button>
-        <p className="gallery-disclaimer">
-          Saved only in this browser. No real review is submitted.
-        </p>
+        <p className="gallery-disclaimer">{t("reviews.localNotice")}</p>
       </form>
     </Modal>
   );

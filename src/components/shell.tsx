@@ -1,35 +1,37 @@
 "use client";
 import Link from "next/link";
+import { useI18n } from "@/i18n/provider";
+import { LanguageSelector } from "./language-selector";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, CalendarDays, Menu, Scissors, X } from "lucide-react";
 import { useMock } from "./provider";
 export function Navbar() {
+  const { t } = useI18n();
   const path = usePathname(),
     { state } = useMock(),
     [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [path]);
   const links = [
-    ["Discover", "/discover"],
-    ["Barber shops", "/shops"],
-    ["Barbers", "/barbers"],
-    ["How it works", "/#how-it-works"],
+    [t("navigation.discover"), "/discover"],
+    [t("navigation.shops"), "/shops"],
+    [t("navigation.barbers"), "/barbers"],
+    [t("navigation.how"), "/#how-it-works"],
   ];
   return (
     <>
       <a className="skip-link" href="#main">
-        Skip to content
+        {t("navigation.skip")}
       </a>
       <div className="demo-strip">
-        A local preview of a better hair day.{" "}
-        <span>All profiles, ratings, and bookings are fictional.</span>
+        {t("navigation.preview")} <span>{t("navigation.fictional")} </span>
       </div>
       <header className="navbar">
         <div className="container nav-inner">
-          <Link href="/" className="logo" aria-label="CHAIR home">
+          <Link href="/" className="logo" aria-label={t("navigation.home")}>
             CHAIR<span>.</span>
           </Link>
-          <nav aria-label="Main navigation">
+          <nav aria-label={t("navigation.main")}>
             {links.map(([name, href]) => (
               <Link
                 className={path.startsWith(href) ? "active" : ""}
@@ -41,6 +43,7 @@ export function Navbar() {
             ))}
           </nav>
           <div className="nav-actions">
+            <LanguageSelector />
             <Link
               href={
                 state.user
@@ -50,19 +53,21 @@ export function Navbar() {
                   : "/login"
               }
             >
-              {state.user ? "My account" : "Sign in"}
+              {t(state.user ? "navigation.account" : "navigation.signIn")}
             </Link>
             <Link href="/register?role=barber" className="join-link">
-              For barbers <ArrowUpRight size={13} />
+              {t("navigation.forBarbers")} <ArrowUpRight size={13} />
             </Link>
             <Link href="/booking" className="button button-dark header-book">
-              Book a chair <ArrowUpRight size={15} />
+              {t("navigation.book")} <ArrowUpRight size={15} />
             </Link>
             <button
               className="icon-button mobile-menu-button"
               aria-expanded={open}
               aria-controls="mobile-nav"
-              aria-label={open ? "Close menu" : "Open menu"}
+              aria-label={t(
+                open ? "navigation.closeMenu" : "navigation.openMenu",
+              )}
               onClick={() => setOpen(!open)}
             >
               {open ? <X /> : <Menu />}
@@ -73,16 +78,17 @@ export function Navbar() {
           <nav
             className="mobile-nav"
             id="mobile-nav"
-            aria-label="Mobile navigation"
+            aria-label={t("navigation.mobile")}
           >
+            <LanguageSelector mobile />
             {links.map(([name, href]) => (
               <Link key={href} href={href} onClick={() => setOpen(false)}>
                 {name}
               </Link>
             ))}
-            <Link href="/account">My account</Link>
-            <Link href="/login">Sign in</Link>
-            <Link href="/register?role=barber">Join as a barber</Link>
+            <Link href="/account">{t("navigation.account")} </Link>
+            <Link href="/login">{t("navigation.signIn")} </Link>
+            <Link href="/register?role=barber">{t("navigation.join")} </Link>
           </nav>
         )}
       </header>
@@ -90,6 +96,7 @@ export function Navbar() {
   );
 }
 export function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="footer">
       <div className="container footer-grid">
@@ -98,46 +105,46 @@ export function Footer() {
             CHAIR<span>.</span>
           </Link>
           <p>
-            Find your barber.
+            {t("footer.tagline1")}
             <br />
-            Find your people.
+            {t("footer.tagline2")}
           </p>
           <span className="footer-city">
-            TBILISI, GEORGIA <span>41.7151° N · 44.8271° E</span>
+            {t("footer.city")} <span>41.7151° N · 44.8271° E</span>
           </span>
         </div>
         <div>
-          <h4>Find your chair</h4>
-          <Link href="/discover">Discover</Link>
-          <Link href="/shops">Barber shops</Link>
-          <Link href="/barbers">Barbers</Link>
-          <Link href="/styles">Haircut styles</Link>
+          <h4>{t("footer.find")} </h4>
+          <Link href="/discover">{t("navigation.discover")} </Link>
+          <Link href="/shops">{t("navigation.shops")} </Link>
+          <Link href="/barbers">{t("navigation.barbers")} </Link>
+          <Link href="/styles">{t("footer.styles")} </Link>
         </div>
         <div>
-          <h4>Make it yours</h4>
-          <Link href="/account/appointments">My appointments</Link>
-          <Link href="/account/favorites">Saved favorites</Link>
-          <Link href="/register">Create an account</Link>
-          <Link href="/barber/dashboard">Barber workspace</Link>
+          <h4>{t("footer.yours")} </h4>
+          <Link href="/account/appointments">{t("footer.appointments")} </Link>
+          <Link href="/account/favorites">{t("footer.favorites")} </Link>
+          <Link href="/register">{t("footer.create")} </Link>
+          <Link href="/barber/dashboard">{t("footer.workspace")} </Link>
         </div>
         <div className="footer-signoff">
           <Scissors size={27} />
           <span>
-            GOOD CRAFT.
+            {t("footer.craft")}
             <br />
-            BETTER CONNECTIONS.
+            {t("footer.connections")}
           </span>
           <Link href="/booking" className="text-link">
-            Your next haircut <ArrowUpRight size={17} />
+            {t("footer.nextCut")} <ArrowUpRight size={17} />
           </Link>
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© {new Date().getFullYear()} CHAIR. · Local prototype</span>
         <span>
-          Fictional profiles & statistics. Stock photographs are illustrative.
+          {t("footer.copyright", { year: String(new Date().getFullYear()) })}
         </span>
-        <Link href="/about">About this preview</Link>
+        <span>{t("footer.disclosure")}</span>
+        <Link href="/about">{t("footer.about")} </Link>
       </div>
     </footer>
   );

@@ -1,13 +1,9 @@
 "use client";
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  ArrowUpRight,
-  MapPin,
-  Search,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { useI18n } from "@/i18n/provider";
+import { createDisplay } from "@/i18n/display";
+import { SUPPORTED_LOCALES } from "@/i18n/config";
+import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
 import { useMock } from "./provider";
 import { BarberCard, ShopCard } from "./cards";
 import { EmptyState, Modal, PageHeader } from "./ui";
@@ -19,6 +15,9 @@ import {
   slotAvailable,
 } from "@/lib/booking";
 import { addDays, today } from "@/lib/dates";
+// Search all supported languages so changing the interface language preserves results.
+const searchDisplays = SUPPORTED_LOCALES.map(createDisplay);
+
 export interface DiscoveryParams {
   location?: string;
   service?: string;
@@ -34,6 +33,7 @@ export function Discovery({
   initial?: DiscoveryParams;
   mode?: "barbers" | "shops";
 }) {
+  const { t, money, number, label, serviceName, styleName } = useI18n();
   const { state } = useMock(),
     [kind, setKind] = useState(mode),
     [query, setQuery] = useState(initial.q ?? ""),
@@ -86,7 +86,19 @@ export function Discovery({
                   : "");
           return (
             (!query ||
-              `${b.name} ${shop.name} ${shop.neighborhood} ${b.styleIds.map((id) => styles.find((s) => s.id === id)?.name).join(" ")}`
+              `${b.name} ${shop.name} ${shop.neighborhood} ${searchDisplays.map((display) => display.label(shop.neighborhood)).join(" ")} ${b.styleIds
+                .map((id) => {
+                  const item = styles.find((s) => s.id === id);
+                  return item
+                    ? [
+                        item.name,
+                        ...searchDisplays.map((display) =>
+                          display.styleName(item),
+                        ),
+                      ].join(" ")
+                    : "";
+                })
+                .join(" ")}`
                 .toLowerCase()
                 .includes(query.toLowerCase())) &&
             (!location || location === shop.neighborhood) &&
@@ -144,55 +156,57 @@ export function Discovery({
   const filters = (
     <>
       <div className="filter-title">
-        <h3>Make it your own</h3>
+        <h3>{t("discovery.filtersTitle")}</h3>
         <button className="link-button" onClick={reset}>
-          Reset all
+          {t("discovery.resetAll")}
         </button>
       </div>
       <label className="field">
-        Neighborhood
+        {t("discovery.neighborhood")}
         <select value={location} onChange={(e) => setLocation(e.target.value)}>
-          <option value="">All of Tbilisi</option>
+          <option value="">{t("discovery.allTbilisi")}</option>
           {neighborhoods.map((n) => (
-            <option key={n}>{n}</option>
-          ))}
-        </select>
-      </label>
-      <label className="field">
-        Distance
-        <select value={distance} onChange={(e) => setDistance(+e.target.value)}>
-          <option value={10}>Any distance</option>
-          <option value={1}>Within 1 km</option>
-          <option value={3}>Within 3 km</option>
-          <option value={5}>Within 5 km</option>
-        </select>
-        <span className="hint">Sample distance from central Tbilisi</span>
-      </label>
-      <label className="field">
-        Service
-        <select value={service} onChange={(e) => setService(e.target.value)}>
-          <option value="">Any service</option>
-          {state.services.map((s) => (
-            <option value={s.id} key={s.id}>
-              {s.name}
+            <option key={n} value={n}>
+              {label(n)}
             </option>
           ))}
         </select>
       </label>
       <label className="field">
-        Haircut style
+        {t("discovery.distance")}
+        <select value={distance} onChange={(e) => setDistance(+e.target.value)}>
+          <option value={10}>{t("discovery.anyDistance")}</option>
+          <option value={1}>{t("discovery.distance1")}</option>
+          <option value={3}>{t("discovery.distance3")}</option>
+          <option value={5}>{t("discovery.distance5")}</option>
+        </select>
+        <span className="hint">{t("discovery.distanceHint")}</span>
+      </label>
+      <label className="field">
+        {t("discovery.service")}
+        <select value={service} onChange={(e) => setService(e.target.value)}>
+          <option value="">{t("discovery.anyService")}</option>
+          {state.services.map((s) => (
+            <option value={s.id} key={s.id}>
+              {serviceName(s)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="field">
+        {t("discovery.haircutStyle")}
         <select value={style} onChange={(e) => setStyle(e.target.value)}>
-          <option value="">Any style</option>
+          <option value="">{t("discovery.anyStyle")}</option>
           {styles.map((s) => (
             <option value={s.id} key={s.id}>
-              {s.name}
+              {styleName(s)}
             </option>
           ))}
         </select>
       </label>
       <div className="filter-divider" />
       <label className="field">
-        Price up to <strong>₾{maxPrice}</strong>
+        {t("discovery.priceUpTo")} <strong>{money(maxPrice)}</strong>
         <input
           type="range"
           min="15"
@@ -202,37 +216,37 @@ export function Discovery({
           onChange={(e) => setMaxPrice(+e.target.value)}
         />
         <div className="range-labels">
-          <span>₾15</span>
-          <span>₾100</span>
+          <span>{money(15)}</span>
+          <span>{money(100)}</span>
         </div>
       </label>
       <label className="field">
-        Minimum rating
+        {t("discovery.minimumRating")}
         <select
           value={minRating}
           onChange={(e) => setMinRating(+e.target.value)}
         >
-          <option value={0}>All ratings</option>
-          <option value={4}>4.0 and above</option>
-          <option value={4.5}>4.5 and above</option>
-          <option value={4.9}>4.9 and above</option>
+          <option value={0}>{t("discovery.allRatings")}</option>
+          <option value={4}>{t("discovery.rating4")}</option>
+          <option value={4.5}>{t("discovery.rating45")}</option>
+          <option value={4.9}>{t("discovery.rating49")}</option>
         </select>
       </label>
       <label className="field">
-        Experience
+        {t("discovery.experience")}
         <select
           value={experience}
           onChange={(e) => setExperience(+e.target.value)}
         >
-          <option value={0}>All experience levels</option>
-          <option value={3}>3+ years</option>
-          <option value={5}>5+ years</option>
-          <option value={8}>8+ years</option>
+          <option value={0}>{t("discovery.allExperience")}</option>
+          <option value={3}>{t("discovery.experience3")}</option>
+          <option value={5}>{t("discovery.experience5")}</option>
+          <option value={8}>{t("discovery.experience8")}</option>
         </select>
       </label>
       <div className="filter-divider" />
       <label className="field">
-        Availability
+        {t("discovery.availability")}
         <select
           value={availability}
           onChange={(e) => {
@@ -240,13 +254,13 @@ export function Discovery({
             setDate("");
           }}
         >
-          <option value="">Any day</option>
-          <option value="today">Available today</option>
-          <option value="tomorrow">Available tomorrow</option>
+          <option value="">{t("discovery.anyDay")}</option>
+          <option value="today">{t("discovery.today")}</option>
+          <option value="tomorrow">{t("discovery.tomorrow")}</option>
         </select>
       </label>
       <label className="field">
-        Or choose a date
+        {t("discovery.chooseDate")}
         <input
           type="date"
           min={today()}
@@ -263,28 +277,28 @@ export function Discovery({
   return (
     <div className="container page-section">
       <PageHeader
-        eyebrow="A GOOD CUT STARTS HERE"
+        eyebrow={t("discovery.eyebrow")}
         title={
           mode === "shops"
-            ? "Find your new local"
+            ? t("discovery.shopsTitle")
             : mode === "barbers" && initial.style
-              ? "Find your style specialist"
-              : "Find your kind of barber"
+              ? t("discovery.specialistTitle")
+              : t("discovery.barbersTitle")
         }
-        description="Explore the people, the places, and the craft. Find a chair that feels like yours."
+        description={t("discovery.description")}
       />
       <div className="discovery-search">
         <Search size={19} />
         <input
-          aria-label="Search barbers, shops, or styles"
-          placeholder="A name, a neighborhood, a style…"
+          aria-label={t("discovery.searchLabel")}
+          placeholder={t("discovery.searchPlaceholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         {query && (
           <button
             className="icon-button"
-            aria-label="Clear search"
+            aria-label={t("discovery.clearSearch")}
             onClick={() => setQuery("")}
           >
             <X size={15} />
@@ -292,21 +306,26 @@ export function Discovery({
         )}
         <span>
           <MapPin size={15} />
-          Tbilisi, Georgia
+          {t("discovery.cityCountry")}
         </span>
       </div>
       <div className="discovery-layout">
         <aside className="filter-sidebar">{filters}</aside>
         <div className="discovery-results">
           <div className="result-controls">
-            <div className="tabs" role="tablist" aria-label="Result type">
+            <div
+              className="tabs"
+              role="tablist"
+              aria-label={t("discovery.resultType")}
+            >
               <button
                 role="tab"
                 aria-selected={kind === "barbers"}
                 className={kind === "barbers" ? "active" : ""}
                 onClick={() => setKind("barbers")}
               >
-                Barbers <span className="count">{filtered.length}</span>
+                {t("discovery.barbers")}{" "}
+                <span className="count">{number(filtered.length)}</span>
               </button>
               <button
                 role="tab"
@@ -314,41 +333,53 @@ export function Discovery({
                 className={kind === "shops" ? "active" : ""}
                 onClick={() => setKind("shops")}
               >
-                Barber shops{" "}
-                <span className="count">{filteredShops.length}</span>
+                {t("discovery.shops")}{" "}
+                <span className="count">{number(filteredShops.length)}</span>
               </button>
             </div>
             <label className="sort-control">
-              Sort by
+              {t("discovery.sortBy")}
               <select
-                aria-label="Sort results"
+                aria-label={t("discovery.sortLabel")}
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
               >
-                <option value="recommended">Recommended</option>
-                <option value="rating">Highest rated</option>
-                <option value="reviews">Most reviewed</option>
-                <option value="price">Lowest price</option>
-                <option value="available">Earliest available</option>
+                <option value="recommended">
+                  {t("discovery.recommended")}
+                </option>
+                <option value="rating">{t("discovery.highestRated")}</option>
+                <option value="reviews">{t("discovery.mostReviewed")}</option>
+                <option value="price">{t("discovery.lowestPrice")}</option>
+                <option value="available">
+                  {t("discovery.earliestAvailable")}
+                </option>
               </select>
             </label>
           </div>
           <div className="result-meta">
             <p aria-live="polite">
-              {kind === "barbers" ? filtered.length : filteredShops.length}{" "}
-              {kind === "barbers" ? "barbers" : "shops"}{" "}
-              {location ? `in ${location}` : "in Tbilisi"}
+              {t(
+                kind === "barbers"
+                  ? "discovery.barberResults"
+                  : "discovery.shopResults",
+                {
+                  count:
+                    kind === "barbers" ? filtered.length : filteredShops.length,
+                  location: label(location || "Tbilisi"),
+                },
+              )}
             </p>
             <button
               className="button button-outline mobile-filters"
               onClick={() => setMobile(true)}
             >
               <SlidersHorizontal size={15} />
-              Filters{activeCount ? ` (${activeCount})` : ""}
+              {t("discovery.filters")}
+              {activeCount ? ` (${number(activeCount)})` : ""}
             </button>
             {activeCount > 0 && (
               <button className="link-button" onClick={reset}>
-                Clear {activeCount} filters
+                {t("discovery.clearCount", { count: activeCount })}
               </button>
             )}
           </div>
@@ -366,30 +397,28 @@ export function Discovery({
             </div>
           ) : (
             <EmptyState
-              title="No chairs found. Yet."
-              text="Try a wider neighborhood, another date, or fewer filters. Your next great cut is out there."
-              action="Clear filters"
+              title={t("discovery.emptyTitle")}
+              text={t("discovery.emptyDescription")}
+              action={t("discovery.clearFilters")}
               onAction={reset}
             />
           )}
-          <div className="results-note">
-            You’re exploring fictional profiles and illustrative portfolio
-            photographs.
-          </div>
+          <div className="results-note">{t("discovery.disclosure")}</div>
         </div>
       </div>
       <Modal
         open={mobile}
         onClose={() => setMobile(false)}
-        title="Find your fit"
+        title={t("discovery.mobileTitle")}
       >
         <div className="mobile-filter-content">{mobile && filters}</div>
         <button
           className="button button-dark button-full"
           onClick={() => setMobile(false)}
         >
-          Show {kind === "barbers" ? filtered.length : filteredShops.length}{" "}
-          results
+          {t("discovery.showResults", {
+            count: kind === "barbers" ? filtered.length : filteredShops.length,
+          })}
         </button>
       </Modal>
     </div>

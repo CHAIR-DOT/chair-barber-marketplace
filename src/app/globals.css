@@ -7,8 +7,8 @@
   --accent: #a56041;
   --soft: #eeeee6;
   --green: #537452;
-  --serif: "DM Serif Display", Georgia, serif;
-  --sans: "DM Sans", Arial, sans-serif;
+  --serif: "DM Serif Display", "Noto Serif Georgian", Georgia, serif;
+  --sans: "DM Sans", "Noto Sans Georgian", Arial, sans-serif;
   --radius: 10px;
   --shadow: 0 8px 28px #2628210c;
 }
@@ -551,7 +551,7 @@ small {
     font-size: 12px;
     min-height: 38px;
   }
-  .nav-actions > a:first-child {
+  .nav-actions > a:first-of-type {
     display: none;
   }
   .hero {
@@ -1606,7 +1606,7 @@ small {
   }
 }
 @media (max-width: 600px) {
-  .nav-actions > a:first-child {
+  .nav-actions > a:first-of-type {
     display: none;
   }
   .header-book {
@@ -5471,4 +5471,61 @@ input[type="range"] {
 /* Allow the workspace grid item to shrink around its scrollable data table. */
 .dashboard-main {
   min-width: 0;
+}
+
+/* Localized navigation uses the existing controls and responsive menu. */
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+.language-selector select {
+  width: 104px;
+  min-height: 40px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+}
+.language-selector-mobile {
+  align-self: flex-start;
+  margin: 0 10px 8px;
+}
+.locale-storage-notice {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: min(420px, calc(100% - 36px));
+  padding: 12px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 6px;
+  font-size: 13px;
+}
+html:lang(ka) h1,
+html:lang(ka) h2 {
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+@media (max-width: 800px) {
+  .nav-actions > .language-selector {
+    display: none;
+  }
+}
+
+/* Long translated profile tabs scroll within the existing content column. */
+.profile-layout > div {
+  min-width: 0;
+}
+.profile-tabs {
+  overflow-x: auto;
+}
+.profile-tabs a {
+  flex-shrink: 0;
 }

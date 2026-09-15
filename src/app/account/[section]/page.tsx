@@ -1,3 +1,4 @@
+import { translate } from "@/i18n/translate";
 import { notFound } from "next/navigation";
 import { AccountPage } from "@/components/account";
 export const dynamicParams = false;
@@ -11,7 +12,13 @@ export async function generateMetadata({
 }: {
   params: Promise<{ section: string }>;
 }) {
-  return { title: `My ${(await params).section}` };
+  const { section } = await params;
+  const valid = ["appointments", "favorites", "reviews", "settings"].includes(
+    section,
+  );
+  return {
+    title: translate("ka", valid ? `metadata.${section}` : "metadata.notFound"),
+  };
 }
 export default async function Page({
   params,

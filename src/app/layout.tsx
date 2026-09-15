@@ -5,18 +5,24 @@ import "@fontsource/dm-sans/600.css";
 import "@fontsource/dm-sans/700.css";
 import "@fontsource/dm-serif-display/400.css";
 import "@fontsource/dm-serif-display/400-italic.css";
+import "@fontsource/noto-sans-georgian/400.css";
+import "@fontsource/noto-sans-georgian/500.css";
+import "@fontsource/noto-sans-georgian/600.css";
+import "@fontsource/noto-sans-georgian/700.css";
+import "@fontsource/noto-serif-georgian/400.css";
 import "./globals.css";
+import { LocaleProvider } from "@/i18n/provider";
+import { translate } from "@/i18n/translate";
 import { MockProvider } from "@/components/provider";
 import { Navbar, Footer } from "@/components/shell";
 import { WebMcp } from "@/components/webmcp";
 import { CompareDock } from "@/components/compare";
 export const metadata: Metadata = {
   title: {
-    default: "CHAIR. — Find your barber. Find your style.",
+    default: `CHAIR. — ${translate("ka", "metadata.home")}`,
     template: "%s | CHAIR.",
   },
-  description:
-    "Discover independent barbers, explore their work, and find your next great haircut in Tbilisi. An interactive local prototype.",
+  description: translate("ka", "metadata.description"),
   icons: { icon: "/favicon.svg" },
 };
 export default function RootLayout({
@@ -25,15 +31,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="ka" data-scroll-behavior="smooth">
       <body>
-        <MockProvider>
-          <WebMcp />
-          <Navbar />
-          <main id="main">{children}</main>
-          <CompareDock />
-          <Footer />
-        </MockProvider>
+        <LocaleProvider>
+          <MockProvider>
+            <WebMcp />
+            <Navbar />
+            <main id="main">{children}</main>
+            <CompareDock />
+            <Footer />
+          </MockProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

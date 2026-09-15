@@ -72,15 +72,58 @@ src/components/provider.tsx   Local state and domain actions; future repository 
 src/lib/types.ts         Related domain entity interfaces
 src/lib/data.ts          Shops, barbers, services, styles, appointments, reviews, portfolio, schedules
 src/lib/booking.ts       Pure availability, overlap, price, and review-eligibility rules
-src/lib/dates.ts         Shared Asia/Tbilisi date and GEL formatting helpers
-src/lib/i18n.ts          Initial English/Georgian navigation dictionary and locale boundary
+src/lib/dates.ts         Internal calendar/date helpers using Asia/Tbilisi
+src/i18n/                KA/EN/RU locale context, translation, display helpers, and metadata
+src/i18n/messages/       Semantic dictionaries grouped by interface area and fixture content
+src/components/language-selector.tsx   Accessible desktop/mobile language selector
+src/lib/i18n.ts          Compatibility exports for the active localization system
 public/images/           Local licensed illustrative photography
 tests/domain.test.ts     Data relationships and booking/review domain checks
+tests/i18n.test.ts       Dictionary coverage, formatting, fallback, and canonical-data preservation
 ```
 
 The store owns mutations; screens consume shared entities and actions. Services have global definitions and per-barber price/eligibility relationships. Appointments snapshot price and duration. Reviews reference the customer, barber, and a completed appointment. The UI mounts after local storage is read, avoiding stale editor values and time-dependent server/client hydration differences.
 
-Future Georgian localization can extend `i18n.ts` and move the remaining English page copy into dictionaries without changing entity IDs or relationships. Localization is prepared, not complete.
+## Localization
+
+The frontend supports **ქართული (`ka`), English (`en`), and Русский (`ru`)**. Georgian is the first-visit default, including server-rendered text and metadata. Browser language does not select the initial language. After hydration, a valid saved preference is applied; switching language updates the interface immediately and keeps the existing URLs.
+
+`LocaleProvider` and `useI18n()` in `src/i18n/provider.tsx` supply the selected locale, setter, translation function, and display helpers. `LanguageSelector` in `src/components/language-selector.tsx` is a labeled native select with a Lucide language icon; the header includes it on desktop and within the mobile menu. The provider updates `<html lang>`, page titles, and the description to match the selected language.
+
+The preference is stored under **`chair.locale.v1`**, separately from application data under **`chair.prototype.v1`**. Choosing a language changes presentation; it does not change prices, selected entities, booking state, favorites, account identity, or stored records. Invalid or absent preferences resolve to Georgian. If storage is unavailable, the selected language remains usable for the current session and a localized notice explains that it could not be saved.
+
+### Translation and display files
+
+| File                             | Responsibility                                                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/i18n/config.ts`             | Supported locales, Georgian default, storage key, locale names, `Intl` locales, dictionary types     |
+| `src/i18n/translate.ts`          | Semantic-key lookup, interpolation, numeric plural selection, English fallback, development warnings |
+| `src/i18n/display.ts`            | Localized dates/numbers/GEL, safe fixture display helpers, localized error display                   |
+| `src/i18n/metadata.ts`           | Route-aware client page titles while preserving canonical profile names                              |
+| `src/i18n/messages/core.ts`      | Navigation, homepage, shared actions, notifications, validation, errors, metadata                    |
+| `src/i18n/messages/discovery.ts` | Discovery, cards, profiles, styles, comparison                                                       |
+| `src/i18n/messages/journey.ts`   | Booking, authentication, customer accounts, shared dashboard navigation                              |
+| `src/i18n/messages/workspace.ts` | Barber management, reviews, portfolio                                                                |
+| `src/i18n/messages/entities.ts`  | Generic service/style names, fixture descriptions, known role/location/status labels                 |
+| `src/i18n/messages/index.ts`     | Combines all message groups for each locale                                                          |
+
+Display uses `Intl` with `ka-GE`, `en-GB`, and `ru-RU`. If a browser lacks Georgian locale data, `src/i18n/dates.ts` uses the bundled month and weekday names in `messages/calendar.ts`, while `src/i18n/numbers.ts` preserves numeric precision, signs, and percentages with Georgian separators and grouping. The number helper is shared by display values, GEL amounts, and translation interpolation; it does not import dictionaries. Supported native locale formatting stays unchanged. Currency remains GEL with **₾** in every language. Dates remain in **Asia/Tbilisi**; stored `YYYY-MM-DD` dates and time values are unchanged. Native date/time picker panels and other browser-owned controls may follow browser or operating-system language. App labels, validation messages, date cards, and formatted date text use the selected app language.
+
+The original locally bundled DM Sans and DM Serif Display remain the primary fonts. Locally bundled Noto Sans Georgian and Noto Serif Georgian supply Georgian characters. Arial and Georgia, followed by generic system fonts, supply Cyrillic fallback. Font rendering can vary slightly across operating systems; the app makes no remote font requests.
+
+### Canonical content and future changes
+
+Barber, shop, brand, and customer names remain canonical, as do IDs, slugs, URLs, relationships, prices, and account values. Customer-written reviews remain in their original language. Intentionally named portfolio works and user-authored descriptions are preserved. Generic seeded portfolio titles that equal their haircut category use the localized style name.
+
+Entity display helpers translate supported fixture fields only when the entity ID and original field value still match the seed. Edited fields and new custom entities display their own text. Known generic role/location/status tokens and the system-generated default portfolio description have explicit mappings. Do not translate an entire record or write localized display text back into the mock store.
+
+**Every newly introduced user-facing UI string must be added to the localization system in Georgian, English, and Russian. Do not introduce new hardcoded interface text.**
+
+1. Add a semantic key to the appropriate message group. `defineMessages` rows use `[English, Georgian, Russian]`; groups declared as locale records require the same key in all three records. Keep keys unique across groups and interpolation fields identical across languages.
+2. Render with `useI18n().t(key, values)` in client components; use `translate("ka", key, values)` for default server text. Pass numeric `count` values as numbers for `Intl.PluralRules`; add matching `.one` or other variants across dictionaries when needed, with grammatical base wording for fallback.
+3. Use the shared `date`, `relativeDate`, `number`, and `money` helpers for display. Keep internal dates, route/query values, IDs, and selection state canonical. Store error/toast keys and interpolation values so open messages can change language too.
+4. For new generic seed content, add entity translations and preserve the helper's ID/original-value checks. Render authored reviews, custom fields, and intentional work titles verbatim.
+5. Run TypeScript and tests, build, inspect the affected interactions in all three languages, and check long copy at 375/768/1024/1440px. Update project memory with actual results before committing and pushing.
 
 ## What is mocked
 
@@ -100,6 +143,8 @@ The optional, feature-detected WebMCP `set_saved_barber` tool uses the same favo
 ## Verification
 
 `npm test` covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
+
+Localization tests also cover dictionary parity and placeholders, default/fallback behavior, critical translated actions, plural and numeric formatting, unchanged canonical records, custom content, portfolio title rules, dates/GEL, and localized domain errors.
 
 The browser verification log is in `VERIFICATION.md`. The design tokens and component conventions are in `DESIGN_SYSTEM.md`.
 

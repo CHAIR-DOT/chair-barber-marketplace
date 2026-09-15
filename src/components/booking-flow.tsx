@@ -14,7 +14,8 @@ import {
   Users,
 } from "lucide-react";
 import { shops, SLOT_TIMES } from "@/lib/data";
-import { addDays, formatDate, money, relativeDate, today } from "@/lib/dates";
+import { addDays, today } from "@/lib/dates";
+import { useI18n } from "@/i18n/provider";
 import {
   getPrice,
   nextAvailable,
@@ -29,14 +30,7 @@ export interface BookingParams {
   service?: string;
   reschedule?: string;
 }
-const STEPS = [
-  "The shop",
-  "Your barber",
-  "The service",
-  "The date",
-  "The time",
-  "Final details",
-];
+const STEPS = ["shop", "barber", "service", "date", "time", "details"];
 export function BookingPage({ initial }: { initial: BookingParams }) {
   const { ready } = useMock();
   return ready ? (
@@ -48,6 +42,18 @@ export function BookingPage({ initial }: { initial: BookingParams }) {
   );
 }
 function BookingFlow({ initial }: { initial: BookingParams }) {
+  const {
+    t: tr,
+    date: formatDate,
+    relativeDate,
+    money,
+    number,
+    label,
+    serviceName,
+    serviceDescription,
+    barberTitle,
+    errorText,
+  } = useI18n();
   const { state, book } = useMock(),
     existing = state.appointments.find(
       (a) => a.id === initial.reschedule && a.status === "upcoming",
@@ -143,43 +149,56 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
       <div className="summary-shop">
         {shop && <img src={shop.image} alt={shop.name} />}
         <div>
-          <span className="eyebrow">YOUR NEXT GOOD HAIR DAY</span>
-          <h3>{shop?.name ?? "Your chair is waiting"}</h3>
-          {shop && <p>{shop.neighborhood}, Tbilisi</p>}
+          <span className="eyebrow">{tr("booking.summary.eyebrow")}</span>
+          <h3>{shop?.name ?? tr("booking.summary.waiting")}</h3>
+          {shop && (
+            <p>
+              {label(shop.neighborhood)}, {label("Tbilisi")}
+            </p>
+          )}
         </div>
       </div>
       <dl className="booking-summary">
         <div>
-          <dt>Barber</dt>
+          <dt>{tr("booking.summary.barber")}</dt>
           <dd>
             {resolved?.name ??
               (barberId === "any"
-                ? "Any available barber"
-                : "Choose your person")}
+                ? tr("booking.anyBarber")
+                : tr("booking.summary.chooseBarber"))}
           </dd>
         </div>
         <div>
-          <dt>Service</dt>
-          <dd>{service?.name ?? "Choose your service"}</dd>
-        </div>
-        <div>
-          <dt>Date</dt>
+          <dt>{tr("booking.summary.service")}</dt>
           <dd>
-            {date ? formatDate(date, { weekday: "long" }) : "Make it a date"}
+            {service
+              ? serviceName(service)
+              : tr("booking.summary.chooseService")}
           </dd>
         </div>
         <div>
-          <dt>Time</dt>
-          <dd>{time || "Find your time"}</dd>
+          <dt>{tr("booking.summary.date")}</dt>
+          <dd>
+            {date
+              ? formatDate(date, { weekday: "long" })
+              : tr("booking.summary.chooseDate")}
+          </dd>
         </div>
         <div>
-          <dt>Duration</dt>
-          <dd>{service ? `${service.duration} minutes` : "—"}</dd>
+          <dt>{tr("booking.summary.time")}</dt>
+          <dd>{time || tr("booking.summary.chooseTime")}</dd>
+        </div>
+        <div>
+          <dt>{tr("booking.summary.duration")}</dt>
+          <dd>
+            {service ? tr("booking.minutes", { count: service.duration }) : "—"}
+          </dd>
         </div>
       </dl>
       <div className="summary-total">
         <span>
-          Total <small>GEL · Pay at the shop concept</small>
+          {tr("booking.summary.total")}{" "}
+          <small>{tr("booking.summary.payment")}</small>
         </span>
         <strong>{Number.isFinite(price) && price ? money(price) : "—"}</strong>
       </div>
@@ -192,64 +211,69 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
         <div className="success-mark">
           <Check size={34} />
         </div>
-        <div className="eyebrow">A GOOD HAIR DAY IS ON THE WAY</div>
+        <div className="eyebrow">{tr("booking.confirmation.eyebrow")}</div>
         <h1>
-          Your chair is waiting<span className="accent">.</span>
+          {tr("booking.confirmation.title")}
+          <span className="accent">.</span>
         </h1>
         <p>
-          You’re all set for {relativeDate(appointment.date).toLowerCase()} at{" "}
-          {appointment.time}.<br />
-          This is a simulated appointment. No real booking or payment was made.
+          {tr("booking.confirmation.schedule", {
+            date: relativeDate(appointment.date),
+            time: appointment.time,
+          })}
+          <br />
+          {tr("booking.confirmation.notice")}
         </p>
         <div className="confirmation-card">
           <Badge tone="green">
             <CheckCircle2 size={13} />
-            Demo {existing ? "rescheduled" : "confirmed"}
+            {tr(
+              existing
+                ? "booking.confirmation.rescheduled"
+                : "booking.confirmation.confirmed",
+            )}
           </Badge>
           {summary}
           <div className="confirmation-ref">
-            REFERENCE · {confirmed.slice(-8).toUpperCase()}
+            {tr("booking.confirmation.reference", {
+              reference: confirmed.slice(-8).toUpperCase(),
+            })}
           </div>
         </div>
         <div className="inline-actions">
           <Link href="/account/appointments" className="button button-dark">
-            View my appointments <ArrowUpRight size={16} />
+            {tr("booking.confirmation.appointments")}
+            <ArrowUpRight size={16} />
           </Link>
           <Link
             href={`/barbers/${resolved?.slug}`}
             className="button button-outline"
           >
-            Back to your barber
+            {tr("booking.confirmation.back")}
           </Link>
         </div>
-        <p className="gallery-disclaimer">
-          Saved in this browser. No confirmation email or SMS is sent.
-        </p>
+        <p className="gallery-disclaimer">{tr("booking.confirmation.saved")}</p>
       </div>
     );
   }
-  const stepTitles = [
-    "Find your place.",
-    "Choose your person.",
-    "A little off the top?",
-    "Make it a date.",
-    "Find your moment.",
-    "Looking good. Let’s confirm.",
-  ];
   return (
     <div className="container booking-page">
-      <BackLink href="/discover">Back to discovery</BackLink>
+      <BackLink href="/discover">{tr("booking.backDiscovery")}</BackLink>
       <div className="booking-heading">
         <div className="eyebrow">
-          {existing ? "A CHANGE OF PLANS" : "MAKE TIME FOR A GOOD CUT"}
+          {existing
+            ? tr("booking.heading.rescheduleEyebrow")
+            : tr("booking.heading.eyebrow")}
         </div>
         <h1>
-          {existing ? "Reschedule your chair" : "Book your next good hair day"}
+          {existing
+            ? tr("booking.heading.reschedule")
+            : tr("booking.heading.title")}
           <span className="accent">.</span>
         </h1>
-        <p>Simple choices. Clear prices. A chair with your name on it.</p>
+        <p>{tr("booking.heading.description")}</p>
       </div>
-      <div className="booking-progress" aria-label="Booking progress">
+      <div className="booking-progress" aria-label={tr("booking.progress")}>
         {STEPS.map((title, i) => (
           <button
             key={title}
@@ -261,20 +285,22 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
               setError("");
             }}
           >
-            <span>{i < step ? <Check size={13} /> : i + 1}</span>
-            <strong>{title}</strong>
+            <span>{i < step ? <Check size={13} /> : number(i + 1)}</span>
+            <strong>{tr(`booking.steps.${title}`)}</strong>
           </button>
         ))}
       </div>
       <div className="booking-layout">
         <section className="booking-step">
           <div className="booking-step-title">
-            <span className="eyebrow">STEP {step + 1} OF 6</span>
-            <h2>{stepTitles[step]}</h2>
+            <span className="eyebrow">
+              {tr("booking.step", { step: number(step + 1) })}
+            </span>
+            <h2>{tr(`booking.titles.${STEPS[step]}`)}</h2>
           </div>
           {error && (
             <p className="error-message" role="alert">
-              {error}
+              {errorText(error)}
             </p>
           )}
           {step === 0 && (
@@ -298,7 +324,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                   <div>
                     <strong>{s.name}</strong>
                     <span>
-                      {s.neighborhood} · {s.address}
+                      {label(s.neighborhood)} · {s.address}
                     </span>
                   </div>
                   <span className="radio-indicator">
@@ -323,8 +349,8 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                   <Users size={24} />
                 </div>
                 <div>
-                  <strong>Any available barber</strong>
-                  <span>A great cut, with the first person available.</span>
+                  <strong>{tr("booking.anyBarber")}</strong>
+                  <span>{tr("booking.anyBarberDescription")}</span>
                 </div>
                 <span className="radio-indicator">
                   {barberId === "any" && <Check size={12} />}
@@ -350,7 +376,10 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                     <div>
                       <strong>{b.name}</strong>
                       <span>
-                        {b.role} · {b.experience} years experience
+                        {barberTitle(b)} ·{" "}
+                        {tr("booking.experience", {
+                          count: b.experience,
+                        })}
                       </span>
                       <Rating value={r.value} count={r.count} />
                     </div>
@@ -378,12 +407,12 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                     <Scissors size={23} />
                   </div>
                   <div>
-                    <strong>{s.name}</strong>
-                    <span>{s.description}</span>
-                    <span>{s.duration} minutes</span>
+                    <strong>{serviceName(s)}</strong>
+                    <span>{serviceDescription(s)}</span>
+                    <span>{tr("booking.minutes", { count: s.duration })}</span>
                   </div>
                   <div className="option-price">
-                    {barberId === "any" && <small>from</small>}
+                    {barberId === "any" && <small>{tr("booking.from")}</small>}
                     {money(
                       Math.min(
                         ...team
@@ -405,10 +434,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
           )}
           {step === 3 && (
             <>
-              <p className="small-text muted">
-                All times are local to Tbilisi (GMT+4). Pick a day in the next
-                30 days.
-              </p>
+              <p className="small-text muted">{tr("booking.date.notice")}</p>
               <div className="date-grid">
                 {Array.from({ length: 14 }, (_, i) => addDays(i)).map((d) => {
                   const hasSlots = eligible.some((b) =>
@@ -421,7 +447,13 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                       key={d}
                       className={`date-option ${date === d ? "selected" : ""}`}
                       disabled={!hasSlots}
-                      aria-label={`${formatDate(d, { weekday: "long" })}${!hasSlots ? ", unavailable" : ""}`}
+                      aria-label={
+                        hasSlots
+                          ? formatDate(d, { weekday: "long" })
+                          : tr("booking.unavailableLabel", {
+                              value: formatDate(d, { weekday: "long" }),
+                            })
+                      }
                       aria-pressed={date === d}
                       onClick={() => {
                         setDate(d);
@@ -435,10 +467,12 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                           month: undefined,
                         })}
                       </span>
-                      <strong>{new Date(`${d}T12:00:00Z`).getUTCDate()}</strong>
+                      <strong>
+                        {number(new Date(`${d}T12:00:00Z`).getUTCDate())}
+                      </strong>
                       <span>
                         {d === today()
-                          ? "Today"
+                          ? tr("booking.today")
                           : formatDate(d, { month: "short", day: undefined })}
                       </span>
                     </button>
@@ -446,7 +480,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                 })}
               </div>
               <label className="field">
-                Choose another date
+                {tr("booking.anotherDate")}
                 <input
                   type="date"
                   min={today()}
@@ -468,14 +502,16 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                   <strong>
                     {date
                       ? formatDate(date, { weekday: "long", year: "numeric" })
-                      : "Choose a date"}
+                      : tr("booking.chooseDate")}
                   </strong>
                   <span>
-                    {service?.duration} minute appointment · Tbilisi time
+                    {tr("booking.time.duration", {
+                      count: service?.duration ?? 0,
+                    })}
                   </span>
                 </div>
                 <button className="link-button" onClick={() => setStep(3)}>
-                  Change
+                  {tr("booking.change")}
                 </button>
               </div>
               <div className="time-grid">
@@ -495,7 +531,11 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                       key={t}
                       disabled={!available}
                       aria-pressed={time === t}
-                      aria-label={`${t}${available ? "" : ", unavailable"}`}
+                      aria-label={
+                        available
+                          ? t
+                          : tr("booking.unavailableLabel", { value: t })
+                      }
                       className={`time-option ${time === t ? "selected" : ""}`}
                       onClick={() => {
                         setTime(t);
@@ -503,7 +543,11 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                       }}
                     >
                       {t}
-                      <span>{available ? "Available" : "Unavailable"}</span>
+                      <span>
+                        {available
+                          ? tr("booking.available")
+                          : tr("booking.unavailable")}
+                      </span>
                     </button>
                   );
                 })}
@@ -514,16 +558,13 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                 ),
               ) && (
                 <EmptyState
-                  title="No chairs free on this day"
-                  text="Try another date, or choose any available barber for more options."
-                  action="Choose another day"
+                  title={tr("booking.time.emptyTitle")}
+                  text={tr("booking.time.emptyText")}
+                  action={tr("booking.time.anotherDay")}
                   onAction={() => setStep(3)}
                 />
               )}
-              <p className="notice">
-                Your time is reserved only after confirmation. Availability is
-                simulated in this browser.
-              </p>
+              <p className="notice">{tr("booking.time.notice")}</p>
             </>
           )}
           {step === 5 && (
@@ -531,29 +572,24 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
               <div className="review-appointment">
                 <img src={resolved?.image} alt={resolved?.name} />
                 <div>
-                  <Badge tone="green">Your barber</Badge>
+                  <Badge tone="green">{tr("booking.steps.barber")}</Badge>
                   <h3>{resolved?.name}</h3>
                   <span>{shop?.name}</span>
                 </div>
               </div>
               {barberId === "any" && (
                 <p className="notice">
-                  We matched you with {resolved?.name.split(" ")[0]}, who is
-                  available for your selected service and time.
+                  {tr("booking.review.matched", {
+                    name: resolved?.name.split(" ")[0] ?? "",
+                  })}
                 </p>
               )}
               <div className="review-booking-details">{summary}</div>
               <label className="check-label">
                 <CheckCircle2 size={17} />
-                <span>
-                  Clear pricing. No deposit or payment in this preview.
-                </span>
+                <span>{tr("booking.review.payment")}</span>
               </label>
-              <p className="notice">
-                This demo booking is for the sample customer Alex Chikovani. You
-                can cancel or reschedule it from My appointments. No real
-                appointment, charge, email, or SMS is created.
-              </p>
+              <p className="notice">{tr("booking.review.notice")}</p>
             </>
           )}
           <div className="booking-step-actions">
@@ -566,7 +602,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                 }}
               >
                 <ArrowLeft size={15} />
-                Back
+                {tr("booking.back")}
               </button>
             ) : (
               <span />
@@ -578,9 +614,9 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
             >
               {step === 5
                 ? existing
-                  ? "Confirm new time"
-                  : "Confirm demo booking"
-                : "Continue"}
+                  ? tr("booking.confirmNewTime")
+                  : tr("booking.confirmDemo")
+                : tr("booking.continue")}
               {step === 5 ? <Check size={16} /> : <ArrowRight size={16} />}
             </button>
           </div>
@@ -590,12 +626,10 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
             {summary}
             <div className="summary-trust">
               <CheckCircle2 size={15} />
-              <span>Transparent prices. Your choice of barber.</span>
+              <span>{tr("booking.trust")}</span>
             </div>
           </div>
-          <p className="gallery-disclaimer">
-            A local prototype. Your selections stay in this browser.
-          </p>
+          <p className="gallery-disclaimer">{tr("booking.localNotice")}</p>
         </aside>
       </div>
     </div>

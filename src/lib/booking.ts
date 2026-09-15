@@ -106,7 +106,7 @@ export function validateAppointment(
 ) {
   const barber = state.barbers.find((b) => b.id === input.barberId);
   if (!barber || barber.shopId !== input.shopId)
-    throw new Error("Choose a barber from this shop.");
+    throw new Error("errors.barberShop");
   if (
     !slotAvailable(
       state,
@@ -117,9 +117,7 @@ export function validateAppointment(
       excludeId,
     )
   )
-    throw new Error(
-      "That slot is no longer available. Please choose another time.",
-    );
+    throw new Error("errors.slotUnavailable");
   return {
     barber,
     service: state.services.find((s) => s.id === input.serviceId)!,

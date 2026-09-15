@@ -1,26 +1,29 @@
 "use client";
+import { useI18n } from "@/i18n/provider";
 import { useState } from "react";
 import { useMock } from "./provider";
 import { Modal } from "./ui";
 export function ResetDemo() {
+  const { t } = useI18n();
   const { reset } = useMock(),
     [open, setOpen] = useState(false);
   return (
     <>
       <button className="button button-outline" onClick={() => setOpen(true)}>
-        Reset demo data
+        {t("reset.button")}
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="A fresh start?">
-        <p className="small-text muted">
-          Restore the sample profiles, appointments, reviews, and schedules.
-          This removes only your changes in this local preview.
-        </p>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("reset.title")}
+      >
+        <p className="small-text muted">{t("reset.text")}</p>
         <div className="modal-actions">
           <button
             className="button button-outline"
             onClick={() => setOpen(false)}
           >
-            Keep my changes
+            {t("reset.keep")}
           </button>
           <button
             className="button button-dark"
@@ -29,7 +32,7 @@ export function ResetDemo() {
               setOpen(false);
             }}
           >
-            Restore sample data
+            {t("reset.confirm")}
           </button>
         </div>
       </Modal>

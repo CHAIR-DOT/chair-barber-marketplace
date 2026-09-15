@@ -1,5 +1,6 @@
+import { translate } from "@/i18n/translate";
 import { BookingPage, type BookingParams } from "@/components/booking-flow";
-export const metadata = { title: "Book your chair" };
+export const metadata = { title: translate("ka", "metadata.booking") };
 export default async function Page({
   searchParams,
 }: {

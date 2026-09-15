@@ -3,34 +3,32 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   CalendarDays,
-  Check,
   MapPin,
   Scissors,
   Search,
-  Star,
 } from "lucide-react";
-import { shops, styles } from "@/lib/data";
+import { shops, styles, services, neighborhoods } from "@/lib/data";
 import { today } from "@/lib/dates";
 import { useMock } from "@/components/provider";
 import { BarberCard, ShopCard, StyleCard } from "@/components/cards";
+import { useI18n } from "@/i18n/provider";
 export default function Home() {
   const { state } = useMock();
+  const { t, label, serviceName } = useI18n();
   return (
     <>
       <section className="hero container">
         <div className="hero-copy">
           <div className="eyebrow">
-            <span className="small-line" /> GOOD HAIR. GOOD COMPANY.
+            <span className="small-line" />
+            {t("home.eyebrow")}
           </div>
           <h1>
-            Find the barber
+            {t("home.title1")}
             <br />
-            who gets <em>your style.</em>
+            {t("home.title2")} <em>{t("home.titleAccent")}</em>
           </h1>
-          <p>
-            Great hair starts with the right person. Discover Tbilisi’s talented
-            barbers, explore their work, and make the chair yours.
-          </p>
+          <p>{t("home.intro")}</p>
           <div className="hero-proof">
             <div className="avatar-stack">
               {state.barbers.slice(0, 3).map((b) => (
@@ -39,22 +37,22 @@ export default function Home() {
             </div>
             <div>
               <span className="proof-stars">★★★★★</span>
-              <span>A good connection. An even better cut.</span>
+              <span>{t("home.proof")}</span>
             </div>
           </div>
         </div>
         <div className="hero-visual">
           <img
             src="/images/hero.jpg"
-            alt="A barber carefully finishing a customer's beard"
+            alt={t("home.imageAlt")}
             fetchPriority="high"
           />
-          <span className="image-caption">CRAFT. CHARACTER. CONNECTION.</span>
+          <span className="image-caption">{t("home.caption")}</span>
           <div className="hero-note">
             <Scissors size={18} />
             <div>
-              <strong>Your next good hair day.</strong>
-              <span>It starts in the right chair.</span>
+              <strong>{t("home.noteTitle")}</strong>
+              <span>{t("home.noteText")}</span>
             </div>
             <ArrowUpRight size={20} />
           </div>
@@ -63,73 +61,79 @@ export default function Home() {
           <label>
             <MapPin size={20} />
             <span>
-              <small>WHERE</small>
-              <select name="location" aria-label="Location">
-                <option value="">Tbilisi, Georgia</option>
-                <option>Vake</option>
-                <option>Vera</option>
-                <option>Saburtalo</option>
-                <option>Old Tbilisi</option>
+              <small>{t("home.where")}</small>
+              <select name="location" aria-label={t("home.location")}>
+                <option value="">{t("home.city")}</option>
+                {neighborhoods.map((n) => (
+                  <option key={n} value={n}>
+                    {label(n)}
+                  </option>
+                ))}
               </select>
             </span>
           </label>
           <label>
             <Scissors size={20} />
             <span>
-              <small>WHAT</small>
-              <select name="service" aria-label="Service">
-                <option value="">Any service</option>
-                <option value="haircut">Haircut</option>
-                <option value="skin-fade">Skin fade</option>
-                <option value="haircut-beard">Haircut & beard</option>
+              <small>{t("home.what")}</small>
+              <select name="service" aria-label={t("home.service")}>
+                <option value="">{t("home.anyService")}</option>
+                {services.slice(0, 3).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {serviceName(s)}
+                  </option>
+                ))}
               </select>
             </span>
           </label>
           <label className="search-date">
             <CalendarDays size={20} />
             <span>
-              <small>WHEN</small>
+              <small>{t("home.when")}</small>
               <input
                 type="date"
                 name="date"
                 min={today()}
-                aria-label="Appointment date"
+                aria-label={t("home.appointmentDate")}
               />
             </span>
           </label>
           <button className="button button-dark">
-            <Search size={18} /> Find a barber
+            <Search size={18} />
+            {t("home.find")}
           </button>
         </form>
       </section>
       <div className="container quick-discovery">
-        <span>A little inspiration?</span>
+        <span>{t("home.inspiration")}</span>
         {[
-          ["Skin fades", "skin-fade"],
-          ["Beard styling", "beard-styles"],
-          ["Classic cuts", "classic-scissor-cut"],
-        ].map(([name, id]) => (
+          ["home.skinFades", "skin-fade"],
+          ["home.beardStyling", "beard-styles"],
+          ["home.classicCuts", "classic-scissor-cut"],
+        ].map(([key, id]) => (
           <Link href={`/styles/${id}`} key={id}>
-            {name}
+            {t(key)}
             <ArrowUpRight size={12} />
           </Link>
         ))}
         <Link href="/discover?availability=today" className="available-quick">
           <span />
-          Available today
+          {t("home.availableToday")}
         </Link>
       </div>
       <section className="container section">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">THE NEIGHBORHOOD EDIT</span>
+            <span className="eyebrow">{t("home.neighborhood")}</span>
             <h2>
-              Popular near you<span className="accent">.</span>
+              {t("home.popular")}
+              <span className="accent">.</span>
             </h2>
-            <p>Good spaces. Great people. Your new regular.</p>
+            <p>{t("home.popularText")}</p>
           </div>
           <Link href="/shops" className="text-link">
-            Explore all shops <ArrowUpRight size={18} />
+            {t("home.allShops")}
+            <ArrowUpRight size={18} />
           </Link>
         </div>
         <div className="shop-grid">
@@ -142,14 +146,16 @@ export default function Home() {
         <div className="container section">
           <div className="section-heading">
             <div>
-              <span className="eyebrow">FIND YOUR LOOK</span>
+              <span className="eyebrow">{t("home.look")}</span>
               <h2>
-                A style that feels like you<span className="accent">.</span>
+                {t("home.styleTitle")}
+                <span className="accent">.</span>
               </h2>
-              <p>See the cut. Find the person who can make it yours.</p>
+              <p>{t("home.styleText")}</p>
             </div>
             <Link href="/styles" className="text-link">
-              Browse by style <ArrowUpRight size={18} />
+              {t("home.browseStyle")}
+              <ArrowUpRight size={18} />
             </Link>
           </div>
           <div className="style-grid">
@@ -169,17 +175,16 @@ export default function Home() {
       <section className="container section top-barbers">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">PEOPLE BEHIND THE CRAFT</span>
+            <span className="eyebrow">{t("home.people")}</span>
             <h2>
-              Top barbers. Your next regular<span className="accent">.</span>
+              {t("home.topBarbers")}
+              <span className="accent">.</span>
             </h2>
-            <p>
-              Independent style. Personal attention. Work that speaks for
-              itself.
-            </p>
+            <p>{t("home.barbersText")}</p>
           </div>
           <Link href="/barbers" className="text-link">
-            Meet all barbers <ArrowUpRight size={18} />
+            {t("home.allBarbers")}
+            <ArrowUpRight size={18} />
           </Link>
         </div>
         <div className="barber-grid">
@@ -195,39 +200,24 @@ export default function Home() {
       </section>
       <section className="how-section container" id="how-it-works">
         <div className="how-intro">
-          <div className="eyebrow">LESS GUESSWORK. MORE YOU.</div>
+          <div className="eyebrow">{t("home.howEyebrow")}</div>
           <h2>
-            Your next great cut,
+            {t("home.howTitle")}
             <br />
-            <em>in a few simple steps.</em>
+            <em>{t("home.howAccent")}</em>
           </h2>
           <Link href="/discover" className="button button-dark">
-            Find your chair <ArrowUpRight size={17} />
+            {t("footer.find")}
+            <ArrowUpRight size={17} />
           </Link>
         </div>
         <div className="how-steps">
-          {[
-            [
-              "01",
-              "Find your person",
-              "Explore portfolios, compare specialties, and find a barber who speaks your style.",
-            ],
-            [
-              "02",
-              "Make it a date",
-              "Choose a service and a time that works for you. Clear prices, before you book.",
-            ],
-            [
-              "03",
-              "Make yourself at home",
-              "Take a seat. Get a great cut. Share your experience and save your new regular.",
-            ],
-          ].map(([n, title, text]) => (
+          {[1, 2, 3].map((n) => (
             <div key={n}>
-              <span>{n}</span>
+              <span>{`0${n}`}</span>
               <div>
-                <h3>{title}</h3>
-                <p>{text}</p>
+                <h3>{t(`home.step${n}Title`)}</h3>
+                <p>{t(`home.step${n}Text`)}</p>
               </div>
             </div>
           ))}
@@ -235,15 +225,16 @@ export default function Home() {
       </section>
       <section className="barber-invite container">
         <div>
-          <span className="eyebrow">YOUR CRAFT DESERVES AN AUDIENCE</span>
+          <span className="eyebrow">{t("home.inviteEyebrow")}</span>
           <h2>
-            Great with a pair of scissors?
+            {t("home.invite1")}
             <br />
-            Let’s find your people.
+            {t("home.invite2")}
           </h2>
         </div>
         <Link href="/register?role=barber" className="button button-light">
-          Join as a barber <ArrowUpRight size={18} />
+          {t("navigation.join")}
+          <ArrowUpRight size={18} />
         </Link>
       </section>
     </>

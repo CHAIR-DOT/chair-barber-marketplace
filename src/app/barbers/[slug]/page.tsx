@@ -1,3 +1,4 @@
+import { translate } from "@/i18n/translate";
 import { notFound } from "next/navigation";
 import { barbers } from "@/lib/data";
 import { BarberProfile } from "@/components/profiles";
@@ -12,7 +13,9 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   return {
-    title: barbers.find((b) => b.slug === slug)?.name ?? "Barber not found",
+    title:
+      barbers.find((b) => b.slug === slug)?.name ??
+      translate("ka", "metadata.notFound"),
   };
 }
 export default async function Page({

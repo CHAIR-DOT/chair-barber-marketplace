@@ -170,7 +170,7 @@ test("booking validation rejects shop mismatch and changes in slot availability"
         date,
         time: "10:00",
       }),
-    /this shop/,
+    { message: "errors.barberShop" },
   );
   s.availability[0].blockedSlots.push("10:00");
   assert.throws(
@@ -182,7 +182,7 @@ test("booking validation rejects shop mismatch and changes in slot availability"
         date,
         time: "10:00",
       }),
-    /no longer available/,
+    { message: "errors.slotUnavailable" },
   );
 });
 test("only the owning customer can review a completed booking exactly once", () => {

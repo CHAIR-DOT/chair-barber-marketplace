@@ -11,7 +11,8 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { customer, shops, styles } from "@/lib/data";
-import { formatDate, money, relativeDate, today } from "@/lib/dates";
+import { today } from "@/lib/dates";
+import { useI18n } from "@/i18n/provider";
 import { canReview } from "@/lib/booking";
 import type { Appointment } from "@/lib/types";
 import { useMock } from "./provider";
@@ -30,6 +31,7 @@ function AppointmentCard({
   onCancel: (id: string) => void;
   onReview: (id: string) => void;
 }) {
+  const { t: tr, date: formatDate, money, label, serviceName } = useI18n();
   const { state } = useMock(),
     b = state.barbers.find((b) => b.id === appointment.barberId)!,
     s = shops.find((s) => s.id === appointment.shopId)!,
@@ -57,18 +59,19 @@ function AppointmentCard({
           }
         >
           {upcoming
-            ? "Upcoming"
+            ? tr("account.upcoming")
             : appointment.status === "upcoming"
-              ? "Visit date passed"
-              : appointment.status}
+              ? tr("account.visitPassed")
+              : label(appointment.status)}
         </Badge>
-        <h3>{service?.name}</h3>
+        <h3>{service ? serviceName(service) : ""}</h3>
         <Link href={`/barbers/${b.slug}`}>
           {b.name} · {s.name}
         </Link>
         <span>
           <Clock3 size={12} />
-          {appointment.time} · {appointment.duration} min{" "}
+          {appointment.time} ·{" "}
+          {tr("account.minutesShort", { count: appointment.duration })}{" "}
           <strong>{money(appointment.price)}</strong>
         </span>
       </div>
@@ -77,7 +80,7 @@ function AppointmentCard({
           className="button button-outline"
           onClick={() => onView(appointment.id)}
         >
-          View appointment
+          {tr("account.viewAppointment")}
         </button>
         {upcoming ? (
           <>
@@ -85,13 +88,13 @@ function AppointmentCard({
               className="text-link"
               href={`/booking?reschedule=${appointment.id}`}
             >
-              Reschedule
+              {tr("account.reschedule")}
             </Link>
             <button
               className="link-button"
               onClick={() => onCancel(appointment.id)}
             >
-              Cancel
+              {tr("account.cancel")}
             </button>
           </>
         ) : (
@@ -100,14 +103,15 @@ function AppointmentCard({
               className="text-link"
               href={`/booking?barber=${b.id}&shop=${s.id}&service=${appointment.serviceId}`}
             >
-              Book again <ArrowUpRight size={13} />
+              {tr("account.bookAgain")}
+              <ArrowUpRight size={13} />
             </Link>
             {canReview(state, appointment.id, customer.id) && (
               <button
                 className="link-button"
                 onClick={() => onReview(appointment.id)}
               >
-                Leave a review
+                {tr("account.leaveReview")}
               </button>
             )}
           </>
@@ -127,6 +131,14 @@ export function AccountPage({ section = "overview" }: { section?: string }) {
   );
 }
 function AccountContent({ section = "overview" }: { section?: string }) {
+  const {
+    t: tr,
+    date: formatDate,
+    money,
+    number,
+    label: labelText,
+    serviceName,
+  } = useI18n();
   const { state, cancel, update, notify } = useMock(),
     [tab, setTab] = useState("upcoming"),
     [favoriteTab, setFavoriteTab] = useState("barber"),
@@ -171,25 +183,30 @@ function AccountContent({ section = "overview" }: { section?: string }) {
       <PageHeader
         eyebrow={
           section === "overview"
-            ? "MAKE YOURSELF AT HOME"
-            : "YOUR PERSONAL CORNER"
+            ? tr("account.homeEyebrow")
+            : tr("account.personalEyebrow")
         }
         title={
           {
-            overview: `Good to see you, ${(state.user?.role === "customer" ? state.user.name : customer.name).split(" ")[0]}`,
-            appointments: "Your appointments",
-            favorites: "The ones worth saving",
-            reviews: "Your words matter",
-            settings: "Make it personal",
-          }[section] ?? "Your account"
+            overview: tr("account.title.overview", {
+              name: (state.user?.role === "customer"
+                ? state.user.name
+                : customer.name
+              ).split(" ")[0],
+            }),
+            appointments: tr("account.title.appointments"),
+            favorites: tr("account.title.favorites"),
+            reviews: tr("account.title.reviews"),
+            settings: tr("account.title.settings"),
+          }[section] ?? tr("account.title.default")
         }
         description={
           {
-            overview: "Your next cut, your favorite people, all in one place.",
-            appointments: "A little time set aside for yourself.",
-            favorites: "Great barbers, good spaces, and looks you love.",
-            reviews: "Good feedback helps the next person find their barber.",
-            settings: "Keep your demo profile up to date.",
+            overview: tr("account.description.overview"),
+            appointments: tr("account.description.appointments"),
+            favorites: tr("account.description.favorites"),
+            reviews: tr("account.description.reviews"),
+            settings: tr("account.description.settings"),
           }[section]
         }
       />
@@ -197,50 +214,56 @@ function AccountContent({ section = "overview" }: { section?: string }) {
         <>
           <div className="metric-grid customer-metrics">
             {[
-              [CalendarDays, upcoming.length, "Upcoming appointments"],
-              [Heart, state.favorites.length, "Saved favorites"],
-              [MessageSquare, reviews.length, "Your reviews"],
+              [
+                CalendarDays,
+                upcoming.length,
+                tr("account.metrics.appointments"),
+              ],
+              [Heart, state.favorites.length, tr("account.metrics.favorites")],
+              [MessageSquare, reviews.length, tr("account.metrics.reviews")],
             ].map(([Icon, value, label]) => {
               const I = Icon as typeof CalendarDays;
               return (
                 <div className="metric" key={String(label)}>
                   <I size={18} />
-                  <strong>{String(value)}</strong>
+                  <strong>{number(Number(value))}</strong>
                   <span>{String(label)}</span>
                 </div>
               );
             })}
           </div>
           <div className="dashboard-section-title">
-            <h2>Your next good hair day.</h2>
+            <h2>{tr("account.nextTitle")}</h2>
             <Link href="/account/appointments" className="text-link">
-              All appointments <ArrowUpRight size={15} />
+              {tr("account.allAppointments")}
+              <ArrowUpRight size={15} />
             </Link>
           </div>
           {upcoming.length ? (
             cards(upcoming.slice(0, 1))
           ) : (
             <EmptyState
-              title="Your next chapter is a fresh cut"
-              text="No upcoming appointments. Find a barber who gets your style."
-              action="Find a barber"
+              title={tr("account.empty.nextTitle")}
+              text={tr("account.empty.nextText")}
+              action={tr("account.findBarber")}
               href="/discover"
             />
           )}
           <div className="dashboard-section-title">
-            <h2>A familiar chair.</h2>
-            <span className="muted small-text">Book again</span>
+            <h2>{tr("account.familiarChair")}</h2>
+            <span className="muted small-text">{tr("account.bookAgain")}</span>
           </div>
           {cards(past.slice(0, 2))}
-          <div className="notice">
-            This is Alex’s sample customer account. Bookings and reviews are
-            stored only in this browser.
-          </div>
+          <div className="notice">{tr("account.sampleNotice")}</div>
         </>
       )}
       {section === "appointments" && (
         <>
-          <div className="tabs" role="tablist" aria-label="Appointment status">
+          <div
+            className="tabs"
+            role="tablist"
+            aria-label={tr("account.appointmentStatus")}
+          >
             {[
               ["upcoming", upcoming.length],
               ["past", past.length],
@@ -253,7 +276,8 @@ function AccountContent({ section = "overview" }: { section?: string }) {
                 className={tab === label ? "active" : ""}
                 onClick={() => setTab(String(label))}
               >
-                {String(label)} <span className="count">{count}</span>
+                {tr(`account.tab.${label}`)}{" "}
+                <span className="count">{number(Number(count))}</span>
               </button>
             ))}
           </div>
@@ -266,11 +290,11 @@ function AccountContent({ section = "overview" }: { section?: string }) {
             <EmptyState
               title={
                 tab === "upcoming"
-                  ? "Your calendar has room for a good cut"
-                  : `No ${tab} appointments`
+                  ? tr("account.empty.upcoming")
+                  : tr(`account.empty.${tab}`)
               }
-              text="Your appointments will appear here when you make a booking."
-              action="Explore barbers"
+              text={tr("account.empty.appointmentsText")}
+              action={tr("account.exploreBarbers")}
               href="/discover"
             />
           )}
@@ -278,11 +302,15 @@ function AccountContent({ section = "overview" }: { section?: string }) {
       )}
       {section === "favorites" && (
         <>
-          <div className="tabs" role="tablist" aria-label="Favorite type">
+          <div
+            className="tabs"
+            role="tablist"
+            aria-label={tr("account.favoriteType")}
+          >
             {[
-              ["barber", "Barbers"],
-              ["shop", "Barber shops"],
-              ["style", "Haircut styles"],
+              ["barber", tr("account.favorite.barber")],
+              ["shop", tr("account.favorite.shop")],
+              ["style", tr("account.favorite.style")],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -293,7 +321,7 @@ function AccountContent({ section = "overview" }: { section?: string }) {
               >
                 {label}
                 <span className="count">
-                  {state.favorites.filter((f) => f.type === id).length}
+                  {number(state.favorites.filter((f) => f.type === id).length)}
                 </span>
               </button>
             ))}
@@ -334,12 +362,12 @@ function AccountContent({ section = "overview" }: { section?: string }) {
             </div>
           ) : (
             <EmptyState
-              title="Keep the good ones close"
-              text="Tap a heart on a barber, shop, or style to save it here for your next visit."
+              title={tr("account.empty.favoritesTitle")}
+              text={tr("account.empty.favoritesText")}
               action={
                 favoriteTab === "style"
-                  ? "Explore haircut styles"
-                  : "Find your favorites"
+                  ? tr("account.exploreStyles")
+                  : tr("account.findFavorites")
               }
               href={favoriteTab === "style" ? "/styles" : "/discover"}
             />
@@ -353,8 +381,8 @@ function AccountContent({ section = "overview" }: { section?: string }) {
             <div className="review-prompt">
               <MessageSquare size={26} />
               <div>
-                <h3>How was your last visit?</h3>
-                <p>Share your experience after a completed haircut.</p>
+                <h3>{tr("account.reviewPromptTitle")}</h3>
+                <p>{tr("account.reviewPromptText")}</p>
               </div>
               <button
                 className="button button-dark"
@@ -366,7 +394,7 @@ function AccountContent({ section = "overview" }: { section?: string }) {
                   )
                 }
               >
-                Write a review
+                {tr("account.writeReview")}
               </button>
             </div>
           )}
@@ -374,14 +402,11 @@ function AccountContent({ section = "overview" }: { section?: string }) {
             reviews.map((r) => <ReviewCard review={r} key={r.id} />)
           ) : (
             <EmptyState
-              title="The first word is yours"
-              text="After a completed appointment, your review can help someone find their next barber."
+              title={tr("account.empty.reviewsTitle")}
+              text={tr("account.empty.reviewsText")}
             />
           )}
-          <p className="notice">
-            “Verified appointment” means the review is linked to a completed
-            sample booking. It does not represent real verification.
-          </p>
+          <p className="notice">{tr("account.reviewNotice")}</p>
         </>
       )}
       {section === "settings" && (
@@ -390,7 +415,7 @@ function AccountContent({ section = "overview" }: { section?: string }) {
           onSubmit={(e) => {
             e.preventDefault();
             if (name.trim().length < 2) {
-              notify("Please enter a name with at least two characters.");
+              notify("account.validation.name");
               return;
             }
             update({
@@ -402,7 +427,7 @@ function AccountContent({ section = "overview" }: { section?: string }) {
                 role: "customer",
               },
             });
-            notify("Your demo profile has been updated.");
+            notify("account.profileUpdated");
           }}
         >
           <div className="settings-person">
@@ -414,12 +439,12 @@ function AccountContent({ section = "overview" }: { section?: string }) {
                 .slice(0, 2)}
             </span>
             <div>
-              <h3>Your personal details</h3>
-              <p>Only saved on this device.</p>
+              <h3>{tr("account.personalDetails")}</h3>
+              <p>{tr("account.savedOnDevice")}</p>
             </div>
           </div>
           <label className="field">
-            Full name
+            {tr("account.fullName")}
             <input
               required
               minLength={2}
@@ -428,7 +453,7 @@ function AccountContent({ section = "overview" }: { section?: string }) {
             />
           </label>
           <label className="field">
-            Email address
+            {tr("account.email")}
             <input
               required
               type="email"
@@ -437,57 +462,74 @@ function AccountContent({ section = "overview" }: { section?: string }) {
             />
           </label>
           <label className="field">
-            Phone number
+            {tr("account.phone")}
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
-            <span className="hint">No calls or messages are sent.</span>
+            <span className="hint">{tr("account.phoneHint")}</span>
           </label>
           <button className="button button-dark">
-            Save changes <Check size={15} />
+            {tr("account.saveChanges")}
+            <Check size={15} />
           </button>
           <button
             type="button"
             className="link-button"
             onClick={() => {
               update({ user: null });
-              notify("Signed out of the demo.");
+              notify("account.signedOut");
             }}
           >
-            Sign out of demo
+            {tr("account.signOut")}
           </button>
         </form>
       )}
       <Modal
         open={!!view}
         onClose={() => setView(null)}
-        title="Your appointment"
+        title={tr("account.appointmentTitle")}
       >
         {view && (
           <>
             <Badge tone={view.status === "upcoming" ? "green" : ""}>
-              {view.status}
+              {labelText(view.status)}
             </Badge>
             <dl className="booking-summary appointment-detail">
               {[
                 [
-                  "Barber",
+                  tr("account.detail.barber"),
                   state.barbers.find((b) => b.id === view.barberId)?.name,
                 ],
-                ["Shop", shops.find((s) => s.id === view.shopId)?.name],
                 [
-                  "Service",
-                  state.services.find((s) => s.id === view.serviceId)?.name,
+                  tr("account.detail.shop"),
+                  shops.find((s) => s.id === view.shopId)?.name,
                 ],
                 [
-                  "Date",
+                  tr("account.detail.service"),
+                  (() => {
+                    const service = state.services.find(
+                      (s) => s.id === view.serviceId,
+                    );
+                    return service ? serviceName(service) : "";
+                  })(),
+                ],
+                [
+                  tr("account.detail.date"),
                   formatDate(view.date, { weekday: "long", year: "numeric" }),
                 ],
-                ["Time", `${view.time} · Tbilisi time`],
-                ["Duration", `${view.duration} minutes`],
-                ["Price", money(view.price)],
+                [
+                  tr("account.detail.time"),
+                  tr("account.detail.localTime", { time: view.time }),
+                ],
+                [
+                  tr("account.detail.duration"),
+                  tr("account.detail.minutes", {
+                    count: view.duration,
+                  }),
+                ],
+                [tr("account.detail.price"), money(view.price)],
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>
@@ -496,8 +538,9 @@ function AccountContent({ section = "overview" }: { section?: string }) {
               ))}
             </dl>
             <p className="notice">
-              Demo appointment · No real booking or payment. Reference{" "}
-              {view.id.slice(-8).toUpperCase()}.
+              {tr("account.detail.notice", {
+                reference: view.id.slice(-8).toUpperCase(),
+              })}
             </p>
           </>
         )}
@@ -505,18 +548,15 @@ function AccountContent({ section = "overview" }: { section?: string }) {
       <Modal
         open={!!cancelId}
         onClose={() => setCancel(null)}
-        title="A change of plans?"
+        title={tr("account.cancelTitle")}
       >
-        <p className="small-text muted">
-          Cancel this demo appointment? You can always come back and find
-          another time.
-        </p>
+        <p className="small-text muted">{tr("account.cancelText")}</p>
         <div className="modal-actions">
           <button
             className="button button-outline"
             onClick={() => setCancel(null)}
           >
-            Keep appointment
+            {tr("account.keepAppointment")}
           </button>
           <button
             className="button button-dark"
@@ -525,7 +565,7 @@ function AccountContent({ section = "overview" }: { section?: string }) {
               setCancel(null);
             }}
           >
-            Cancel appointment
+            {tr("account.cancelAppointment")}
           </button>
         </div>
       </Modal>

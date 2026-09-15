@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/i18n/provider";
 import Link from "next/link";
 export default function ErrorPage({
   reset,
@@ -6,20 +7,18 @@ export default function ErrorPage({
   error: Error;
   reset: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="container not-found" role="alert">
-      <div className="eyebrow">A LITTLE SNAG</div>
-      <h1>Let’s take another look.</h1>
-      <p>
-        Something interrupted this page. Your saved demo data is still in this
-        browser.
-      </p>
+      <div className="eyebrow">{t("errors.eyebrow")}</div>
+      <h1>{t("errors.title")}</h1>
+      <p>{t("errors.page")}</p>
       <div className="inline-actions">
         <button className="button button-dark" onClick={reset}>
-          Try again
+          {t("errors.retry")}
         </button>
         <Link className="button button-outline" href="/">
-          Back home
+          {t("errors.home")}
         </Link>
       </div>
     </div>

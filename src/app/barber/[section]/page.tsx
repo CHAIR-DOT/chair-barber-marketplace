@@ -1,3 +1,4 @@
+import { translate } from "@/i18n/translate";
 import { notFound } from "next/navigation";
 import { BarberWorkspace } from "@/components/barber-workspace";
 export const dynamicParams = false;
@@ -11,7 +12,17 @@ export async function generateMetadata({
 }: {
   params: Promise<{ section: string }>;
 }) {
-  return { title: `Barber ${(await params).section}` };
+  const { section } = await params;
+  const valid = [
+    "dashboard",
+    "profile",
+    "portfolio",
+    "services",
+    "schedule",
+  ].includes(section);
+  return {
+    title: translate("ka", valid ? `metadata.${section}` : "metadata.notFound"),
+  };
 }
 export default async function Page({
   params,

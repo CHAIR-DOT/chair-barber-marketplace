@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useI18n } from "@/i18n/provider";
 import { useEffect, useId, useRef } from "react";
 import { ArrowLeft, Heart, Search, Star, X } from "lucide-react";
 import { useMock } from "./provider";
@@ -22,11 +23,19 @@ export function Rating({
   count?: number;
   showCount?: boolean;
 }) {
+  const { t, number } = useI18n();
   return (
     <span className="rating">
       <Star size={14} fill="currentColor" />
-      <strong>{value ? value.toFixed(1) : "New"}</strong>
-      {showCount && count !== undefined && <span>({count})</span>}
+      <strong>
+        {value
+          ? number(value, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            })
+          : t("common.new")}
+      </strong>
+      {showCount && count !== undefined && <span>({number(count)})</span>}
     </span>
   );
 }
@@ -39,13 +48,16 @@ export function FavoriteButton({
   id: string;
   label: string;
 }) {
+  const { t } = useI18n();
   const { favorite, isFavorite } = useMock();
   const saved = isFavorite(type, id);
   return (
     <button
       type="button"
       className={`icon-button favorite-button ${saved ? "saved" : ""}`}
-      aria-label={`${saved ? "Unsave" : "Save"} ${label}`}
+      aria-label={t(saved ? "common.unsaveEntity" : "common.saveEntity", {
+        name: label,
+      })}
       aria-pressed={saved}
       onClick={() => favorite(type, id)}
     >
@@ -87,8 +99,9 @@ export function EmptyState({
   );
 }
 export function SkeletonCard() {
+  const { t } = useI18n();
   return (
-    <div className="skeleton-card" aria-label="Loading">
+    <div className="skeleton-card" aria-label={t("common.loading")}>
       <div className="skeleton skeleton-image" />
       <div className="skeleton skeleton-line" />
       <div className="skeleton skeleton-line short" />
@@ -108,6 +121,7 @@ export function Modal({
   children: React.ReactNode;
   wide?: boolean;
 }) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null),
     id = useId();
   useEffect(() => {
@@ -140,7 +154,7 @@ export function Modal({
           <button
             className="icon-button"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t("common.closeDialog")}
           >
             <X size={20} />
           </button>
@@ -177,15 +191,16 @@ export function PageHeader({
 }
 export function BackLink({
   href = "/discover",
-  children = "Back to discovery",
+  children,
 }: {
   href?: string;
   children?: React.ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <Link className="back-link" href={href}>
       <ArrowLeft size={16} />
-      {children}
+      {children ?? t("common.backDiscovery")}
     </Link>
   );
 }

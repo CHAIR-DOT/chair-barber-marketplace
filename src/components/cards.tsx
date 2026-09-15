@@ -1,25 +1,20 @@
 "use client";
 import Link from "next/link";
+import { useI18n } from "@/i18n/provider";
 import {
   ArrowUpRight,
   BadgeCheck,
-  Clock3,
   GitCompareArrows,
   MapPin,
 } from "lucide-react";
 import { shops, styles } from "@/lib/data";
 import { getPrice, nextAvailable, ratingFor } from "@/lib/booking";
-import {
-  relativeDate,
-  money,
-  currentMinutes,
-  minutes,
-  today,
-} from "@/lib/dates";
+import { currentMinutes, minutes, today } from "@/lib/dates";
 import type { Barber, BarberShop, HaircutStyle } from "@/lib/types";
 import { useMock } from "./provider";
-import { Badge, FavoriteButton, Rating } from "./ui";
+import { FavoriteButton, Rating } from "./ui";
 export function NextSlot({ barberId }: { barberId: string }) {
+  const { t, relativeDate } = useI18n();
   const { state } = useMock(),
     next = nextAvailable(state, barberId);
   return (
@@ -27,11 +22,12 @@ export function NextSlot({ barberId }: { barberId: string }) {
       <i />
       {next
         ? `${relativeDate(next.date)}, ${next.time}`
-        : "Schedule opening soon"}
+        : t("cards.scheduleSoon")}
     </span>
   );
 }
 export function ShopCard({ shop }: { shop: BarberShop }) {
+  const { t, relativeDate, money, label } = useI18n();
   const { state } = useMock(),
     team = state.barbers.filter((b) => b.shopId === shop.id),
     rs = state.reviews.filter((r) => team.some((b) => b.id === r.barberId)),
@@ -51,15 +47,18 @@ export function ShopCard({ shop }: { shop: BarberShop }) {
   return (
     <article className="shop-card">
       <div className="card-image">
-        <Link href={`/shops/${shop.slug}`} aria-label={`Explore ${shop.name}`}>
+        <Link
+          href={`/shops/${shop.slug}`}
+          aria-label={t("cards.exploreShop", { name: shop.name })}
+        >
           <img
             src={shop.image}
-            alt={`${shop.name}, illustrative barbershop interior`}
+            alt={t("cards.shopImage", { name: shop.name })}
             loading="lazy"
           />
         </Link>
         {shop.featured && (
-          <span className="image-badge">THE NEIGHBORHOOD EDIT</span>
+          <span className="image-badge">{t("cards.neighborhoodEdit")}</span>
         )}
         <FavoriteButton type="shop" id={shop.id} label={shop.name} />
       </div>
@@ -71,7 +70,8 @@ export function ShopCard({ shop }: { shop: BarberShop }) {
       </div>
       <p className="card-location">
         <MapPin size={13} />
-        {shop.neighborhood}, Tbilisi <span>· {shop.distance} km</span>
+        {t("cards.location", { neighborhood: label(shop.neighborhood) })}{" "}
+        <span>· {t("cards.distance", { count: shop.distance })}</span>
       </p>
       <div className="shop-preview">
         <div className="avatar-stack">
@@ -81,9 +81,9 @@ export function ShopCard({ shop }: { shop: BarberShop }) {
             </Link>
           ))}
         </div>
-        <span>{team.length} talented barbers</span>
+        <span>{t("cards.talentedBarbers", { count: team.length })}</span>
         <span className={`open-label ${open ? "is-open" : ""}`}>
-          {open ? "Open now" : "Closed now"}
+          {open ? t("cards.open") : t("cards.closed")}
         </span>
       </div>
       <div className="card-bottom">
@@ -91,10 +91,10 @@ export function ShopCard({ shop }: { shop: BarberShop }) {
           <i />
           {upcoming
             ? `${relativeDate(upcoming.next!.date)}, ${upcoming.next!.time}`
-            : "No times available"}
+            : t("cards.noTimes")}
         </span>
         <span className="from-price">
-          From{" "}
+          {t("cards.from")}{" "}
           <strong>
             {money(Math.min(...team.map((b) => getPrice(b, "haircut", state))))}
           </strong>
@@ -110,6 +110,7 @@ export function BarberCard({
   barber: Barber;
   compact?: boolean;
 }) {
+  const { t, money, label, styleName } = useI18n();
   const { state, compare, toggleCompare } = useMock(),
     shop = shops.find((s) => s.id === barber.shopId)!,
     r = ratingFor(barber.id, state.reviews);
@@ -118,21 +119,21 @@ export function BarberCard({
       <div className="barber-image">
         <Link
           href={`/barbers/${barber.slug}`}
-          aria-label={`View ${barber.name}`}
+          aria-label={t("cards.viewBarber", { name: barber.name })}
         >
           <img
             src={barber.image}
-            alt={`${barber.name}, illustrative barber portrait`}
+            alt={t("cards.barberImage", { name: barber.name })}
             loading="lazy"
           />
         </Link>
         <FavoriteButton type="barber" id={barber.id} label={barber.name} />
         <span className="barber-image-badge">
           {!r.count
-            ? "NEW TALENT"
+            ? t("cards.newTalent")
             : r.value >= 4.9
-              ? "TOP RATED"
-              : "THE CRAFT EDIT"}
+              ? t("cards.topRated")
+              : t("cards.craftEdit")}
         </span>
       </div>
       <div className="barber-card-content">
@@ -147,43 +148,47 @@ export function BarberCard({
             <BadgeCheck
               className="verified-icon"
               size={17}
-              aria-label="Demo verified barber"
+              aria-label={t("cards.verifiedAria")}
             />
           )}
           <Rating value={r.value} count={r.count} />
         </div>
         <Link href={`/shops/${shop.slug}`} className="barber-shop">
-          {shop.name} · {shop.neighborhood}
+          {shop.name} · {label(shop.neighborhood)}
         </Link>
         <div className="barber-experience">
-          {barber.experience} years experience{" "}
-          <span>· {barber.completedCuts.toLocaleString("en-GB")} cuts</span>
+          {t("cards.experience", { count: barber.experience })}{" "}
+          <span>· {t("cards.cuts", { count: barber.completedCuts })}</span>
         </div>
         <div className="tags">
           {barber.styleIds.slice(0, 3).map((id) => (
             <Link className="tag" key={id} href={`/styles/${id}`}>
-              {styles.find((s) => s.id === id)?.name}
+              {(() => {
+                const style = styles.find((s) => s.id === id);
+                return style ? styleName(style) : "";
+              })()}
             </Link>
           ))}
         </div>
         <div className="barber-card-meta">
           <NextSlot barberId={barber.id} />
           <span className="from-price">
-            From <strong>{money(getPrice(barber, "haircut", state))}</strong>
+            {t("cards.from")}{" "}
+            <strong>{money(getPrice(barber, "haircut", state))}</strong>
           </span>
         </div>
         <div className="barber-card-actions">
           <Link href={`/barbers/${barber.slug}`} className="text-link">
-            Meet your barber <ArrowUpRight size={16} />
+            {t("cards.meetBarber")} <ArrowUpRight size={16} />
           </Link>
           <button
             className={`compare-toggle ${compare.includes(barber.id) ? "selected" : ""}`}
             aria-pressed={compare.includes(barber.id)}
-            aria-label={`Compare ${barber.name}`}
+            aria-label={t("cards.compareBarber", { name: barber.name })}
             onClick={() => toggleCompare(barber.id)}
           >
             <GitCompareArrows size={15} />
-            <span>Compare</span>
+            <span>{t("cards.compare")}</span>
           </button>
         </div>
       </div>
@@ -191,30 +196,33 @@ export function BarberCard({
   );
 }
 export function StyleCard({ style }: { style: HaircutStyle }) {
+  const { t, styleName } = useI18n();
   const { state } = useMock();
   return (
     <article className="style-card">
       <div className="style-image">
         <Link
           href={`/styles/${style.slug}`}
-          aria-label={`Browse ${style.name} specialists`}
+          aria-label={t("cards.browseSpecialists", { name: styleName(style) })}
         >
           <img
             src={style.image}
-            alt={`${style.name} inspiration, illustrative haircut`}
+            alt={t("cards.styleImage", { name: styleName(style) })}
             loading="lazy"
           />
         </Link>
-        <FavoriteButton type="style" id={style.id} label={style.name} />
+        <FavoriteButton type="style" id={style.id} label={styleName(style)} />
       </div>
       <Link href={`/styles/${style.slug}`}>
         <h3>
-          {style.name}
+          {styleName(style)}
           <ArrowUpRight size={15} />
         </h3>
         <span>
-          {state.barbers.filter((b) => b.styleIds.includes(style.id)).length}{" "}
-          specialists
+          {t("cards.specialists", {
+            count: state.barbers.filter((b) => b.styleIds.includes(style.id))
+              .length,
+          })}
         </span>
       </Link>
     </article>
