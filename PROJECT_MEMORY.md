@@ -16,7 +16,7 @@ Continue the existing application; do not create a new scaffold. Root `AGENTS.md
 
 **Frontend prototype using local mock data.** Discovery, profiles, booking, customer accounts, and barber management work within the prototype's limits. Preview: `http://127.0.0.1:3000`. No public site deployment or backend implementation is authorized by the current task.
 
-**Current task:** Establish concise mandatory project memory and private GitHub version control. The baseline is committed locally on `main` (`f3e9dc2`); pre-upload checks passed. GitHub CLI is installed; official browser/device sign-in is waiting for the user. Remote setup and upload remain pending. See Repository / Version Control for the exact resume point.
+**Current task:** Establish concise mandatory project memory and private GitHub version control. The baseline is committed locally on `main` (`f3e9dc2`); pre-upload checks passed. The user reported that the first device code failed or expired. Authentication was rechecked (no signed-in account), the old attempt stopped, and a fresh official GitHub CLI browser/device flow started. The new one-time code was provided only in chat, not saved in the repository. Remote setup and upload remain pending user authorization. See Repository / Version Control for the exact resume point.
 
 ## Mandatory Development Workflow
 
@@ -222,6 +222,7 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 - Reorganized memory around current truth and concise history; established mandatory ongoing commit/push workflow.
 - Committed baseline `f3e9dc2` on `main`, expanded ignores, audited 85 tracked files and reran baseline checks. Installed verified official GitHub CLI; secure browser authorization is waiting for the user.
 - Updated typechecking to generate ignored Next declarations before checking fresh checkouts.
+- Restarted GitHub device authentication after the user reported an invalid/expired code; verified no account was signed in. No application changes or repeated app tests were needed; authentication remains pending.
 
 ## Next Recommended Steps
 
@@ -232,4 +233,4 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 
 ## Last Updated
 
-**2026-09-15 (Asia/Tbilisi)** — Frontend remains functional and local-only. Baseline committed locally, checks passed, ignore rules audited and memory reorganized. Official GitHub CLI browser authorization is the only current external blocker; private remote creation/upload/verification must continue after approval. No remote backup exists yet.
+**2026-09-15 (Asia/Tbilisi)** — Restarted official GitHub CLI device sign-in with a fresh one-time code after the first attempt failed/expired. Local baseline and application remain intact. User authorization is still required before private remote creation/upload/verification. No remote backup exists yet.
