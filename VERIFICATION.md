@@ -54,3 +54,10 @@ Browser testing creates local demo activity. To start fresh, use **About this pr
 - Two optional Sharp/WASM packages appear as extraneous in the local install but are present in the lockfile; all declared dependencies match and checks passed.
 - Stopped only the separate production test server on port 3011. The existing development preview on port 3000 was preserved.
 - Full earlier browser interaction/responsive checks were not repeated for these Git/documentation changes.
+
+## GitHub upload verification — 15 September 2026
+
+- Authenticated GitHub API identified `CHAIR-DOT`; repository metadata confirmed `CHAIR-DOT/chair-barber-marketplace` is private with default branch `main`.
+- First push succeeded and established `main` tracking `origin/main`. The remote branch commit matched the local commit.
+- Compared every remote file path, mode and content hash against the local Git tree: all 85 files matched, including `PROJECT_MEMORY.md` and 25 images; no ignored dependency/build/environment/credential paths were uploaded.
+- Updated repository details in memory and README. No application code changed; the preceding successful build, type, domain and HTTP checks remain the relevant validation.

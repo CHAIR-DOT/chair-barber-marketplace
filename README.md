@@ -2,6 +2,8 @@
 
 A photography-led marketplace for finding a barber in Tbilisi. Built with Next.js App Router, React, TypeScript, Tailwind CSS, Lucide, and small reusable UI components. Everything is local and mocked.
 
+Private source repository: [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Primary branch: `main`; remote: `origin`.
+
 ## Continue in a new chat
 
 Read [PROJECT_MEMORY.md](PROJECT_MEMORY.md) first. It records the current stopping point, completed work, important decisions, test results, known limitations, and the next action. [PROJECT_BRIEF.md](PROJECT_BRIEF.md) preserves the original request.

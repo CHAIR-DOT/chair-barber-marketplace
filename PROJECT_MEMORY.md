@@ -16,7 +16,7 @@ Continue the existing application; do not create a new scaffold. Root `AGENTS.md
 
 **Frontend prototype using local mock data.** Discovery, profiles, booking, customer accounts, and barber management work within the prototype's limits. Preview: `http://127.0.0.1:3000`. No public site deployment or backend implementation is authorized by the current task.
 
-**Current task:** Establish concise mandatory project memory and private GitHub version control. The baseline is committed locally on `main` (`f3e9dc2`); pre-upload checks passed. The user reported that the first device code failed or expired. Authentication was rechecked (no signed-in account), the old attempt stopped, and a fresh official GitHub CLI browser/device flow started. The new one-time code was provided only in chat, not saved in the repository. Remote setup and upload remain pending user authorization. See Repository / Version Control for the exact resume point.
+**Current status:** Mandatory project memory and private GitHub version control are established. The existing frontend and its history are uploaded to [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Authentication succeeded as **CHAIR-DOT**; `main` tracks `origin/main`. The source upload was verified against local commit/file hashes. No application feature is pending from this setup task; continue with the user’s next requested improvement.
 
 ## Mandatory Development Workflow
 
@@ -194,21 +194,24 @@ No backend provider/account is connected. Browser localStorage remains prototype
 
 ## Repository / Version Control
 
-- **Local:** Git initialized on `main`; baseline commit `f3e9dc2` (`chore: establish project baseline`) contains 85 audited files including this memory. No earlier repository/history or remote existed. Use `git log -1` for the latest documentation/checkpoint commit; do not attempt to store a commit’s own hash inside itself.
-- **Remote:** Not created/connected. GitHub CLI 2.101.0 is installed at `/Users/macuser/.local/bin/gh` from the official release; its archive matched the published SHA-256. No prior CLI login existed. Secure browser/device authentication was started and is waiting for the user; authenticated account is not yet verified. Use the full CLI path if `gh` is not on PATH. The stalled Homebrew install was stopped; no shell-profile changes were made.
-- **Planned name:** `chair-barber-marketplace`, matching package metadata. Prefer **private**; check authenticated owner and existing repository/remotes before creation.
-- **GitHub URL / upstream:** Pending. No successful upload is claimed yet.
-- **Identity:** Existing global name/email were inspected and preserved. Repository-local author name uses the existing valid name; repository-local email uses the address the user supplied. GitHub username remains unverified until authentication succeeds. No credentials are stored in the project.
-- **Safe scope:** Source/config, lockfile, licensed local assets, tests, brief, memory and docs. Ignore dependencies/builds/caches, env files, private-key/credential formats, logs/temp files, OS/editor metadata, local assistant state and synced reference material.
-- `.env.example` is allowed only with verified placeholders; none exists. Do not delete real local env files. Audit found no actual project credentials.
-- **Workflow:** Review → test → update memory → inspect diff/status/staged files → descriptive commit → normal push to the same remote. Keep memory tracked and synchronized with code. No force-push/history rewriting without explicit approval.
-- **Exact resume point:** Wait for the user to complete the official GitHub CLI browser authorization, then verify the authenticated account with `gh api user`; inspect local commit status and owner/repository; create/connect private remote without duplicating an existing repository; push `main` with upstream tracking; verify remote hash/visibility/files/exclusions; update final repository details here and commit/push that update.
+- **Status:** Git initialized, committed, connected to GitHub, and uploaded successfully. Initial baseline `f3e9dc2` (`chore: establish project baseline`) contains 85 audited files; later commits record the handoff and setup. Use `git log -1` for the current latest commit rather than storing a commit’s own hash inside itself.
+- **Authenticated GitHub username:** `CHAIR-DOT`, verified with the authenticated GitHub API after official browser/device authorization.
+- **Repository:** `CHAIR-DOT/chair-barber-marketplace`.
+- **URL:** [https://github.com/CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace).
+- **Visibility:** **Private**, verified from GitHub repository metadata. This is source-code hosting; the application still runs only on localhost.
+- **Remote:** `origin` → `https://github.com/CHAIR-DOT/chair-barber-marketplace.git`.
+- **Primary branch / upstream:** `main` → `origin/main`. Normal push: `git push`; inspect fetch/status before incorporating remote changes. Preserve existing history and unrelated edits.
+- **CLI:** GitHub CLI 2.101.0 at `/Users/macuser/.local/bin/gh` (use the full path if needed). Its official release archive matched the published SHA-256. Secure browser authorization succeeded; no tokens/device codes were stored in project files. The stalled Homebrew install was stopped and no shell-profile changes were made.
+- **Commit identity:** Existing global name/email remain unchanged. Repository-local author name preserves the existing valid name; repository-local email uses the address the user supplied. Git author name and GitHub account name need not be identical.
+- **Tracked content:** Source/config, lockfile, licensed assets, tests, brief, memory and docs. Dependencies/builds/caches, env files, private-key/credential formats, logs/temp files, OS/editor metadata, assistant-local state and synced references are ignored. `.env.example` is allowed only with verified placeholders; none exists. Never delete real local env files just because they are ignored.
+- **Workflow:** Read memory/code → implement → test → update current memory sections → inspect diff/status/staged content for secrets → descriptive commit → push to this same repository → verify remote commit/upstream and expected clean tree. Keep memory and code in the same commit whenever practical. No force-push/history rewriting without explicit approval; no new repository per task.
+- **Next action:** Continue the existing frontend when the user requests a change. GitHub setup has no remaining authentication blocker.
 
 ## Verification
 
 **Fresh during Git preparation, 2026-09-15:** dependency consistency passed; TypeScript passed; **9/9 tests**; production build passed (57 generated pages); HTTP checks passed for **55 valid routes, 5 expected 404s, 25 images**. Own test server on 3011 was stopped; existing development server on 3000 preserved. No lint command exists. The updated `next typegen && tsc --noEmit` command also passed after the baseline checks. All 20 required memory sections and local documentation links were checked. A clean `git archive` of the committed sources (reusing installed dependencies) successfully generated Next declarations and passed typechecking without pre-existing build output.
 
-Upload audit: no real credential candidates/URLs, env files, private keys/certificates, source symlinks or sensitive JPG metadata found. Stock credit tags are expected. `.DS_Store` is now ignored. Original `AGENTS.md` remains mode 444. The staged audit passed for all 85 files: memory included, 25 images included, no forbidden/generated/env files or credential signatures found. `git diff --cached --check` passed. The local baseline commit succeeded; remote verification is pending user sign-in.
+Upload audit: no real credential candidates/URLs, env files, private keys/certificates, source symlinks or sensitive JPG metadata found. Stock credit tags are expected. `.DS_Store` is now ignored. Original `AGENTS.md` remains mode 444. The staged audit passed for all 85 files: memory included, 25 images included, no forbidden/generated/env files or credential signatures found. `git diff --cached --check` passed. The local baseline commit succeeded. GitHub upload verification confirmed matching branch commit IDs and all 85 file paths, modes and content hashes, including memory and 25 images; no forbidden generated/environment paths were present. Private visibility and `origin/main` tracking were also confirmed. Application tests were not repeated for this authentication/documentation-only completion.
 
 **Earlier browser checks, 2026-09-15:** filters/reset/no-results, favorites after refresh, comparison/lightbox Escape, mobile filters, any-barber booking → same-ID reschedule → cancel, one eligible review, price/service/schedule/portfolio/profile edits, role navigation/sign-out and optional WebMCP. Seven main surfaces measured at 375/768/1024/1440px without page overflow after the mobile table fix. Production home/profile had no observed browser console errors/warnings. These interaction checks were not rerun for Git preparation. See [VERIFICATION.md](VERIFICATION.md) for details and limits.
 
@@ -220,17 +223,17 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 - Fixed any-barber confirmation, hydration/editor persistence, booking horizon/eligibility, mobile table overflow and invalid-route status handling.
 - Created project memory/read-update instructions, preserved the original brief and documented the project location.
 - Reorganized memory around current truth and concise history; established mandatory ongoing commit/push workflow.
-- Committed baseline `f3e9dc2` on `main`, expanded ignores, audited 85 tracked files and reran baseline checks. Installed verified official GitHub CLI; secure browser authorization is waiting for the user.
+- Committed baseline `f3e9dc2` on `main`, expanded ignores, audited 85 tracked files and reran baseline checks. Installed verified official GitHub CLI.
 - Updated typechecking to generate ignored Next declarations before checking fresh checkouts.
-- Restarted GitHub device authentication after the user reported an invalid/expired code; verified no account was signed in. No application changes or repeated app tests were needed; authentication remains pending.
+- Completed secure GitHub sign-in as `CHAIR-DOT` after a device-code retry; created the private `chair-barber-marketplace` repository, pushed `main`, and verified visibility, upstream, commit and all 85 remote files. Added repository details to memory and README.
 
 ## Next Recommended Steps
 
-1. **Current authorized task:** Await the user’s GitHub CLI browser approval, verify authentication, then finish private GitHub setup and verification; record the actual remote/visibility/branch or precise authentication blocker.
+1. **Setup complete:** Use the existing private GitHub repository for future meaningful development work; maintain memory and commit/push reviewed changes together.
 2. Review the localhost prototype with the user and implement their next requested improvement while preserving data/design.
 3. When requested, finish Georgian localization or add focused accessibility/interaction coverage.
 4. When requested, begin schema/permissions/authentication then transactional bookings; keep payments/notifications/deployment deferred until authorized.
 
 ## Last Updated
 
-**2026-09-15 (Asia/Tbilisi)** — Restarted official GitHub CLI device sign-in with a fresh one-time code after the first attempt failed/expired. Local baseline and application remain intact. User authorization is still required before private remote creation/upload/verification. No remote backup exists yet.
+**2026-09-15 (Asia/Tbilisi)** — Private GitHub source hosting is established under `CHAIR-DOT/chair-barber-marketplace`; `main` was pushed and verified. Project memory and mandatory future Git workflow are tracked. No authentication/setup blocker remains; the application stays a localhost frontend prototype.
