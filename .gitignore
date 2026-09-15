@@ -1,0 +1,56 @@
+# Dependencies and generated output
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local configuration and secrets (never delete the real local files)
+.env
+.env.*
+!.env.example
+*.local
+.npmrc
+.netrc
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials*.json
+*service-account*.json
+# Track .env.example only after confirming every value is a placeholder.
+
+# Logs, caches, test results, and temporary tools
+logs/
+*.log
+.cache/
+.npm/
+.sites-runtime/
+test-results/
+playwright-report/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# OS and editor metadata
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Machine-local assistant state and synced references
+.codex/
+.agents/
+/sources/
