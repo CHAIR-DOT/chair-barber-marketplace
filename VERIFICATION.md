@@ -45,3 +45,12 @@ The mobile discovery filter dialog was exercised: changing the neighborhood and 
 These checks validate a frontend prototype, not a production booking service. Authentication and authorization are simulated, local storage is device/browser-specific, and stock photographs are illustrative. Multi-user booking conflicts, payments, notifications, uploads to remote storage, and server-enforced review permissions require the backend described in `BACKEND_PLAN.md`.
 
 Browser testing creates local demo activity. To start fresh, use **About this preview → Reset demo data**; this is optional and explicitly confirms removal of local demo changes.
+
+## Git baseline preparation — 15 September 2026
+
+- Reran dependency consistency, TypeScript, all 9 domain tests, production build, and production HTTP checks: 55 valid routes, 5 expected invalid-route 404s, and 25 images passed. No lint script is configured.
+- Updated typechecking to generate ignored Next declarations first; verified it both in the workspace and a clean archive of committed sources using existing installed dependencies.
+- Audited project candidates and staged content: 85 files including memory and 25 images; no real credential candidates or forbidden generated/environment files found. Tested ignore rules; preserved the original read-only instructions and local browser data.
+- Two optional Sharp/WASM packages appear as extraneous in the local install but are present in the lockfile; all declared dependencies match and checks passed.
+- Stopped only the separate production test server on port 3011. The existing development preview on port 3000 was preserved.
+- Full earlier browser interaction/responsive checks were not repeated for these Git/documentation changes.

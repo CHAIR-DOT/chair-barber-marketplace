@@ -14,7 +14,7 @@ Start a new task in this same folder with: **“Read PROJECT_MEMORY.md and conti
 
 ## Run locally
 
-Requires Node.js 20.9 or newer and npm. Dependencies are pinned in `package-lock.json`.
+Requires Node.js 20.9 or newer and npm. Dependencies are pinned in `package-lock.json`. The path below is this machine’s project folder; after cloning elsewhere, use your clone folder instead.
 
 ```bash
 cd /Users/macuser/.codex/.chatgpt-projects/g-p-6aa958719c2081918e959be626523117
