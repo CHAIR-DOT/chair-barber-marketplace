@@ -1,15 +1,23 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
+import {
+  DEFAULT_STYLE_SELECTION,
+  type StyleSelection,
+} from "@/lib/style-selection";
+import { createHairVariants } from "./style-hair-variants";
+import { createBeardVariants } from "./style-beard-variants";
+
 export type StyleCategory = "hair" | "beard";
 export type StyleScene = {
   setCategory: (category: StyleCategory) => void;
+  setSelection: (selection: StyleSelection) => void;
   rotate: (direction: number) => void;
   reset: () => void;
   dispose: () => void;
 };
 
-/** Asset boundary: replace this scan with a licensed, normalized variant rig here. */
+/** Local scan with fitted, cached hair and beard child groups. */
 const MODEL = "/models/lee-perry-smith/";
 const clamp = THREE.MathUtils.clamp;
 
@@ -18,7 +26,11 @@ export function createStyleScene(
   options: {
     onReady: () => void;
     onError: () => void;
-    onHotspot: (category: StyleCategory, x: number, y: number) => void;
+    onHotspot: (
+      category: StyleCategory,
+      xPercent: number,
+      yPercent: number,
+    ) => void;
   },
 ): StyleScene {
   const renderer = new THREE.WebGLRenderer({
@@ -40,8 +52,8 @@ export function createStyleScene(
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
-  camera.position.set(0, 0.5, 19.5);
-  camera.lookAt(0, -0.1, 0);
+  camera.position.set(0, 0.5, 17.75);
+  camera.lookAt(0, 0.45, 0);
   const portrait = new THREE.Group();
   portrait.rotation.y = -0.12;
   scene.add(portrait);
@@ -71,6 +83,15 @@ export function createStyleScene(
   let targetPitch = 0;
   let introStart = 0;
   let category: StyleCategory = "hair";
+  let selection = DEFAULT_STYLE_SELECTION;
+  let hair: ReturnType<typeof createHairVariants> | undefined;
+  let beard: ReturnType<typeof createBeardVariants> | undefined;
+  function setSelection(next: StyleSelection) {
+    selection = next;
+    hair?.setStyle(next.hairStyleId);
+    beard?.setStyle(next.beardStyleId);
+    requestFrame();
+  }
   let pointer: {
     id: number;
     x: number;
@@ -83,7 +104,7 @@ export function createStyleScene(
   const vector = new THREE.Vector3();
   const anchors: Record<StyleCategory, THREE.Vector3> = {
     hair: new THREE.Vector3(-1.2, 3.25, 1.6),
-    beard: new THREE.Vector3(1.1, -0.25, 2.55),
+    beard: new THREE.Vector3(0.6, -0.2, 1.95),
   };
 
   function requestFrame() {
@@ -100,7 +121,7 @@ export function createStyleScene(
       !loaded || reducedMotion.matches
         ? 1
         : Math.min(1, (now - introStart) / 700);
-    camera.position.z = 19.5 + (1 - progress) * 1.2;
+    camera.position.z = 17.75 + (1 - progress) * 1.2;
     renderer.render(scene, camera);
     for (const name of ["hair", "beard"] as const) {
       vector.copy(anchors[name]);
@@ -108,8 +129,8 @@ export function createStyleScene(
       vector.project(camera);
       options.onHotspot(
         name,
-        (vector.x * 0.5 + 0.5) * width,
-        (-vector.y * 0.5 + 0.5) * height,
+        (vector.x * 0.5 + 0.5) * 100,
+        (-vector.y * 0.5 + 0.5) * 100,
       );
     }
     if (
@@ -296,6 +317,7 @@ export function createStyleScene(
         normalScale: new THREE.Vector2(0.65, 0.65),
         roughness: 0.8,
       });
+      let head: THREE.Mesh | undefined;
       model.traverse((child) => {
         if (!(child instanceof THREE.Mesh)) return;
         const old = Array.isArray(child.material)
@@ -303,7 +325,42 @@ export function createStyleScene(
           : [child.material];
         old.forEach((item) => item.dispose());
         child.material = material;
+        head ??= child;
       });
+      if (!head) throw new Error("Head mesh missing");
+      // Build only once, after assigning the scan material. Child transforms follow
+      // the scan exactly; later choices only toggle the cached groups' visibility.
+      hair = createHairVariants(head);
+      beard = createBeardVariants(head);
+      head.add(hair.group, beard.group);
+      // Fit each projected control to a real surface vertex, including any GLB
+      // node transform. A point floating in front of the jaw drifts on rotation.
+      const positions = head.geometry.getAttribute("position");
+      const normals = head.geometry.getAttribute("normal");
+      const sample = new THREE.Vector3();
+      const surfaceNormal = new THREE.Vector3();
+      for (const anchor of Object.values(anchors)) {
+        let nearest = 0;
+        let distance = Infinity;
+        for (let index = 0; index < positions.count; index++) {
+          sample.fromBufferAttribute(positions, index);
+          const squared = sample.distanceToSquared(anchor);
+          if (squared < distance) {
+            distance = squared;
+            nearest = index;
+          }
+        }
+        anchor.fromBufferAttribute(positions, nearest);
+        if (normals)
+          anchor.addScaledVector(
+            surfaceNormal.fromBufferAttribute(normals, nearest),
+            0.03,
+          );
+        head.updateWorldMatrix(true, false);
+        head.localToWorld(anchor);
+        portrait.worldToLocal(anchor);
+      }
+      setSelection(selection);
       loaded = true;
       introStart = performance.now();
       setCategory(category);
@@ -316,6 +373,7 @@ export function createStyleScene(
 
   return {
     setCategory,
+    setSelection,
     rotate,
     reset,
     dispose() {
@@ -332,6 +390,9 @@ export function createStyleScene(
       renderer.domElement.removeEventListener("webglcontextlost", fail);
       document.removeEventListener("visibilitychange", visibility);
       reducedMotion.removeEventListener("change", requestFrame);
+      hair?.group.removeFromParent();
+      hair?.dispose();
+      beard?.dispose();
       disposeObject(portrait);
       textures.forEach((texture) => texture.dispose());
       renderer.dispose();

@@ -280,6 +280,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
           <button
             key={title}
             disabled={i > step}
+            aria-label={tr(`booking.steps.${title}`)}
             aria-current={i === step ? "step" : undefined}
             className={i === step ? "active" : i < step ? "done" : ""}
             onClick={() => {

@@ -14,7 +14,7 @@ and [full CC BY 3.0 license](lee-perry-smith/CC-BY-3.0.txt) accompany the files.
 The model's license is distinct from the Three.js library license.
 
 The included geometry and textures are unmodified upstream files. CHAIR. supplies
-its own lighting, framing, display material and interactive category highlights.
+its own lighting, framing, display material, category highlights and original procedural hair/beard child meshes.
 The scan is an illustrative model, not an identity or endorsement of a fictional
 marketplace barber. Keep visible attribution near the model and retain these
 notices when redistributing the assets.
@@ -42,16 +42,38 @@ e976d73b31407f8d0967412bf468019ed26a5d5a32cf5811aabff7e816458a65  Map-COL.jpg
 7cf4da43a6ae6d32f7f7d063fe129a19468af6f4fe7c53b937f83959709fcb50  LeePerrySmith_License.txt
 ```
 
-## Professional asset replacement
+## Fitted style variants
 
-This is a realistic scanned base with a shaved scalp and facial stubble, not a
-finished set of interchangeable haircut and beard meshes. Selections should
-update the configuration and relevant category highlight; do not imply that the
-scan predicts the selected haircut on the customer's face.
+The upstream GLB contains one static scan, with no interchangeable nodes or morph
+attributes. CHAIR. generates original, illustrative geometry around that scan:
 
-A later licensed professional asset may be placed in this directory, with its
-own source, consent/license documentation, and optimized textures. Integrate it
-through the scene's model-loading boundary, normalize its bounds/framing, and
-define named hair/beard meshes or variants there. Preserve the canonical
-selection IDs, accessible controls, discovery integration, loading state, and
-WebGL fallback. Add attribution and changed-file details for any derived assets.
+- `style-hair-variants.ts`: eleven canonical hairstyle groups under `hair-variants`,
+  each named by the existing hair ID. A shared radial field raycasts the skull;
+  fitted shells, tapered flowing strands, curls and long locks create different
+  silhouettes. Materials and a small procedural fiber texture are shared.
+- `style-beard-variants.ts`: six groups named `beard-<canonical-id>` under
+  `chair-beard-variants`. Barycentric samples of the scan's UV triangles position
+  cheeks/chin/moustache shells and instanced strands. Lip/cheek boundaries clip
+  triangles precisely. Stubble is strands only; clean-shaven adds no geometry.
+- `style-scene.ts` attaches both groups to the scan mesh after assigning its skin
+  material. `setSelection` remembers choices during loading, then changes group
+  visibility and requests a render. There is no scene reload or per-choice fetch.
+  Dispose variant resources before traversing the remaining model.
+
+All variants are cached at first load. Hair creation is roughly 1.1 seconds and
+beard creation about 0.1 seconds in local Node geometry tests; these are setup
+measurements, not a mobile benchmark. The scan and three runtime asset files stay
+unchanged. New geometry is authored in source rather than downloaded.
+
+## Remaining limitations and professional replacement
+
+Styles are sculpted illustrations, not professional groomed assets or a prediction
+on the customer's face. The scan has closed eyes and baked subtle facial stubble;
+clean-shaven removes added meshes but does not erase that texture. These scalp and
+UV masks are fitted to this scan specifically, not a general-purpose human rig.
+
+A later licensed professional model may replace the scan/variant boundary with
+properly named hair and beard nodes. Document its source/license, normalize its
+bounds/framing and reauthor the fitting rules if keeping procedural variants.
+Preserve canonical IDs, accessible controls, attribution, reduced motion,
+automatic WebGL fallback and existing discovery/booking integration.

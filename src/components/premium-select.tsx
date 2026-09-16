@@ -3,11 +3,13 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import "./premium-filters.css";
 
@@ -41,7 +43,13 @@ export function PremiumSelect({
   const searchRef = useRef({ text: "", time: 0 });
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const [placement, setPlacement] = useState({ above: false, height: 288 });
+  const [placement, setPlacement] = useState({
+    above: false,
+    height: 288,
+    left: 0,
+    edge: 0,
+    width: 0,
+  });
   const selectedIndex = options.findIndex((option) => option.value === value);
   const selected = options[selectedIndex];
 
@@ -49,18 +57,23 @@ export function PremiumSelect({
     if (!options.length) return;
     const rect = triggerRef.current?.getBoundingClientRect();
     if (rect) {
-      const boundary = rootRef.current
-        ?.closest(".premium-filter-scroll")
-        ?.getBoundingClientRect();
-      const below =
-        Math.min(window.innerHeight, boundary?.bottom ?? window.innerHeight) -
-        rect.bottom -
-        16;
-      const above = rect.top - Math.max(0, boundary?.top ?? 0) - 16;
+      // A fixed portal escapes scrolling/clipping ancestors. Keep it within
+      // the visible viewport, including zoom and an on-screen keyboard.
+      const viewport = window.visualViewport;
+      const left = (viewport?.offsetLeft ?? 0) + 8;
+      const top = (viewport?.offsetTop ?? 0) + 8;
+      const right = left + (viewport?.width ?? window.innerWidth) - 16;
+      const bottom = top + (viewport?.height ?? window.innerHeight) - 16;
+      const below = bottom - rect.bottom - 7;
+      const above = rect.top - top - 7;
       const useAbove = below < 224 && above > below;
+      const width = Math.min(rect.width, Math.max(0, right - left));
       setPlacement({
         above: useAbove,
-        height: Math.max(112, Math.min(288, useAbove ? above : below)),
+        height: Math.max(0, Math.min(288, useAbove ? above : below)),
+        left: Math.max(left, Math.min(rect.left, right - width)),
+        edge: useAbove ? window.innerHeight - rect.top + 7 : rect.bottom + 7,
+        width,
       });
     }
     setActive(index);
@@ -77,20 +90,40 @@ export function PremiumSelect({
   useEffect(() => {
     if (!open) return;
     function dismiss(event: PointerEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (
+        !rootRef.current?.contains(target) &&
+        !listRef.current?.contains(target)
+      )
+        setOpen(false);
     }
-    function resize() {
+    function close() {
       setOpen(false);
     }
+    function onScroll(event: Event) {
+      // Scrolling the options must stay usable; moving their trigger dismisses
+      // the floating list instead of leaving it detached from the control.
+      if (
+        !(event.target instanceof Node) ||
+        !listRef.current?.contains(event.target)
+      )
+        close();
+    }
     document.addEventListener("pointerdown", dismiss);
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", close);
+    window.addEventListener("scroll", onScroll, true);
+    window.visualViewport?.addEventListener("resize", close);
+    window.visualViewport?.addEventListener("scroll", close);
     return () => {
       document.removeEventListener("pointerdown", dismiss);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", close);
+      window.removeEventListener("scroll", onScroll, true);
+      window.visualViewport?.removeEventListener("resize", close);
+      window.visualViewport?.removeEventListener("scroll", close);
     };
   }, [open]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
     // Scroll only the options list, never the surrounding page or filter sheet.
     const list = listRef.current;
@@ -214,32 +247,46 @@ export function PremiumSelect({
           aria-hidden="true"
         />
       </button>
-      {open && (
-        <ul
-          ref={listRef}
-          id={`${id}-options`}
-          role="listbox"
-          aria-labelledby={`${id}-label`}
-          className={`premium-select-options ${placement.above ? "opens-above" : ""}`}
-          style={{ maxHeight: placement.height }}
-        >
-          {options.map((option, index) => (
-            <li
-              id={`${id}-option-${index}`}
-              key={option.value}
-              role="option"
-              aria-selected={option.value === value}
-              className={active === index ? "is-active" : ""}
-              onPointerMove={() => setActive(index)}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => choose(index)}
-            >
-              <span>{option.label}</span>
-              {option.value === value && <Check size={15} aria-hidden="true" />}
-            </li>
-          ))}
-        </ul>
-      )}
+      {open &&
+        createPortal(
+          <ul
+            ref={listRef}
+            id={`${id}-options`}
+            role="listbox"
+            aria-labelledby={`${id}-label`}
+            className="premium-select-options"
+            style={{
+              maxHeight: placement.height,
+              width: placement.width,
+              left: placement.left,
+              top: placement.above ? undefined : placement.edge,
+              bottom: placement.above ? placement.edge : undefined,
+            }}
+          >
+            {options.map((option, index) => (
+              <li
+                id={`${id}-option-${index}`}
+                key={option.value}
+                role="option"
+                aria-selected={option.value === value}
+                className={active === index ? "is-active" : ""}
+                onPointerMove={(event) => {
+                  if (event.pointerType === "mouse") setActive(index);
+                }}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => choose(index)}
+              >
+                <span>{option.label}</span>
+                {option.value === value && (
+                  <Check size={15} aria-hidden="true" />
+                )}
+              </li>
+            ))}
+          </ul>,
+          // Dialog descendants remain in the modal top layer and accessible;
+          // portaling to body from a modal would make the options inert.
+          rootRef.current?.closest("dialog") ?? document.body,
+        )}
     </div>
   );
 }

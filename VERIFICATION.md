@@ -1,6 +1,38 @@
 # Verification record
 
-Latest checks: interactive 3D studio/filter polish, 16 September 2026. Earlier localization/baseline checks below remain historical evidence.
+Latest checks: real style switching and focused UI fixes, 16 September 2026. The initial studio, localization and baseline checks below are historical evidence.
+
+## Real 3D style switching and focused UI fixes — 16 September 2026
+
+### Automated and source verification
+
+- TypeScript and production build pass (57 generated pages); 31/31 tests pass. Two new tests use the bundled GLB to check every hair/beard ID, distinct finite geometry, cached switching, mouth clearance, unchanged source vertices, bounded hair geometry and disposal. Package ESM mode resolves the Three.js CommonJS test warning; no warning suppression is used. No lint is configured.
+- Local production HTTP check passes: 55 valid routes, 5 expected unknown-route 404 responses, 25 images. Expected Next `NoFallbackError` logs for intentionally invalid static routes remain unchanged.
+- The original three model files still match the documented SHA-256 values; no new downloaded or large binary assets. Existing data, prices, provider, filter predicates and lower homepage JSX are unchanged. The one booking-flow edit adds localized progress-button accessible names. The hero heading also has a correctly spaced localized accessible name across its styled text segments.
+- Reviewed async selection retention, visibility-only switching, child transforms, renderer disposal, late-load failure handling, idle/offscreen rendering and touch intent. Each visible hairstyle uses one or two merged meshes; beard shells/instanced strands share resources. Setup timings from local geometry tests are not device performance benchmarks.
+
+### Browser checks on isolated localhost 3011
+
+- Visually selected all eleven hair styles and all six beard choices. Compared actual silhouettes/surfaces, not only labels. Repeated hair changes retained full beard; repeated beard changes retained long hair; then changed hair with defined beard. No scene reset, loading flash or repeated asset load is introduced by the selection path.
+- Refined coarse hair grooves/hairline/fades and jagged beard lip boundaries after browser inspection. Stubble now uses fitted strands only. Clean-shaven removes added geometry; residual scanned stubble and closed eyes remain asset limitations.
+- Refresh and KA/EN/RU changes retained the canonical selection. Selected cards reveal within their own scroll container on hydration/category/locale/viewport changes, without scrolling the page.
+- Hero measured in **96 combinations**: KA/EN/RU × widths 375, 390, 430, 768, 1024, 1280, 1440, 1920 × heights 667, 800, 900, 1080. No horizontal page overflow, caption/configurator overflow, hero-bottom clipping or out-of-bounds main panels after the fixes. Visual inspections covered every width across representative languages/heights.
+- Discovery, barber directory, shop directory, Giorgi profile and booking measured in **120 combinations**: all three languages × all eight widths. No page overflow, broken loaded images, overflowing barber action rows or comparison targets smaller than 44px.
+- Root cause of missing text reproduced before edits: Georgian step row bottom 822px versus fixed hero bottom 807px at 1280×667. Removed that redundant strip intentionally. Useful rotation guidance and attribution now occupy normal flow below a dedicated model stage; hero height grows with text. No Photo View control/state/keys/styles remain.
+- Mobile dialog style dropdown at 375×667 stayed inside the viewport (bottom 659px), portaled inside its native dialog. End scrolled the options internally; Escape closed only the list, then Escape closed the sheet. Trigger retained keyboard focus. Desktop/home controls use the same portal/keyboard behavior.
+- Keyboard rotation and bounded mouse drag worked at desktop and 375px. The final angled view revealed a beard anchor outside the jaw; anchors now use nearest actual scan vertices before projection. Percentage positions avoid stale pixel overflow during resize.
+- Mobile menu opened with readable language/account links, Escape returned focus to its toggle, and crossing to desktop removed the menu. Shared account routing and active navigation semantics were source-reviewed.
+- Russian mobile profile and booking review remained usable. Profile service CTA opened Giorgi's Signature haircut; selected 17 September / 10:00 and reached review with unchanged **₾35 / 45 minutes**. No new booking was submitted and no product records were changed.
+- Fonts use local DM Sans/Serif for Latin and local Noto Georgian for Georgian. Ordinary Russian uses the existing Arial/Georgia system fallback (the bundled Noto Cyrillic-ext subset does not cover basic Russian). Actual visual checks found no missing glyphs; typography can vary by operating system.
+- Main production browser console showed no observed errors/warnings. The isolated fallback proxy intentionally produces a GLB 503; that expected failure is separate from production checks.
+
+### Automatic fallback and boundaries
+
+A loopback-only QA proxy on 3012 returned 503 for the GLB. The canvas was disposed, automatic existing photo appeared, no Photo View control or inactive hotspots were exposed, and both style categories remained usable. Taper Fade + Defined beard reached four matching barbers. This tests asset-load failure, not a physical GPU failure.
+
+Real touch hardware, hardware WebGL context loss, slow-device performance and a formal screen-reader audit were not available. Pointer interaction and `pan-y`/capture cleanup were checked; do not call narrow desktop viewports real-device touch testing. The earlier native date-popup tool crash remains untested in an ordinary browser. App-owned booking date/time controls passed this task.
+
+Temporary QA tabs/server/proxy are cleaned up after verification; the original port-3000 preview and data remain intact.
 
 ## Interactive 3D studio and premium filters — 16 September 2026
 

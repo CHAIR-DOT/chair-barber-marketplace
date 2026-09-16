@@ -141,6 +141,9 @@ nav a,
   align-items: center;
   gap: 25px;
 }
+.navbar .mobile-nav {
+  display: none;
+}
 nav a:hover,
 nav a.active,
 .text-link:hover {
@@ -964,16 +967,29 @@ small {
 }
 .barber-card-actions .text-link {
   font-size: 12px;
+  white-space: normal;
+  min-width: 0;
+  line-height: 1.5;
 }
 .compare-toggle {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
   gap: 4px;
   font-size: 10px;
   border: 0;
   padding: 4px 0;
   background: transparent;
   color: var(--muted);
+  border-radius: 5px;
+}
+.compare-toggle:hover,
+.compare-toggle:focus-visible {
+  background: var(--soft);
+  color: var(--ink);
 }
 .compare-toggle.selected {
   color: var(--accent);
@@ -1524,6 +1540,9 @@ small {
     box-shadow: var(--shadow);
     flex-direction: column;
     gap: 0;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .mobile-nav a {
     padding: 10px;

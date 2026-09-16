@@ -85,12 +85,13 @@ function ModelPortrait({
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
     "loading",
   );
-  const [photo, setPhoto] = useState(false);
+  const { selection } = useStyleSelection();
+  const latestSelection = useRef(selection);
+  latestSelection.current = selection;
   const latestCategory = useRef(category);
   latestCategory.current = category;
 
   useEffect(() => {
-    if (photo) return;
     let cancelled = false;
     let sceneReady = false;
     let scene: StyleScene | undefined;
@@ -123,18 +124,19 @@ function ModelPortrait({
               cancelled = true;
             }
           },
-          onHotspot: (name, x, y) => {
+          onHotspot: (name, xPercent, yPercent) => {
             if (cancelled || !sceneReady) return;
             const element =
               name === "hair" ? hairSpot.current : beardSpot.current;
             if (element) {
-              element.style.left = `${x}px`;
-              element.style.top = `${y}px`;
+              element.style.left = `${xPercent}%`;
+              element.style.top = `${yPercent}%`;
             }
           },
         });
         controller.current = scene;
         scene.setCategory(latestCategory.current);
+        scene.setSelection(latestSelection.current);
       })
       .catch(() => {
         if (!cancelled) {
@@ -148,98 +150,88 @@ function ModelPortrait({
       scene?.dispose();
       controller.current = null;
     };
-  }, [photo]);
+  }, []);
 
   useEffect(() => {
     controller.current?.setCategory(category);
   }, [category]);
-  const ready = !photo && status === "ready";
   useEffect(() => {
-    if (ready) return;
-    // The static portrait uses the responsive CSS anchors, not the last 3D frame.
-    for (const element of [hairSpot.current, beardSpot.current]) {
-      element?.style.removeProperty("left");
-      element?.style.removeProperty("top");
-    }
-  }, [ready]);
+    controller.current?.setSelection(selection);
+  }, [selection]);
+  const ready = status === "ready";
   return (
     <div className={`model-portrait ${ready ? "model-ready" : ""}`}>
-      <div className="portrait-aura" />
-      <img
-        src="/images/hero.jpg"
-        alt=""
-        className="model-poster"
-        fetchPriority="high"
-      />
-      <div
-        ref={host}
-        className="model-canvas"
-        role="img"
-        aria-hidden={!ready}
-        aria-label={t("hero.modelLabel")}
-      />
-      {(["hair", "beard"] as const).map((name) => (
-        <button
-          key={name}
-          ref={name === "hair" ? hairSpot : beardSpot}
-          className={`model-hotspot hotspot-${name} ${category === name ? "is-active" : ""}`}
-          type="button"
-          aria-label={t(
-            name === "hair" ? "hero.hairOptions" : "hero.beardOptions",
-          )}
-          aria-pressed={category === name}
-          onClick={() => onCategory(name)}
-        >
-          <span className="hotspot-ring">
-            <span />
-          </span>
-          <span className="hotspot-label">{t(`hero.${name}`)}</span>
-        </button>
-      ))}
-      <div className="model-view-toggle">
-        <button
-          type="button"
-          aria-pressed={photo}
-          onClick={() => setPhoto((value) => !value)}
-        >
-          {t(photo ? "hero.threeD" : "hero.photo")}
-        </button>
+      <div className="model-stage" aria-busy={status === "loading"}>
+        <div className="portrait-aura" />
+        {status === "loading" && (
+          <div className="model-skeleton" aria-hidden="true" />
+        )}
+        {status === "fallback" && (
+          <img src="/images/hero.jpg" alt="" className="model-poster" />
+        )}
+        <div
+          ref={host}
+          className="model-canvas"
+          role="img"
+          aria-hidden={!ready}
+          aria-label={t("hero.modelLabel")}
+        />
+        {ready &&
+          (["hair", "beard"] as const).map((name) => (
+            <button
+              key={name}
+              ref={name === "hair" ? hairSpot : beardSpot}
+              className={`model-hotspot hotspot-${name} ${category === name ? "is-active" : ""}`}
+              type="button"
+              aria-label={t(
+                name === "hair" ? "hero.hairOptions" : "hero.beardOptions",
+              )}
+              aria-pressed={category === name}
+              onClick={() => onCategory(name)}
+            >
+              <span className="hotspot-ring">
+                <span />
+              </span>
+              <span className="hotspot-label">{t(`hero.${name}`)}</span>
+            </button>
+          ))}
       </div>
       <div className="model-tools">
         <p aria-live="polite">
           {t(
             ready
               ? "hero.rotate"
-              : !photo && status === "loading"
+              : status === "loading"
                 ? "hero.loading"
                 : "hero.fallback",
           )}
         </p>
-        {ready && (
-          <div className="model-rotation">
-            <button
-              type="button"
-              onClick={() => controller.current?.rotate(-1)}
-              aria-label={t("hero.rotateLeft")}
-            >
-              <ChevronLeft size={17} />
-            </button>
-            <button
-              type="button"
-              onClick={() => controller.current?.reset()}
-              aria-label={t("hero.resetView")}
-            >
-              <RotateCcw size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={() => controller.current?.rotate(1)}
-              aria-label={t("hero.rotateRight")}
-            >
-              <ChevronRight size={17} />
-            </button>
-          </div>
-        )}
+        <div className="model-rotation" aria-hidden={!ready}>
+          <button
+            type="button"
+            disabled={!ready}
+            onClick={() => controller.current?.rotate(-1)}
+            aria-label={t("hero.rotateLeft")}
+          >
+            <ChevronLeft size={17} />
+          </button>
+          <button
+            type="button"
+            disabled={!ready}
+            onClick={() => controller.current?.reset()}
+            aria-label={t("hero.resetView")}
+          >
+            <RotateCcw size={15} />
+          </button>
+          <button
+            type="button"
+            disabled={!ready}
+            onClick={() => controller.current?.rotate(1)}
+            aria-label={t("hero.rotateRight")}
+          >
+            <ChevronRight size={17} />
+          </button>
+        </div>
       </div>
       <div className="model-credit">
         {t("hero.modelCredit")}:{" "}
@@ -262,9 +254,34 @@ function StyleConfigurator({
   category: StyleCategory;
   onCategory: (category: StyleCategory) => void;
 }) {
-  const { t, styleName } = useI18n();
+  const { t, styleName, locale } = useI18n();
+  const optionList = useRef<HTMLDivElement>(null);
   const { selection, setHairStyle, setBeardStyle, submitSelection } =
     useStyleSelection();
+  useEffect(() => {
+    const list = optionList.current;
+    if (!list) return;
+    function revealSelection() {
+      if (!list) return;
+      const chosen = list.querySelector<HTMLButtonElement>(
+        '[aria-pressed="true"]',
+      );
+      if (!chosen) return;
+      const bounds = list.getBoundingClientRect();
+      const item = chosen.getBoundingClientRect();
+      // Scroll only the choices, never the surrounding hero/page.
+      if (item.left < bounds.left) list.scrollLeft += item.left - bounds.left;
+      else if (item.right > bounds.right)
+        list.scrollLeft += item.right - bounds.right;
+      if (item.top < bounds.top) list.scrollTop += item.top - bounds.top;
+      else if (item.bottom > bounds.bottom)
+        list.scrollTop += item.bottom - bounds.bottom;
+    }
+    revealSelection();
+    const observer = new ResizeObserver(revealSelection);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [category, selection.hairStyleId, selection.beardStyleId, locale]);
   const selectedHair =
     hairStyles.find((style) => style.id === selection.hairStyleId) ??
     hairStyles[0];
@@ -288,6 +305,7 @@ function StyleConfigurator({
         ))}
       </div>
       <div
+        ref={optionList}
         className="style-options"
         role="group"
         aria-label={t(
@@ -352,7 +370,7 @@ function StyleConfigurator({
 }
 
 export function InteractiveStyleHero() {
-  const { t, number } = useI18n();
+  const { t } = useI18n();
   const [category, setCategory] = useState<StyleCategory>("hair");
   return (
     <section className="style-hero" aria-labelledby="style-hero-title">
@@ -363,7 +381,10 @@ export function InteractiveStyleHero() {
             <span />
             {t("hero.eyebrow")}
           </div>
-          <h1 id="style-hero-title">
+          <h1
+            id="style-hero-title"
+            aria-label={`${t("hero.title")} ${t("hero.titleAccent")}`}
+          >
             {t("hero.title")}
             <em>{t("hero.titleAccent")}</em>
           </h1>
@@ -378,14 +399,6 @@ export function InteractiveStyleHero() {
         </div>
         <ModelPortrait category={category} onCategory={setCategory} />
         <StyleConfigurator category={category} onCategory={setCategory} />
-        <ol className="style-journey">
-          {[1, 2, 3].map((step) => (
-            <li key={step}>
-              <span>{number(step, { minimumIntegerDigits: 2 })}</span>
-              {t(`hero.step${step}`)}
-            </li>
-          ))}
-        </ol>
       </div>
     </section>
   );
