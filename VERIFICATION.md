@@ -212,3 +212,21 @@ At **375/768/1024/1440px**, checked rendered page widths for each surface in eac
 ### Remaining language boundaries
 
 No known untranslated app-owned UI remains from this audit. Canonical names, addresses, identifiers, custom/user-created text and customer-written review paragraphs intentionally stay as authored. Native date/time picker subcontrols and the OS file-selection dialog follow browser/OS language; app-owned labels, date buttons and chosen-file status are localized. No automatic review translation or backend locale persistence was introduced. This is focused multilingual QA, not a formal assistive-technology or visual-regression certification.
+
+
+## GitHub Pages publication — 16 September 2026
+
+Deployment-only task; no redesign or product change. User explicitly authorized making `CHAIR-DOT/chair-barber-marketplace` public after GitHub rejected private Pages under the current plan. Pages source is Actions, HTTPS enforced.
+
+- Setup commit: `e4729e7af5b9c134aba40650cf9d13d1bafba00a`.
+- [First successful build and deployment](https://github.com/CHAIR-DOT/chair-barber-marketplace/actions/runs/35104430569).
+- [Verified public site](https://chair-dot.github.io/chair-barber-marketplace/).
+- 30 tests passed, TypeScript passed, normal and Pages builds each generated all 57 Next pages. The three request-query pages now use client readers under Suspense. Existing static profile/section parameters remain unchanged.
+- Both local static and live HTTPS checks passed: 55 valid routes, 5 unknown-route 404s, 31 images; 57 directory page paths and 113 referenced files (22 JS, 4 CSS, 1 SVG icon, 43 WOFF, 43 WOFF2). Both live commands exited 0; no bundles/fonts were replaced by HTML responses.
+- Artifact review covered 429 output files. No detected secrets, env/config/docs/Git/source-map files or local-user paths. Before public visibility, 9 commits / 272 historical blobs were reviewed, with no concrete secret blocker; existing author metadata/history disclosure was explicitly authorized.
+- Static preview browser: Georgian first visit; English/Russian content and metadata; native Vake search (4 barbers / 2 shops); profile navigation; booking link preselection retaining shop-1/barber-1/haircut, 45 minutes/₾35; barber registration role; active dashboard and direct reload. Homepage at 375/768/1440px had no horizontal overflow, correct responsive hero images and loaded fonts.
+- Live browser: Georgian default, EN/RU switching and loaded flag images; 1440px Georgian screenshot and 375px Russian screenshot; Georgian mobile menu/language switching; native search retains query through GitHub Pages directory redirect; profile navigation and direct reload; active barber dashboard. No observed missing images, horizontal overflow or warning/error console messages.
+- Existing localhost preview still returns HTTP 200, root `/discover` and `/images` paths, Georgian content and the previously saved Giorgi favorite. No browser data was cleared or new booking/product record added. Normal development build remains available.
+- Temporary Python static preview initially hit its default connection backlog during concurrent requests. Increasing only that temporary server queue fixed the check; application code required no change. Own QA server/tab closed after checks; public site and original localhost tabs retained.
+
+Limitations remain those of the existing prototype: JavaScript is required; only generated profile/section slugs exist; unknown routes return 404. All accounts/bookings/uploads are browser-local mock state. Public hosting adds no real backend/auth/payment/shared reservation service. Localhost and the public origin keep separate storage. Physical-device performance and formal accessibility were not tested in this deployment task.
