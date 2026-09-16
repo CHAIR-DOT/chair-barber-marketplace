@@ -14,9 +14,9 @@ Continue the existing application; do not create a new scaffold. Root `AGENTS.md
 
 ## Current Development Phase
 
-**Frontend prototype using local mock data.** Discovery, profiles, booking, customer accounts and barber management work within the prototype's limits. Preview: `http://127.0.0.1:3000`. No public deployment or backend implementation is authorized.
+**Frontend prototype using local mock data.** Discovery, profiles, booking, customer accounts and barber management work within the prototype's limits. Local preview: `http://127.0.0.1:3000`. The user authorized GitHub Pages publication on 2026-09-16 and explicitly approved making this repository public after GitHub rejected private-repository Pages on the current plan. Backend work remains deferred.
 
-**Current status — 2026-09-16:** The user abandoned the mannequin direction. The homepage now uses a noninteractive **cinematic CSS motion poster**: a leather/bronze barber chair, arched mirror and arranged grooming tools, slow camera drift and warm light. All mannequin controls, scene logic, GLB/preview assets, registry and authoring pipeline are removed. The improved flag language dropdown and lower homepage are preserved. `HERO_VISUAL_GUIDE.md` records the current approach; do not resume retired 3D work from historical notes.
+**Hero status — 2026-09-16:** The user abandoned the mannequin direction. The homepage now uses a noninteractive **cinematic CSS motion poster**: a leather/bronze barber chair, arched mirror and arranged grooming tools, slow camera drift and warm light. All mannequin controls, scene logic, GLB/preview assets, registry and authoring pipeline are removed. The improved flag language dropdown and lower homepage are preserved. `HERO_VISUAL_GUIDE.md` records the current approach; do not resume retired 3D work from historical notes.
 
 29 tests, TypeScript and production build pass. Browser checks cover 36 hero layout cases, 18 language-menu cases, real image-load failure, emulated reduced motion, offscreen pause and navigation. The original localhost-3000 browser data is preserved. This is decorative generated artwork with CSS motion, not an object-assembly simulation or live video.
 
@@ -178,7 +178,7 @@ All shops, barbers, reviews and appointments are fictional/demo state. Profile-v
 
 ## Not Implemented Yet
 
-Real database/API storage, secure authentication/server permissions, concurrent booking protection, remote uploads, payment collection/refunds/payouts, email/SMS, analytics and production hosting. The original brief defers backend work. **Private GitHub source upload is authorized; public website deployment is not part of this request.**
+Real database/API storage, secure authentication/server permissions, concurrent booking protection, remote uploads, payment collection/refunds/payouts, email/SMS and analytics remain unimplemented. Public static prototype hosting is authorized; real production booking infrastructure is not.
 
 ## Known Issues
 
@@ -239,13 +239,25 @@ Replace provider actions with asynchronous repositories gradually. [BACKEND_PLAN
 
 No backend provider/account is connected. Browser localStorage remains prototype storage.
 
+## Deployment
+
+- **Provider / intended public URL:** GitHub Pages, `https://chair-dot.github.io/chair-barber-marketplace/` (returned by authenticated Pages creation API).
+- **Checkpoint status:** Pages has been enabled with `build_type: workflow`, and the repository is public as explicitly authorized. Deployment files are locally prepared and static checks pass; no workflow has been pushed or live deployment verified yet.
+- **Workflow:** `.github/workflows/deploy-pages.yml`, pushes to `main` and `workflow_dispatch`. npm lockfile / Node 22; install → tests → Next static export → upload `out/` → deploy. Once pushed, future main pushes automatically publish after successful checks. No generated output is committed.
+- **Export:** `npm run build:pages` gates `output: "export"`, `trailingSlash: true`, and `basePath` behind `GITHUB_PAGES=true`. `actions/configure-pages` supplies `NEXT_PUBLIC_BASE_PATH` (currently `/chair-barber-marketplace`). `src/lib/public-path.ts` applies that prefix at native image/form rendering, preserving canonical fixture/storage values and uploaded data URLs. Next Link/router/bundled assets handle the prefix themselves.
+- **Compatibility:** Discover/booking/register page wrappers retain metadata and render client query adapters under existing localized Suspense fallback. All profile/section slugs already have `generateStaticParams` and `dynamicParams=false`. No server APIs, actions, middleware, request cookies/headers or image optimization need replacing. Dashboard active links accept trailing slashes.
+- **Local development:** Normal dev/build/start have no Pages prefix. After a Pages build, run `npm run build` before `npm start`. Do not use `next start` for the exported `out/`; mount it under the repository path using a static server.
+- **Limits:** JavaScript is required for the interactive prototype; only built profile/section slugs exist, unknown paths 404. Accounts, bookings and uploads stay browser/origin-local mock data, with no real backend/auth/payments/shared reservations. Localhost browser data is not migrated or cleared when opening the public origin.
+- **Security review:** Baseline 9 commits / 272 unique historical blobs reviewed before public visibility; no detected secrets or tracked env/build/dependency/synced-reference files. Existing author metadata/history visibility explicitly approved. Export audit: 429 files, no detected secrets/env/config/docs/maps/local-user paths. Only static website artifacts are deployed.
+- **Exact next action at checkpoint:** Local checks are complete. Commit the reviewed setup, push to existing main, wait Actions and verify the actual public site. User has already approved the visibility change; no authentication or plan blocker remains.
+
 ## Repository / Version Control
 
 - **Status:** Git initialized, committed, connected to GitHub, and uploaded successfully. Initial baseline `f3e9dc2` (`chore: establish project baseline`) contains 85 audited files; later commits record the handoff and setup. Use `git log -1` for the current latest commit rather than storing a commit’s own hash inside itself.
 - **Authenticated GitHub username:** `CHAIR-DOT`, verified with the authenticated GitHub API after official browser/device authorization.
 - **Repository:** `CHAIR-DOT/chair-barber-marketplace`.
 - **URL:** [https://github.com/CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace).
-- **Visibility:** **Private**, verified from GitHub repository metadata. This is source-code hosting; the application still runs only on localhost.
+- **Visibility:** **Public**, changed on 2026-09-16 with explicit user authorization after GitHub rejected Pages for the private repository under the current account plan. Existing source and Git history are now public.
 - **Remote:** `origin` → `https://github.com/CHAIR-DOT/chair-barber-marketplace.git`.
 - **Primary branch / upstream:** `main` → `origin/main`. Normal push: `git push`; inspect fetch/status before incorporating remote changes. Preserve existing history and unrelated edits.
 - **CLI:** GitHub CLI 2.101.0 at `/Users/macuser/.local/bin/gh` (use the full path if needed). Its official release archive matched the published SHA-256. Secure browser authorization succeeded; no tokens/device codes were stored in project files. The stalled Homebrew install was stopped and no shell-profile changes were made.
@@ -256,6 +268,8 @@ No backend provider/account is connected. Browser localStorage remains prototype
 
 ## Verification
 
+**Fresh deployment preparation, 2026-09-16:** 30 tests and TypeScript pass; Pages export builds all 57 generated pages. Local static HTTP checks under `/chair-barber-marketplace` pass 55 routes, 5 unknown-route 404s and 31 images. All 113 referenced scripts/styles/icons/font files across 57 directory pages return valid responses. An initial concurrent check hit the temporary Python server’s small connection queue; restarting that QA server with a larger queue resolved it without application changes. Georgian first visit, English/Russian switching, native Vake search (4 barbers / 2 shops), client profile navigation, preselected booking (Giorgi / haircut / ₾35), barber registration role and dashboard active navigation checked. Normal production build also passes (57 pages), and existing localhost preview returns HTTP 200 without a base path. Exported homepage at 375/768/1440px has no horizontal overflow, loads the correct responsive hero and bundled fonts. Dashboard survives a direct reload. No warning/error logs in the clean QA tab. Live deployment verification still pending.
+
 **Fresh for the motion-poster replacement, 2026-09-16:** 29 tests pass (9 domain, 17 localization, 3 style-state); TypeScript and production build pass, 57 generated pages. Production HTTP checks: 55 valid routes, 5 expected unknown-route 404s and 31 local images. No lint configured. Restricted build stalled; it was stopped and the approved local build passed.
 
 Browser: 36 hero cases (KA/EN/RU × 375/430/768/1024/1440/1920 × 667/800) have no horizontal overflow or clipped tested titles/CTAs/captions and all images load; no canvas remains. 18 translated language-menu cases have correct loaded flags/active locale, viewport bounds and Escape dismissal. Screenshots inspected at desktop and phone widths, with full-chair desktop framing and mobile portrait crop refined. CSS transforms progress over repeated observations spanning more than a full cycle; alternate endpoints are continuous. Actual offscreen scroll pauses animation, returning resumes it. Main-image 503 leaves the matching static poster and usable discovery CTA. Isolated reduced-motion response emulation produces paused/none camera, hidden effects and zero fade; salon CTA still works. Existing Giorgi favorite remains after language changes and discovery. Fresh production browser warnings/errors were empty. No storage reset or new booking/product record.
@@ -265,6 +279,11 @@ Source review confirms all 31 extracted lower-filter rules and lower homepage JS
 **Historical:** The previous 3×3 asset task passed 36 tests and extensive combination/fallback/browser checks, but its visual quality was rejected and all mannequin functionality is now retired. Earlier localization task passed 26 tests, 264 route/locale/width checks and preserved stored state; initial Git setup verified private repo upload and secure auth. Earlier booking/domain/browser checks remain recorded in `VERIFICATION.md`; do not present them as repeated by this hero-only task.
 
 ## Recent Changes
+
+### 2026-09-16 — GitHub Pages preparation (in progress)
+
+- User requested publishing the existing site only, with no redesign/product changes. Verified account/repository/main and static compatibility. After a Pages plan rejection, user explicitly authorized public source/history visibility; changed repository to public and enabled Pages Actions successfully.
+- Added gated static export, deployment workflow, native public-path rendering and three client query adapters. All fixture/store/catalog/product logic remains unchanged. Static build and local asset/route/language/query checks pass; deployment/push still pending at this checkpoint.
 
 ### 2026-09-16 — Current motion-poster direction
 
@@ -284,8 +303,8 @@ Source review confirms all 31 extracted lower-filter rules and lower homepage JS
 1. Read this memory and actual Git status; continue the user's next requested frontend change. Verify upstream before editing. Update memory and commit/push meaningful work.
 2. For hero revisions, use `HERO_VISUAL_GUIDE.md`, `barber-hero.tsx/css` and the documented artwork prompt. Preserve the decorative direction; do not restore mannequin selectors or 3D assets unless explicitly requested.
 3. Validate physical phones, animation performance, native date picker and formal accessibility before production use. Existing browser results are not hardware certification.
-4. Backend, real auth, payments, messaging and public deployment remain deferred until requested.
+4. Backend, real auth, payments and messaging remain deferred until requested. Preserve the public static deployment workflow for future frontend changes.
 
 ## Last Updated
 
-**2026-09-16 (Asia/Tbilisi)** — Replaced rejected mannequin with a cinematic noninteractive barber motion poster. Local compressed artwork, responsive framing, silent 40-second CSS cycle, static recovery/reduced motion and cleanup implemented. All current checks and limits are in Verification. Language selector, lower marketplace and original user data preserved. This file accompanies the implementation commit; use Git for its exact hash and upstream status. Continue the user's next requested change from the new hero guide; do not resume retired 3D work.
+**2026-09-16 (Asia/Tbilisi), deployment checkpoint** — GitHub Pages preparation is in progress. Public repository and Pages activation are complete under explicit authorization. Static export checks pass. Finish local checks, commit/push and verify live deployment; update this checkpoint with actual final status before ending. Original localhost user data remains preserved.

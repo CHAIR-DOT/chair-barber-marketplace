@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -53,16 +54,21 @@ export function BarberHero() {
       <div className="barber-hero-visual" aria-hidden="true">
         <div className="atelier-architecture" />
         <div className="atelier-camera">
-          <div className="atelier-poster" />
+          <div
+            className="atelier-poster"
+            style={{
+              backgroundImage: `url("${publicPath("/images/hero/barber-atelier-poster.webp")}")`,
+            }}
+          />
           <picture
             className={`atelier-image${imageReady && !imageFailed ? " is-ready" : ""}`}
           >
             <source
               media="(max-width: 800px)"
-              srcSet="/images/hero/barber-atelier-mobile.webp"
+              srcSet={publicPath("/images/hero/barber-atelier-mobile.webp")}
             />
             <img
-              src="/images/hero/barber-atelier.webp"
+              src={publicPath("/images/hero/barber-atelier.webp")}
               alt=""
               width={1536}
               height={1024}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { publicPath } from "@/lib/public-path";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/500.css";
 import "@fontsource/dm-sans/600.css";
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | CHAIR.",
   },
   description: translate("ka", "metadata.description"),
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: publicPath("/favicon.svg") },
 };
 export default function RootLayout({
   children,

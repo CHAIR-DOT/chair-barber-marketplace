@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { neighborhoods, services } from "@/lib/data";
 import { today } from "@/lib/dates";
+import { publicPath } from "@/lib/public-path";
 import { useI18n } from "@/i18n/provider";
 import { PremiumSelect } from "./premium-select";
 import "./premium-home-filter.css";
@@ -29,7 +30,10 @@ export function PremiumFilterBar() {
         <h2 id="home-filter-title">{t("homeFilters.title")}</h2>
         <p>{t("homeFilters.subtitle")}</p>
       </div>
-      <form action="/discover" className="container premium-home-search">
+      <form
+        action={publicPath("/discover")}
+        className="container premium-home-search"
+      >
         <PremiumSelect
           label={t("home.location")}
           name="location"

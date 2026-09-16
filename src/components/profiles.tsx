@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -162,7 +163,7 @@ export function BarberProfile({ id }: { id: string }) {
       <div className="barber-profile-hero">
         <div className="profile-portrait">
           <img
-            src={barber.image}
+            src={publicPath(barber.image)}
             alt={t("profiles.barberPortrait", { name: barber.name })}
           />
         </div>
@@ -269,7 +270,7 @@ export function BarberProfile({ id }: { id: string }) {
             <h2>{t("profiles.meet", { name: barber.name.split(" ")[0] })}.</h2>
             <p className="bio-copy">{barberBio(barber)}</p>
             <div className="about-shop">
-              <img src={shop.image} alt={shop.name} />
+              <img src={publicPath(shop.image)} alt={shop.name} />
               <div>
                 <span className="eyebrow">{t("profiles.findMeAt")}</span>
                 <h3>{shop.name}</h3>
@@ -323,7 +324,7 @@ export function ShopProfile({ id }: { id: string }) {
       <BackLink href="/shops">{t("profiles.allShops")}</BackLink>
       <div className="shop-cover">
         <img
-          src={shop.image}
+          src={publicPath(shop.image)}
           alt={t("profiles.shopImage", { name: shop.name })}
         />
         <div className="shop-cover-label">
@@ -365,7 +366,7 @@ export function ShopProfile({ id }: { id: string }) {
             <div className="shop-gallery">
               {shop.gallery.map((image, i) => (
                 <img
-                  src={image}
+                  src={publicPath(image)}
                   alt={t("profiles.shopGalleryAlt", {
                     name: shop.name,
                     count: i + 1,

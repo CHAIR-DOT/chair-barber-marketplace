@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import Link from "next/link";
 import { useI18n } from "@/i18n/provider";
 import { ArrowUpRight } from "lucide-react";
@@ -56,7 +57,7 @@ export function StylePage({ id }: { id?: string }) {
           </div>
         </div>
         <img
-          src={style.image}
+          src={publicPath(style.image)}
           alt={t("styles.imageAlt", { name: styleName(style) })}
         />
       </div>

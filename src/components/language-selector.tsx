@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 
 import { Check, ChevronDown, Globe2 } from "lucide-react";
 import {
@@ -230,7 +231,7 @@ export function LanguageSelector({ mobile = false }: { mobile?: boolean }) {
               onClick={() => choose(index)}
             >
               <img
-                src={FLAGS[value]}
+                src={publicPath(FLAGS[value])}
                 width={22}
                 height={16}
                 alt=""

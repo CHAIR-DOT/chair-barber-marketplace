@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -345,7 +346,7 @@ function BarberWorkspaceContent({
               <div className="mini-portfolio">
                 {portfolio.slice(0, 3).map((p) => (
                   <img
-                    src={p.image}
+                    src={publicPath(p.image)}
                     alt={displayPortfolioTitle(p)}
                     key={p.id}
                   />
@@ -398,7 +399,7 @@ function BarberWorkspaceContent({
           }}
         >
           <div className="profile-photo-edit">
-            <img src={photo} alt={t("workspace.profilePreview")} />
+            <img src={publicPath(photo)} alt={t("workspace.profilePreview")} />
             <div>
               <h3>{t("workspace.faceTitle")}</h3>
               <p>{t("workspace.photoHint")}</p>
@@ -427,7 +428,7 @@ function BarberWorkspaceContent({
                 className={photo === url ? "selected" : ""}
                 onClick={() => setPhoto(url)}
               >
-                <img src={url} alt="" />
+                <img src={publicPath(url)} alt="" />
               </button>
             ))}
           </div>
@@ -506,7 +507,10 @@ function BarberWorkspaceContent({
             <div className="managed-portfolio">
               {portfolio.map((p) => (
                 <article key={p.id}>
-                  <img src={p.image} alt={displayPortfolioTitle(p)} />
+                  <img
+                    src={publicPath(p.image)}
+                    alt={displayPortfolioTitle(p)}
+                  />
                   <div>
                     <div>
                       <h3>{displayPortfolioTitle(p)}</h3>
@@ -892,7 +896,7 @@ function BarberWorkspaceContent({
         >
           <img
             className="portfolio-upload-preview"
-            src={portfolioImage}
+            src={publicPath(portfolioImage)}
             alt={t("workspace.newPreview")}
           />
           <label className="field">

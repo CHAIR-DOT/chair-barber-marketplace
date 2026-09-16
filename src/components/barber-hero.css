@@ -50,8 +50,9 @@
   object-position: right center;
 }
 .atelier-poster {
-  background: url("/images/hero/barber-atelier-poster.webp") right center /
-    contain no-repeat;
+  background-position: right center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 .atelier-image {
   opacity: 0;

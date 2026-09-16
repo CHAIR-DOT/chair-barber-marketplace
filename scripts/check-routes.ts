@@ -1,7 +1,10 @@
 import { shops, barbers, styles } from "../src/lib/data";
 import { readdir } from "node:fs/promises";
 async function main() {
-  const origin = process.argv[2] ?? "http://127.0.0.1:3000";
+  const origin = (process.argv[2] ?? "http://127.0.0.1:3000").replace(
+    /\/$/,
+    "",
+  );
   const routes = [
     "/",
     "/discover",

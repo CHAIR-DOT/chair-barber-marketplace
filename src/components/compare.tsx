@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useState } from "react";
 import Link from "next/link";
 import { GitCompareArrows, X } from "lucide-react";
@@ -25,7 +26,7 @@ export function CompareDock() {
               onClick={() => toggleCompare(b.id)}
               aria-label={t("compare.remove", { name: b.name })}
             >
-              <img src={b.image} alt={b.name} />
+              <img src={publicPath(b.image)} alt={b.name} />
               <X size={12} />
             </button>
           ))}
@@ -67,7 +68,7 @@ export function CompareDock() {
               shop = shops.find((s) => s.id === b.shopId)!;
             return (
               <div key={b.id} className="compare-column">
-                <img src={b.image} alt={b.name} />
+                <img src={publicPath(b.image)} alt={b.name} />
                 <h3>{b.name}</h3>
                 <Rating value={rating.value} count={rating.count} />
                 <dl>

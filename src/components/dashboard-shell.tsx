@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -37,7 +38,7 @@ export function DashboardShell({
   children: React.ReactNode;
 }) {
   const { t: tr, barberTitle } = useI18n();
-  const path = usePathname(),
+  const path = usePathname().replace(/\/$/, "") || "/",
     { state } = useMock();
   return (
     <div className="container dashboard-layout">
@@ -49,7 +50,10 @@ export function DashboardShell({
         </div>
         <div className="dashboard-person">
           {barber ? (
-            <img src={state.barbers[0].image} alt={state.barbers[0].name} />
+            <img
+              src={publicPath(state.barbers[0].image)}
+              alt={state.barbers[0].name}
+            />
           ) : (
             <span className="initial-avatar">AC</span>
           )}

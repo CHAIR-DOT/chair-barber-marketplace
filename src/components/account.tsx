@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -47,7 +48,7 @@ function AppointmentCard({
           {formatDate(appointment.date, { month: "short", day: undefined })}
         </span>
       </div>
-      <img src={b.image} alt={b.name} />
+      <img src={publicPath(b.image)} alt={b.name} />
       <div className="appointment-info">
         <Badge
           tone={

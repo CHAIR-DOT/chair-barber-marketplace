@@ -17,7 +17,7 @@ The user explicitly requested on 15 September 2026 that this project have a Mark
 
 ## Mandatory Git workflow
 
-The user authorized on 15 September 2026 a private GitHub repository for this project and ongoing commits/pushes for meaningful development tasks.
+The user authorized ongoing commits/pushes on 15 September 2026. On 16 September 2026, the user also explicitly authorized making the existing repository public and publishing this prototype to GitHub Pages.
 
 1. Read `PROJECT_MEMORY.md`, inspect relevant code, and treat actual implementation as authoritative.
 2. Implement the requested changes, run appropriate checks, and fix errors caused by the changes.
@@ -35,7 +35,7 @@ This directory is a local mirror of the ChatGPT project “BARBER”. Treat ever
 
 ## Current implementation boundaries
 
-The authorized application is a localhost-only frontend prototype using mock data. A backend, real authentication, payments, messaging, and public deployment are future possibilities, not currently authorized implementation work. Preserve user-created browser data and existing edits. Do not reset local storage just to reproduce the initial demo.
+The authorized application is a frontend prototype using mock data, available locally and through GitHub Pages. Public repository visibility and static Pages deployment were explicitly authorized on 16 September 2026. A backend, real authentication, payments, and messaging remain future possibilities, not currently authorized implementation work. Preserve user-created browser data and existing edits. Do not reset local storage just to reproduce the initial demo.
 
 ## Localization
 

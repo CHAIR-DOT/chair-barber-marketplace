@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -148,7 +149,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
   const summary = (
     <>
       <div className="summary-shop">
-        {shop && <img src={shop.image} alt={shop.name} />}
+        {shop && <img src={publicPath(shop.image)} alt={shop.name} />}
         <div>
           <span className="eyebrow">{tr("booking.summary.eyebrow")}</span>
           <h3>{shop?.name ?? tr("booking.summary.waiting")}</h3>
@@ -323,7 +324,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                     }
                   }}
                 >
-                  <img src={s.image} alt="" />
+                  <img src={publicPath(s.image)} alt="" />
                   <div>
                     <strong>{s.name}</strong>
                     <span>
@@ -375,7 +376,11 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
                       }
                     }}
                   >
-                    <img className="round-portrait" src={b.image} alt="" />
+                    <img
+                      className="round-portrait"
+                      src={publicPath(b.image)}
+                      alt=""
+                    />
                     <div>
                       <strong>{b.name}</strong>
                       <span>
@@ -573,7 +578,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
           {step === 5 && (
             <>
               <div className="review-appointment">
-                <img src={resolved?.image} alt={resolved?.name} />
+                <img src={publicPath(resolved?.image)} alt={resolved?.name} />
                 <div>
                   <Badge tone="green">{tr("booking.steps.barber")}</Badge>
                   <h3>{resolved?.name}</h3>

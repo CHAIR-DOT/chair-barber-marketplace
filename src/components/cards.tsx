@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import Link from "next/link";
 import { useI18n } from "@/i18n/provider";
 import {
@@ -52,7 +53,7 @@ export function ShopCard({ shop }: { shop: BarberShop }) {
           aria-label={t("cards.exploreShop", { name: shop.name })}
         >
           <img
-            src={shop.image}
+            src={publicPath(shop.image)}
             alt={t("cards.shopImage", { name: shop.name })}
             loading="lazy"
           />
@@ -77,7 +78,7 @@ export function ShopCard({ shop }: { shop: BarberShop }) {
         <div className="avatar-stack">
           {team.slice(0, 3).map((b) => (
             <Link href={`/barbers/${b.slug}`} key={b.id} title={b.name}>
-              <img src={b.image} alt={b.name} />
+              <img src={publicPath(b.image)} alt={b.name} />
             </Link>
           ))}
         </div>
@@ -122,7 +123,7 @@ export function BarberCard({
           aria-label={t("cards.viewBarber", { name: barber.name })}
         >
           <img
-            src={barber.image}
+            src={publicPath(barber.image)}
             alt={t("cards.barberImage", { name: barber.name })}
             loading="lazy"
           />
@@ -206,7 +207,7 @@ export function StyleCard({ style }: { style: HaircutStyle }) {
           aria-label={t("cards.browseSpecialists", { name: styleName(style) })}
         >
           <img
-            src={style.image}
+            src={publicPath(style.image)}
             alt={t("cards.styleImage", { name: styleName(style) })}
             loading="lazy"
           />

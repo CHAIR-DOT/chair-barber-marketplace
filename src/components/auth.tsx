@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -33,7 +34,7 @@ export function AuthPage({
   return (
     <div className="auth-page">
       <div className="auth-visual">
-        <img src="/images/shop-3.jpg" alt={tr("auth.imageAlt")} />
+        <img src={publicPath("/images/shop-3.jpg")} alt={tr("auth.imageAlt")} />
         <div>
           <div className="eyebrow">{tr("auth.visualEyebrow")}</div>
           <h2>

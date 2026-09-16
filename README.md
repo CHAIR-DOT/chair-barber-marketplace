@@ -2,7 +2,7 @@
 
 A premium barber marketplace in Tbilisi, with a cinematic animated homepage poster and photography-led discovery. Built with Next.js App Router, React, TypeScript, Tailwind CSS, Lucide, and small reusable UI components. Everything is local and mocked.
 
-Private source repository: [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Primary branch: `main`; remote: `origin`.
+Public source repository: [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Primary branch: `main`; remote: `origin`.
 
 ## Continue in a new chat
 
@@ -36,6 +36,24 @@ npm start
 Stop the development server before `npm start`, or use `npm start -- --port 3001` to run the production build separately. On this protected workspace, Next.js automatic instruction-file generation is disabled so it does not modify the read-only `AGENTS.md`.
 
 `npm run typecheck` generates Next.js route declarations first, so it also works on a fresh checkout. Generated `next-env.d.ts`, `.next/`, dependencies, local environment files, logs, and editor/OS metadata are ignored by Git. An `.env.example` may be committed only with placeholder values; none is currently required.
+
+## GitHub Pages deployment
+
+Public URL: [CHAIR. marketplace](https://chair-dot.github.io/chair-barber-marketplace/).
+
+[Deploy workflow](.github/workflows/deploy-pages.yml) runs on pushes to `main` and manual Actions dispatch. It installs the locked npm dependencies on Node 22, runs tests, exports the site, uploads only `out/`, and deploys through the official Pages actions. Repository Settings → Pages → Source is **GitHub Actions**. The repository was made public with the owner's explicit authorization because the account plan did not support Pages for this private repository.
+
+`actions/configure-pages` supplies the actual repository base path. `npm run build:pages` enables Next's `output: "export"`, trailing-slash directory routes, and that base path. Native images, the favicon, hero poster and home search action use `publicPath`; Next handles its own links, scripts, CSS and bundled fonts. Discovery, booking and registration read query parameters in client adapters beneath Suspense. Stored data and fixture paths stay canonical.
+
+Local reproduction for this repository:
+
+```bash
+NEXT_PUBLIC_BASE_PATH=/chair-barber-marketplace npm run build:pages
+```
+
+Serve the resulting `out/` directory at `/chair-barber-marketplace/` on any local static server. Do not use `next start` for a static export. Normal `npm run dev`, `npm run build` and `npm start` retain localhost routing without a base path; run a normal build before `npm start` if the last build was a Pages export.
+
+All existing profile and dashboard paths are generated at build time; unknown slugs return 404. The interactive prototype requires JavaScript. Accounts, bookings, favorites and uploads remain browser-local mock data. Public hosting adds no backend, secure authentication, payments or shared reservations. Localhost and the public origin have separate browser storage; existing localhost data is preserved.
 
 ## Explore
 

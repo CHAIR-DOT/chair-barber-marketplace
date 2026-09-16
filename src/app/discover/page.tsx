@@ -1,10 +1,12 @@
+import { Suspense } from "react";
 import { translate } from "@/i18n/translate";
-import { Discovery, type DiscoveryParams } from "@/components/discovery";
+import Loading from "@/app/loading";
+import DiscoveryQuery from "./query-client";
 export const metadata = { title: translate("ka", "metadata.discover") };
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<DiscoveryParams>;
-}) {
-  return <Discovery initial={await searchParams} />;
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <DiscoveryQuery />
+    </Suspense>
+  );
 }

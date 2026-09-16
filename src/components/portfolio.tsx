@@ -1,4 +1,5 @@
 "use client";
+import { publicPath } from "@/lib/public-path";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Maximize2 } from "lucide-react";
 import { styles } from "@/lib/data";
@@ -59,7 +60,7 @@ export function PortfolioGallery({
               })}
             >
               <img
-                src={i.image}
+                src={publicPath(i.image)}
                 alt={t("portfolio.imageAlt", { title: portfolioTitle(i) })}
                 loading="lazy"
               />
@@ -91,7 +92,10 @@ export function PortfolioGallery({
               if (e.key === "ArrowLeft") move(-1);
             }}
           >
-            <img src={current.image} alt={portfolioTitle(current)} />
+            <img
+              src={publicPath(current.image)}
+              alt={portfolioTitle(current)}
+            />
             <div className="lightbox-footer">
               <div>
                 <strong>{portfolioTitle(current)}</strong>

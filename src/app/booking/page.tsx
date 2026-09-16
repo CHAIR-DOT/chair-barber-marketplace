@@ -1,10 +1,12 @@
+import { Suspense } from "react";
 import { translate } from "@/i18n/translate";
-import { BookingPage, type BookingParams } from "@/components/booking-flow";
+import Loading from "@/app/loading";
+import BookingQuery from "./query-client";
 export const metadata = { title: translate("ka", "metadata.booking") };
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<BookingParams>;
-}) {
-  return <BookingPage initial={await searchParams} />;
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <BookingQuery />
+    </Suspense>
+  );
 }

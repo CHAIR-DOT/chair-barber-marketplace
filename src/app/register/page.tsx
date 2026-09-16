@@ -1,10 +1,12 @@
+import { Suspense } from "react";
 import { translate } from "@/i18n/translate";
-import { AuthPage } from "@/components/auth";
+import Loading from "@/app/loading";
+import RegisterQuery from "./query-client";
 export const metadata = { title: translate("ka", "metadata.register") };
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ role?: string }>;
-}) {
-  return <AuthPage register initialRole={(await searchParams).role} />;
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <RegisterQuery />
+    </Suspense>
+  );
 }
