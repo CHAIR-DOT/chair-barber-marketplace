@@ -5529,3 +5529,66 @@ html:lang(ka) h2 {
 .profile-tabs a {
   flex-shrink: 0;
 }
+
+/* Temporary style inspiration, shared by discovery and the existing booking flow. */
+.style-selection-brief {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  margin: 0 0 24px;
+  border: 1px solid #d7d3b9;
+  border-radius: 10px;
+  background: #eeeee2;
+}
+.style-selection-brief-icon {
+  color: #81703f;
+  padding-top: 4px;
+}
+.style-selection-brief-copy {
+  flex: 1;
+  min-width: 0;
+}
+.style-selection-brief-title {
+  display: block;
+  font-size: 10px;
+  color: #6c735b;
+  margin-bottom: 5px;
+}
+.style-selection-brief-copy strong {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.style-selection-brief-copy p {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: #6b7162;
+  line-height: 1.7;
+}
+.style-selection-brief-clear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d1d4c2;
+  border-radius: 50%;
+  color: #5b6350;
+  background: transparent;
+}
+.style-selection-brief-clear:hover {
+  background: #e1e3d2;
+}
+@media (max-width: 600px) {
+  .style-selection-brief {
+    padding: 14px;
+    gap: 10px;
+  }
+  .style-selection-brief-copy strong {
+    font-size: 12px;
+  }
+  .style-selection-brief-copy p {
+    font-size: 10px;
+  }
+}

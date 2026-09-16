@@ -52,9 +52,19 @@ Defined in `src/app/globals.css`.
 ## Responsive behavior
 
 - Full navigation transitions to a compact menu.
-- Discovery uses a desktop sidebar and a mobile filter dialog.
+- Discovery uses a desktop sidebar and the existing native dialog styled as a mobile bottom sheet.
 - Four-column barber grids reduce to two compact columns; shop listings reduce to one.
 - Booking summaries move below the flow on tablets and phones; the review step always shows the full summary.
 - Profile booking actions become a fixed bottom bar on narrow screens.
 - Dashboard side navigation becomes a horizontal compact navigation row; data tables scroll within their own region.
 - Use 375, 768, 1024, and 1440px as review widths in all three languages. Check long Georgian and Russian labels, buttons, profile tabs, and navigation. Allow wrapping or contained tab scrolling while preserving the existing composition; avoid horizontal page overflow. Actual check results belong in `VERIFICATION.md`.
+
+## Interactive homepage studio
+
+The top hero uses charcoal `#171b18`, warm gold `#e2bf85`, cream typography and a restrained translucent configurator. The existing navigation keeps its structure and changes color only on the homepage. The lower marketplace keeps its original sections/cards and light palette.
+
+Desktop: copy, central 3D portrait, panel. Tablet: copy above portrait with adjacent panel. At ≤650px the portrait and panel stack, and choices become a horizontal carousel. Use translated labels and visible focus on all category, rotation, thumbnail and CTA controls. The real category controls duplicate the hotspots for accessibility. Avoid continuous animation; respect reduced motion and never lock hero scrolling.
+
+The base scan rotates/highlights categories only; do not imply hairstyle meshes change. Keep the concise inspiration note and asset attribution. Loading/error/photo mode must keep the complete selection-to-discovery journey available.
+
+`PremiumSelect` uses a labeled combobox/listbox with keyboard navigation, selected checks and outside dismissal. All filter chips and counts derive from real state. GEL max-price remains 15–100 / step 5; resetting filters keeps the selected sort. Use scoped component CSS instead of changing marketplace cards.

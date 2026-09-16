@@ -1,109 +1,19 @@
 "use client";
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  CalendarDays,
-  MapPin,
-  Scissors,
-  Search,
-} from "lucide-react";
-import { shops, styles, services, neighborhoods } from "@/lib/data";
-import { today } from "@/lib/dates";
+import { ArrowUpRight } from "lucide-react";
+import { shops, styles } from "@/lib/data";
+import { InteractiveStyleHero } from "@/components/interactive-style-hero";
+import { PremiumFilterBar } from "@/components/premium-filter-bar";
 import { useMock } from "@/components/provider";
 import { BarberCard, ShopCard, StyleCard } from "@/components/cards";
 import { useI18n } from "@/i18n/provider";
 export default function Home() {
   const { state } = useMock();
-  const { t, label, serviceName } = useI18n();
+  const { t } = useI18n();
   return (
     <>
-      <section className="hero container">
-        <div className="hero-copy">
-          <div className="eyebrow">
-            <span className="small-line" />
-            {t("home.eyebrow")}
-          </div>
-          <h1>
-            {t("home.title1")}
-            <br />
-            {t("home.title2")} <em>{t("home.titleAccent")}</em>
-          </h1>
-          <p>{t("home.intro")}</p>
-          <div className="hero-proof">
-            <div className="avatar-stack">
-              {state.barbers.slice(0, 3).map((b) => (
-                <img src={b.image} alt="" key={b.id} />
-              ))}
-            </div>
-            <div>
-              <span className="proof-stars">★★★★★</span>
-              <span>{t("home.proof")}</span>
-            </div>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <img
-            src="/images/hero.jpg"
-            alt={t("home.imageAlt")}
-            fetchPriority="high"
-          />
-          <span className="image-caption">{t("home.caption")}</span>
-          <div className="hero-note">
-            <Scissors size={18} />
-            <div>
-              <strong>{t("home.noteTitle")}</strong>
-              <span>{t("home.noteText")}</span>
-            </div>
-            <ArrowUpRight size={20} />
-          </div>
-        </div>
-        <form action="/discover" className="hero-search">
-          <label>
-            <MapPin size={20} />
-            <span>
-              <small>{t("home.where")}</small>
-              <select name="location" aria-label={t("home.location")}>
-                <option value="">{t("home.city")}</option>
-                {neighborhoods.map((n) => (
-                  <option key={n} value={n}>
-                    {label(n)}
-                  </option>
-                ))}
-              </select>
-            </span>
-          </label>
-          <label>
-            <Scissors size={20} />
-            <span>
-              <small>{t("home.what")}</small>
-              <select name="service" aria-label={t("home.service")}>
-                <option value="">{t("home.anyService")}</option>
-                {services.slice(0, 3).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {serviceName(s)}
-                  </option>
-                ))}
-              </select>
-            </span>
-          </label>
-          <label className="search-date">
-            <CalendarDays size={20} />
-            <span>
-              <small>{t("home.when")}</small>
-              <input
-                type="date"
-                name="date"
-                min={today()}
-                aria-label={t("home.appointmentDate")}
-              />
-            </span>
-          </label>
-          <button className="button button-dark">
-            <Search size={18} />
-            {t("home.find")}
-          </button>
-        </form>
-      </section>
+      <InteractiveStyleHero />
+      <PremiumFilterBar />
       <div className="container quick-discovery">
         <span>{t("home.inspiration")}</span>
         {[

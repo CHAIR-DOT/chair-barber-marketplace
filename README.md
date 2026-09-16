@@ -1,6 +1,6 @@
 # CHAIR. — Barber marketplace prototype
 
-A photography-led marketplace for finding a barber in Tbilisi. Built with Next.js App Router, React, TypeScript, Tailwind CSS, Lucide, and small reusable UI components. Everything is local and mocked.
+An interactive style studio and photography-led marketplace for finding a barber in Tbilisi. Built with Next.js App Router, React, TypeScript, Tailwind CSS, Lucide, and small reusable UI components. Everything is local and mocked.
 
 Private source repository: [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Primary branch: `main`; remote: `origin`.
 
@@ -24,7 +24,7 @@ npm ci
 npm run dev
 ```
 
-Open **http://127.0.0.1:3000**. The development server binds only to this computer. Photos and fonts are included locally, so the running app does not depend on external asset services.
+Open **http://127.0.0.1:3000**. The development server binds only to this computer. Photos, the licensed 3D model, and fonts are included locally, so the running app does not depend on external asset services.
 
 ```bash
 npm run typecheck
@@ -84,6 +84,16 @@ tests/i18n.test.ts       Dictionary coverage, formatting, fallback, and canonica
 
 The store owns mutations; screens consume shared entities and actions. Services have global definitions and per-barber price/eligibility relationships. Appointments snapshot price and duration. Reviews reference the customer, barber, and a completed appointment. The UI mounts after local storage is read, avoiding stale editor values and time-dependent server/client hydration differences.
 
+## Homepage style studio
+
+The top homepage uses a lazy-loaded Three.js scene with a licensed male head scan, warm lighting, bounded drag/keyboard rotation and Hair/Beard hotspots. The configurator reuses the existing 11 haircut IDs and adds six temporary beard preferences. The CTA opens existing `/discover?style=...`; an inspiration brief follows into the normal booking flow without changing services or prices.
+
+Choices live in `chair.style.v1` **sessionStorage**, independently of mock data and language. They survive same-tab navigation/refresh and locale changes. The scan does not change hairstyle meshes; style thumbnails are inspiration. A local photo keeps selectors/CTA available during loading or WebGL/model failure. Photo view is also available explicitly.
+
+`interactive-style-hero.tsx` owns presentation; dynamically imported `style-scene.ts` owns the renderer and replacement boundary. Three.js and its matching development types are the only added 3D packages. The renderer caps DPR, renders on demand, pauses offscreen and cleans up resources. Asset/license/replacement details are in [public/models/README.md](public/models/README.md).
+
+The existing light marketplace content remains intact. `PremiumSelect` and scoped filter CSS add keyboard-accessible dropdowns, price fill/reset, real-state chips/counts and a mobile bottom sheet. The home More filters button passes current search fields plus `filters=open` to open that sheet on mobile. Existing filter meanings and sorting are unchanged.
+
 ## Localization
 
 The frontend supports **ქართული (`ka`), English (`en`), and Русский (`ru`)**. Georgian is the first-visit default, including server-rendered text and metadata. Browser language does not select the initial language. After hydration, a valid saved preference is applied; switching language updates the interface immediately and keeps the existing URLs.
@@ -142,7 +152,7 @@ The optional, feature-detected WebMCP `set_saved_barber` tool uses the same favo
 
 ## Verification
 
-`npm test` covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
+`npm test` includes 29 checks, including canonical style IDs, temporary persistence validation and safe corrupt-state handling. It covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
 
 Localization tests also cover dictionary parity and placeholders, default/fallback behavior, critical translated actions, plural and numeric formatting, unchanged canonical records, custom content, portfolio title rules, dates/GEL, and localized domain errors.
 

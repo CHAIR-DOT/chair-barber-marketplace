@@ -1,11 +1,35 @@
 "use client";
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { useI18n } from "@/i18n/provider";
 import { createDisplay } from "@/i18n/display";
 import { SUPPORTED_LOCALES } from "@/i18n/config";
-import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  ArrowDownWideNarrow,
+  CalendarDays,
+  Clock3,
+  MapPin,
+  Navigation,
+  RotateCcw,
+  Scissors,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Star,
+  X,
+} from "lucide-react";
 import { useMock } from "./provider";
 import { BarberCard, ShopCard } from "./cards";
+import { PremiumSelect } from "./premium-select";
+import { StyleSelectionBrief } from "./style-selection-brief";
+import { useStyleSelection } from "./style-selection-provider";
+import { isHairStyleId } from "@/lib/style-selection";
 import { EmptyState, Modal, PageHeader } from "./ui";
 import { neighborhoods, shops, SLOT_TIMES, styles } from "@/lib/data";
 import {
@@ -18,6 +42,53 @@ import { addDays, today } from "@/lib/dates";
 // Search all supported languages so changing the interface language preserves results.
 const searchDisplays = SUPPORTED_LOCALES.map(createDisplay);
 
+function PriceFilter({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  const { t, money } = useI18n();
+  const id = useId();
+  return (
+    <div className="premium-price-filter">
+      <div className="premium-price-heading">
+        <label htmlFor={id}>{t("discovery.priceUpTo")}</label>
+        <strong>{money(value)}</strong>
+      </div>
+      <input
+        id={id}
+        className="premium-price-range"
+        type="range"
+        min="15"
+        max="100"
+        step="5"
+        value={value}
+        aria-valuetext={money(value)}
+        style={
+          { "--range-fill": `${((value - 15) / 85) * 100}%` } as CSSProperties
+        }
+        onChange={(event) => onChange(+event.target.value)}
+      />
+      <div className="premium-price-limits">
+        <span>{money(15)}</span>
+        <span>{money(100)}</span>
+      </div>
+      {value < 100 && (
+        <button
+          type="button"
+          className="premium-price-reset"
+          onClick={() => onChange(100)}
+        >
+          <RotateCcw size={12} aria-hidden="true" />
+          {t("filters.resetPrice")}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export interface DiscoveryParams {
   location?: string;
   service?: string;
@@ -25,6 +96,7 @@ export interface DiscoveryParams {
   style?: string;
   availability?: string;
   q?: string;
+  filters?: string;
 }
 export function Discovery({
   initial = {},
@@ -33,7 +105,17 @@ export function Discovery({
   initial?: DiscoveryParams;
   mode?: "barbers" | "shops";
 }) {
-  const { t, money, number, label, serviceName, styleName } = useI18n();
+  const {
+    t,
+    money,
+    number,
+    label,
+    serviceName,
+    styleName,
+    date: formatDate,
+  } = useI18n();
+  const { selection, setHairStyle, clearSelection } = useStyleSelection();
+  const appliedInitialStyle = useRef<string | undefined | null>(null);
   const { state } = useMock(),
     [kind, setKind] = useState(mode),
     [query, setQuery] = useState(initial.q ?? ""),
@@ -48,6 +130,34 @@ export function Discovery({
     [distance, setDistance] = useState(10),
     [sort, setSort] = useState("recommended"),
     [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    if (
+      initial.filters === "open" &&
+      window.matchMedia("(max-width: 800px)").matches
+    ) {
+      setMobile(true);
+    }
+  }, [initial.filters]);
+  useEffect(() => {
+    if (!selection.submitted || appliedInitialStyle.current === initial.style)
+      return;
+    appliedInitialStyle.current = initial.style;
+    // A submitted session preference must never override the route's real filter.
+    if (isHairStyleId(initial.style)) {
+      if (selection.hairStyleId !== initial.style) setHairStyle(initial.style);
+    } else clearSelection();
+  }, [
+    initial.style,
+    selection.submitted,
+    selection.hairStyleId,
+    setHairStyle,
+    clearSelection,
+  ]);
+  const changeStyle = (value: string) => {
+    setStyle(value);
+    if (isHairStyleId(value)) setHairStyle(value);
+    else clearSelection();
+  };
   const reset = () => {
     setQuery("");
     setLocation("");
@@ -59,18 +169,8 @@ export function Discovery({
     setMinRating(0);
     setExperience(0);
     setDistance(10);
+    clearSelection();
   };
-  const activeCount = [
-    location,
-    service,
-    style,
-    date,
-    availability,
-    maxPrice < 100,
-    minRating,
-    experience,
-    distance < 10,
-  ].filter(Boolean).length;
   const filtered = useMemo(
     () =>
       state.barbers
@@ -153,129 +253,213 @@ export function Discovery({
   const filteredShops = Array.from(new Set(filtered.map((b) => b.shopId))).map(
     (id) => shops.find((s) => s.id === id)!,
   );
+  const activeChips: { key: string; name: string; remove: () => void }[] = [];
+  if (query)
+    activeChips.push({
+      key: "query",
+      name: t("filters.search", { query }),
+      remove: () => setQuery(""),
+    });
+  if (location)
+    activeChips.push({
+      key: "location",
+      name: label(location),
+      remove: () => setLocation(""),
+    });
+  if (service) {
+    const selected = state.services.find((item) => item.id === service);
+    activeChips.push({
+      key: "service",
+      name: selected ? serviceName(selected) : service,
+      remove: () => setService(""),
+    });
+  }
+  if (style) {
+    const selected = styles.find((item) => item.id === style);
+    activeChips.push({
+      key: "style",
+      name: selected ? styleName(selected) : style,
+      remove: () => changeStyle(""),
+    });
+  }
+  if (date)
+    activeChips.push({
+      key: "date",
+      name: Number.isFinite(new Date(`${date}T12:00:00Z`).valueOf())
+        ? formatDate(date)
+        : date,
+      remove: () => setDate(""),
+    });
+  if (availability)
+    activeChips.push({
+      key: "availability",
+      name:
+        availability === "today" || availability === "tomorrow"
+          ? t(`discovery.${availability}`)
+          : availability,
+      remove: () => setAvailability(""),
+    });
+  if (maxPrice < 100)
+    activeChips.push({
+      key: "price",
+      name: t("filters.price", { price: money(maxPrice) }),
+      remove: () => setMaxPrice(100),
+    });
+  if (minRating)
+    activeChips.push({
+      key: "rating",
+      name: t("filters.rating", { rating: number(minRating) }),
+      remove: () => setMinRating(0),
+    });
+  if (experience)
+    activeChips.push({
+      key: "experience",
+      name: t("filters.experience", { count: experience }),
+      remove: () => setExperience(0),
+    });
+  if (distance < 10)
+    activeChips.push({
+      key: "distance",
+      name: t("filters.distance", { count: distance }),
+      remove: () => setDistance(10),
+    });
+  const activeCount = activeChips.length;
   const filters = (
     <>
-      <div className="filter-title">
-        <h3>{t("discovery.filtersTitle")}</h3>
-        <button className="link-button" onClick={reset}>
-          {t("discovery.resetAll")}
-        </button>
+      <div className="filter-title premium-filter-title">
+        <h3>
+          <SlidersHorizontal size={16} aria-hidden="true" />
+          {t("discovery.filters")}
+          {activeCount > 0 && (
+            <span className="premium-filter-count">{number(activeCount)}</span>
+          )}
+        </h3>
+        {activeCount > 0 && (
+          <button className="link-button" onClick={reset}>
+            {t("filters.clearAll")}
+          </button>
+        )}
       </div>
-      <label className="field">
-        {t("discovery.neighborhood")}
-        <select value={location} onChange={(e) => setLocation(e.target.value)}>
-          <option value="">{t("discovery.allTbilisi")}</option>
-          {neighborhoods.map((n) => (
-            <option key={n} value={n}>
-              {label(n)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="field">
-        {t("discovery.distance")}
-        <select value={distance} onChange={(e) => setDistance(+e.target.value)}>
-          <option value={10}>{t("discovery.anyDistance")}</option>
-          <option value={1}>{t("discovery.distance1")}</option>
-          <option value={3}>{t("discovery.distance3")}</option>
-          <option value={5}>{t("discovery.distance5")}</option>
-        </select>
-        <span className="hint">{t("discovery.distanceHint")}</span>
-      </label>
-      <label className="field">
-        {t("discovery.service")}
-        <select value={service} onChange={(e) => setService(e.target.value)}>
-          <option value="">{t("discovery.anyService")}</option>
-          {state.services.map((s) => (
-            <option value={s.id} key={s.id}>
-              {serviceName(s)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="field">
-        {t("discovery.haircutStyle")}
-        <select value={style} onChange={(e) => setStyle(e.target.value)}>
-          <option value="">{t("discovery.anyStyle")}</option>
-          {styles.map((s) => (
-            <option value={s.id} key={s.id}>
-              {styleName(s)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <div className="filter-divider" />
-      <label className="field">
-        {t("discovery.priceUpTo")} <strong>{money(maxPrice)}</strong>
-        <input
-          type="range"
-          min="15"
-          max="100"
-          step="5"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(+e.target.value)}
+      <div className="premium-filter-group">
+        <PremiumSelect
+          label={t("discovery.neighborhood")}
+          icon={<MapPin size={18} />}
+          value={location}
+          onChange={setLocation}
+          options={[
+            { value: "", label: t("discovery.allTbilisi") },
+            ...neighborhoods.map((n) => ({ value: n, label: label(n) })),
+          ]}
         />
-        <div className="range-labels">
-          <span>{money(15)}</span>
-          <span>{money(100)}</span>
+        <div className="premium-filter-with-hint">
+          <PremiumSelect
+            label={t("discovery.distance")}
+            icon={<Navigation size={17} />}
+            value={String(distance)}
+            onChange={(value) => setDistance(+value)}
+            options={[
+              { value: "10", label: t("discovery.anyDistance") },
+              ...[1, 3, 5].map((n) => ({
+                value: String(n),
+                label: t(`discovery.distance${n}`),
+              })),
+            ]}
+          />
+          <p className="premium-filter-hint">{t("discovery.distanceHint")}</p>
         </div>
-      </label>
-      <label className="field">
-        {t("discovery.minimumRating")}
-        <select
-          value={minRating}
-          onChange={(e) => setMinRating(+e.target.value)}
-        >
-          <option value={0}>{t("discovery.allRatings")}</option>
-          <option value={4}>{t("discovery.rating4")}</option>
-          <option value={4.5}>{t("discovery.rating45")}</option>
-          <option value={4.9}>{t("discovery.rating49")}</option>
-        </select>
-      </label>
-      <label className="field">
-        {t("discovery.experience")}
-        <select
-          value={experience}
-          onChange={(e) => setExperience(+e.target.value)}
-        >
-          <option value={0}>{t("discovery.allExperience")}</option>
-          <option value={3}>{t("discovery.experience3")}</option>
-          <option value={5}>{t("discovery.experience5")}</option>
-          <option value={8}>{t("discovery.experience8")}</option>
-        </select>
-      </label>
-      <div className="filter-divider" />
-      <label className="field">
-        {t("discovery.availability")}
-        <select
+      </div>
+      <div className="premium-filter-group">
+        <PremiumSelect
+          label={t("discovery.service")}
+          icon={<Scissors size={18} />}
+          value={service}
+          onChange={setService}
+          options={[
+            { value: "", label: t("discovery.anyService") },
+            ...state.services.map((item) => ({
+              value: item.id,
+              label: serviceName(item),
+            })),
+          ]}
+        />
+        <PremiumSelect
+          label={t("discovery.haircutStyle")}
+          icon={<Sparkles size={17} />}
+          value={style}
+          onChange={changeStyle}
+          options={[
+            { value: "", label: t("discovery.anyStyle") },
+            ...styles.map((item) => ({
+              value: item.id,
+              label: styleName(item),
+            })),
+          ]}
+        />
+        <PriceFilter value={maxPrice} onChange={setMaxPrice} />
+      </div>
+      <div className="premium-filter-group">
+        <PremiumSelect
+          label={t("discovery.minimumRating")}
+          icon={<Star size={17} />}
+          value={String(minRating)}
+          onChange={(value) => setMinRating(+value)}
+          options={[
+            { value: "0", label: t("discovery.allRatings") },
+            { value: "4", label: t("discovery.rating4") },
+            { value: "4.5", label: t("discovery.rating45") },
+            { value: "4.9", label: t("discovery.rating49") },
+          ]}
+        />
+        <PremiumSelect
+          label={t("discovery.experience")}
+          icon={<Scissors size={17} />}
+          value={String(experience)}
+          onChange={(value) => setExperience(+value)}
+          options={[
+            { value: "0", label: t("discovery.allExperience") },
+            ...[3, 5, 8].map((n) => ({
+              value: String(n),
+              label: t(`discovery.experience${n}`),
+            })),
+          ]}
+        />
+      </div>
+      <div className="premium-filter-group">
+        <PremiumSelect
+          label={t("discovery.availability")}
+          icon={<Clock3 size={17} />}
           value={availability}
-          onChange={(e) => {
-            setAvailability(e.target.value);
+          onChange={(value) => {
+            setAvailability(value);
             setDate("");
           }}
-        >
-          <option value="">{t("discovery.anyDay")}</option>
-          <option value="today">{t("discovery.today")}</option>
-          <option value="tomorrow">{t("discovery.tomorrow")}</option>
-        </select>
-      </label>
-      <label className="field">
-        {t("discovery.chooseDate")}
-        <input
-          type="date"
-          min={today()}
-          max={addDays(30)}
-          value={date}
-          onChange={(e) => {
-            setDate(e.target.value);
-            setAvailability("");
-          }}
+          options={[
+            { value: "", label: t("discovery.anyDay") },
+            { value: "today", label: t("discovery.today") },
+            { value: "tomorrow", label: t("discovery.tomorrow") },
+          ]}
         />
-      </label>
+        <label className="premium-date-filter">
+          <span>
+            <CalendarDays size={16} aria-hidden="true" />
+            {t("discovery.chooseDate")}
+          </span>
+          <input
+            type="date"
+            min={today()}
+            max={addDays(30)}
+            value={date}
+            onChange={(event) => {
+              setDate(event.target.value);
+              setAvailability("");
+            }}
+          />
+        </label>
+      </div>
     </>
   );
   return (
-    <div className="container page-section">
+    <div className="container page-section premium-discovery">
       <PageHeader
         eyebrow={t("discovery.eyebrow")}
         title={
@@ -287,6 +471,7 @@ export function Discovery({
         }
         description={t("discovery.description")}
       />
+      <StyleSelectionBrief />
       <div className="discovery-search">
         <Search size={19} />
         <input
@@ -310,7 +495,9 @@ export function Discovery({
         </span>
       </div>
       <div className="discovery-layout">
-        <aside className="filter-sidebar">{filters}</aside>
+        <aside className="filter-sidebar premium-filter-sidebar">
+          {filters}
+        </aside>
         <div className="discovery-results">
           <div className="result-controls">
             <div
@@ -337,24 +524,20 @@ export function Discovery({
                 <span className="count">{number(filteredShops.length)}</span>
               </button>
             </div>
-            <label className="sort-control">
-              {t("discovery.sortBy")}
-              <select
-                aria-label={t("discovery.sortLabel")}
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-              >
-                <option value="recommended">
-                  {t("discovery.recommended")}
-                </option>
-                <option value="rating">{t("discovery.highestRated")}</option>
-                <option value="reviews">{t("discovery.mostReviewed")}</option>
-                <option value="price">{t("discovery.lowestPrice")}</option>
-                <option value="available">
-                  {t("discovery.earliestAvailable")}
-                </option>
-              </select>
-            </label>
+            <PremiumSelect
+              className="premium-sort-control"
+              label={t("discovery.sortBy")}
+              value={sort}
+              icon={<ArrowDownWideNarrow size={17} />}
+              onChange={setSort}
+              options={[
+                { value: "recommended", label: t("discovery.recommended") },
+                { value: "rating", label: t("discovery.highestRated") },
+                { value: "reviews", label: t("discovery.mostReviewed") },
+                { value: "price", label: t("discovery.lowestPrice") },
+                { value: "available", label: t("discovery.earliestAvailable") },
+              ]}
+            />
           </div>
           <div className="result-meta">
             <p aria-live="polite">
@@ -370,19 +553,47 @@ export function Discovery({
               )}
             </p>
             <button
-              className="button button-outline mobile-filters"
+              className="button button-outline mobile-filters premium-filter-button"
               onClick={() => setMobile(true)}
             >
               <SlidersHorizontal size={15} />
               {t("discovery.filters")}
-              {activeCount ? ` (${number(activeCount)})` : ""}
+              {activeCount > 0 && (
+                <span className="premium-filter-count">
+                  {number(activeCount)}
+                </span>
+              )}
             </button>
-            {activeCount > 0 && (
-              <button className="link-button" onClick={reset}>
-                {t("discovery.clearCount", { count: activeCount })}
-              </button>
-            )}
           </div>
+          {activeChips.length > 0 && (
+            <div
+              className="premium-active-filters"
+              role="group"
+              aria-label={t("filters.active")}
+            >
+              {activeChips.map((chip) => (
+                <button
+                  type="button"
+                  key={chip.key}
+                  className="premium-filter-chip"
+                  onClick={chip.remove}
+                  aria-label={t("filters.remove", { name: chip.name })}
+                >
+                  <span>{chip.name}</span>
+                  <X size={13} aria-hidden="true" />
+                </button>
+              ))}
+              {activeChips.length > 1 && (
+                <button
+                  type="button"
+                  className="premium-clear-filters"
+                  onClick={reset}
+                >
+                  {t("filters.clearAll")}
+                </button>
+              )}
+            </div>
+          )}
           {(kind === "barbers" ? filtered : filteredShops).length ? (
             <div
               className={
@@ -406,21 +617,37 @@ export function Discovery({
           <div className="results-note">{t("discovery.disclosure")}</div>
         </div>
       </div>
-      <Modal
-        open={mobile}
-        onClose={() => setMobile(false)}
-        title={t("discovery.mobileTitle")}
-      >
-        <div className="mobile-filter-content">{mobile && filters}</div>
-        <button
-          className="button button-dark button-full"
-          onClick={() => setMobile(false)}
+      <div className="premium-filter-sheet">
+        <Modal
+          open={mobile}
+          onClose={() => setMobile(false)}
+          title={t("discovery.mobileTitle")}
         >
-          {t("discovery.showResults", {
-            count: kind === "barbers" ? filtered.length : filteredShops.length,
-          })}
-        </button>
-      </Modal>
+          <div className="mobile-filter-content premium-filter-scroll">
+            {mobile && filters}
+          </div>
+          <div className="premium-sheet-footer">
+            {activeCount > 0 && (
+              <button
+                type="button"
+                className="premium-clear-filters"
+                onClick={reset}
+              >
+                {t("filters.clearAll")}
+              </button>
+            )}
+            <button
+              className="button button-dark"
+              onClick={() => setMobile(false)}
+            >
+              {t("discovery.showResults", {
+                count:
+                  kind === "barbers" ? filtered.length : filteredShops.length,
+              })}
+            </button>
+          </div>
+        </Modal>
+      </div>
     </div>
   );
 }

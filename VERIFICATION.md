@@ -1,6 +1,26 @@
 # Verification record
 
-Latest localization checks: 16 September 2026. Earlier baseline checks below are retained as historical evidence.
+Latest checks: interactive 3D studio/filter polish, 16 September 2026. Earlier localization/baseline checks below remain historical evidence.
+
+## Interactive 3D studio and premium filters — 16 September 2026
+
+- TypeScript passed; 29/29 tests passed (9 domain, 17 localization, 3 new canonical style/persistence/corruption checks); final production build passed with 57 generated pages. No lint script is configured.
+- Final production route checks on isolated `127.0.0.1:3011` passed: 55 valid routes, 5 expected 404s, 25 local images. Model/texture assets also loaded successfully in the real scene. Intentional invalid static routes still emit the known Next `NoFallbackError` logs.
+- Model load/short entrance, bounded pointer drag, keyboard rotation, Hair/Beard hotspots, both category panels, hair/beard selections and existing discovery CTA worked. Low Fade + Goatee survived same-tab refresh; choices stayed unchanged across language changes.
+- Textured Crop + Short beard opened the real style filter with four matches, then Giorgi's profile and existing booking. Demo confirmation retained Signature haircut, ₾35 / 45 min, 18 September 2026, 11:30, reference EDF66FB2. Only the isolated QA origin was changed.
+- Homepage and discovery each measured at 375/768/1024/1440 in KA/EN/RU: 24 combinations, no horizontal page overflow. Visually inspected desktop/tablet/mobile portrait/configuration/filter layouts. Geometry's existing shoulders made the initial procedural base redundant; it was removed, lighting softened and final desktop rendering rechecked.
+- Verified keyboard location dropdown selection, service/rating/experience/distance/availability controls, max-price Home/ArrowRight → ₾20 / no results, price reset, real chips/counts, chip removal, Clear all restoring 16 barbers / 8 shops and retaining Lowest price sorting. Full filter predicate/sort block remains identical to the preceding commit. Lower homepage is byte-identical from quick-discovery onward; fixtures and cards are unchanged.
+- Home More filters navigates with current form values and `filters=open`. On mobile this opens the bottom sheet; choosing Vera produces 4 barbers / 2 shops. Dropdown Escape closes only the dropdown; Show results closes the sheet. Desktop remains a sidebar.
+- Photo mode disposes the scene, resets hotspot positions and keeps choices. A temporary loopback proxy on 3012 returned 503 only for the GLB. The automatic fallback showed the local photo, removed the canvas, kept both selectors and navigated Taper Fade + Defined beard to four matching specialists. The intentional 503 is expected test output, not a production asset failure.
+- Audit confirmed all three runtime model files match upstream hashes (700,038 bytes total), source/license/attribution are included, no unnecessary large assets or secret/generated paths. Separate async Three.js chunk is approximately 621 KB raw / 153 KB gzip and absent from initial HTML scripts. No FPS or Lighthouse score is claimed.
+
+### Test boundaries
+
+Pointer drag was exercised at desktop and narrow viewport sizes. Physical touch hardware, hardware WebGL context loss and a complete screen-reader audit were not available; code paths for touch intent, pan-y, reduced motion, hidden/offscreen rendering and cleanup were reviewed. The failure proxy tests asset-load failure and shared fallback behavior, not GPU failure itself.
+
+The existing native date input accepted URL preselection and its date chip removed correctly. Automated fill did not commit a native date in the in-app browser, and opening its OS/browser-owned date popup crashed the isolated test tab. Do not claim that picker interaction passed; retest it in an ordinary browser. Application date handlers/rules were not changed. The crashed temporary tab is left for automatic tool cleanup because the browser tool's URL policy rejects actions on its generated crash page; no security bypass was attempted.
+
+Temporary successful QA tabs/server/proxy are closed after checks and viewport overrides reset. The user's original port 3000 preview/data remain intact. Broader dashboard/profile/account regression results below belong to prior turns.
 
 ## Historical automated checks — 15 September 2026
 

@@ -16,7 +16,7 @@ Continue the existing application; do not create a new scaffold. Root `AGENTS.md
 
 **Frontend prototype using local mock data.** Discovery, profiles, booking, customer accounts, and barber management work within the prototype's limits. Preview: `http://127.0.0.1:3000`. No public site deployment or backend implementation is authorized by the current task.
 
-**Current status:** Complete Georgian/English/Russian frontend localization is implemented and verified. Georgian is the first-visit default. Language selection, metadata, app-controlled dates/numbers and UI feedback update immediately; the separate local preference survives navigation and refresh. All 22 main screens were checked in all three languages and at 375/768/1024/1440px. TypeScript, 26 tests, production build and route/image checks pass. Existing routes, design, canonical entities, booking rules and the user’s port-3000 browser data are preserved. Continue with the next user-requested improvement using the existing private repository; Git state is authoritative for the latest commit/upstream.
+**Current status:** The dark interactive 3D homepage hero and premium filter controls are implemented and verified. Georgian remains the default; KA/EN/RU and all existing lower homepage content, canonical data and booking rules are preserved. Hair/beard choices persist in temporary session state and feed existing discovery/booking. The licensed scan is a base model with category highlights, not a hairstyle mesh simulator. TypeScript, 29 tests, production build and route/image checks pass. This handoff accompanies the feature commit; use Git state for the current commit/upstream. Preserve the user's port-3000 preview/data.
 
 ## Mandatory Development Workflow
 
@@ -45,6 +45,7 @@ For a new chat, use this folder or provide the repository and say: **“Read PRO
 | Lucide React                  | 1.46.0                                    |
 | DM Sans / DM Serif Display    | 5.3.0 packages, original Latin typography |
 | Noto Sans / Serif Georgian    | 5.3.0 packages, local Georgian fallbacks  |
+| Three.js / @types/three       | 0.186.0 / 0.186.0; lazy 3D rendering / development types |
 | tsx / Prettier                | 4.23.13 / 3.9.6                           |
 
 `package.json` and `package-lock.json` are authoritative. Documented minimum: Node >=20.9; current machine: Node 25.2.1/npm 11.6.2. Do not upgrade just to resume work.
@@ -68,6 +69,8 @@ Install only when dependencies are missing or a clean install is needed. Checks:
 | `src/lib/dates.ts`                                 | Canonical Tbilisi date arithmetic and time helpers                                                    |
 | `src/i18n/`                                        | Three-language catalogs, context, date/number/entity display and metadata helpers                     |
 | `src/lib/i18n.ts`                                  | Compatibility exports for the localization boundary                                                   |
+| `public/models/`                                 | Local licensed head scan, two textures, source/license/hash/replacement notes |
+| `src/lib/style-selection.ts`, `tests/style-selection.test.ts` | Canonical temporary inspiration state, validation and tests |
 | `public/images/`, `public/favicon.svg`             | 25 local stock JPGs and brand icon                                                                    |
 | `tests/domain.test.ts`, `tests/i18n.test.ts`       | Domain/fixtures, locale defaults/catalog parity, formatting, preservation and route-title regressions |
 | `scripts/check-routes.ts`                          | Valid/invalid-route and image HTTP checks                                                             |
@@ -80,7 +83,7 @@ Dependencies, build output, generated `next-env.d.ts`, caches, local configurati
 
 ## Architecture
 
-- `LocaleProvider` wraps `MockProvider` and supplies language/display helpers without remounting the store. `MockProvider` in `provider.tsx` owns shared state and mutations. Screens consume common entities/actions; this is the future asynchronous repository/API boundary.
+- `LocaleProvider` wraps `StyleSelectionProvider`, which wraps `MockProvider` and supplies language/display helpers without remounting the store. `MockProvider` in `provider.tsx` owns shared state and mutations. Screens consume common entities/actions; this is the future asynchronous repository/API boundary.
 - Storage key: **`chair.prototype.v1`**, shape `{version: 1, data: MockState}`. Persistent collections: favorites, appointments, reviews, barbers, services, portfolio, availability, user. Comparison is temporary in-memory state, capped at 3 barbers.
 - Preserve the provider's `ready` gate and synchronous `stateRef`; they prevent hydration problems and stale editor defaults overwriting saved details. Mount dependent editors after hydration.
 - Services have global definitions and barber eligibility/price relationships. Appointments snapshot price/duration; reviews link a completed visit, customer, and barber.
@@ -90,18 +93,31 @@ Dependencies, build output, generated `next-env.d.ts`, caches, local configurati
 - Preserve **`agentRules: false`** in `next.config.ts`: Next otherwise tried to append generated instructions to the protected `AGENTS.md` and failed with EACCES. `poweredByHeader` and `devIndicators` are also disabled.
 - The route checker wraps work in `async main()` for the installed tsx execution mode and reads images relative to the project root.
 
+## Homepage Studio and Filter Architecture
+
+- **Hero composition:** `interactive-style-hero.tsx` exports `InteractiveStyleHero` and contains `ModelPortrait`, `StyleConfigurator` and original SVG beard illustrations. The old hero alone is replaced; everything from `quick-discovery` onward in `app/page.tsx` is byte-identical to the preceding commit. `premium-filter-bar.tsx` relocates the existing location/service/date form below the hero. Home-only CSS harmonizes navigation colors without changing its routes or language controls.
+- **Renderer:** browser-only dynamic import of `style-scene.ts`, using only Three.js `0.186.0` plus GLTFLoader from the same package; no React Three Fiber/Drei/postprocessing/physics. `@types/three` is a development dependency. Current separate 3D chunk is about 621 KB raw / 153 KB gzip and absent from initial HTML scripts. Rendering runs on demand and stops when idle/offscreen/document-hidden. DPR is capped at 1.5 (1.25 on narrow screens), with simple lights, no shadows and two 1024² textures. Dispose removes GPU resources, event listeners and observers, including late-loading assets.
+- **Licensed model:** `public/models/lee-perry-smith/LeePerrySmith.glb`, `Map-COL.jpg`, `Infinite-Level_02_Tangent_SmoothUV.jpg`; **700,038 bytes total**, 9,279 vertices / 17,684 triangles. Infinite, 3D Head Scan by Lee Perry-Smith, CC BY 3.0, from a pinned official Three.js asset commit. The original notice, full license, source URLs, hashes and replacement instructions are in [public/models/README.md](public/models/README.md). Keep visible attribution and bundled notices. The shaved/stubbled, closed-eye scan is an illustrative base; it is not any fictional barber's identity or a customer likeness.
+- **Interactions:** limited yaw ±0.65 radians and pitch ±0.09; subtle desktop pointer response, horizontal drag with intent threshold, keyboard rotation/reset buttons and projected Hair/Beard hotspot buttons. Selecting a category moves a restrained warm light and highlights the control. Touch uses `touch-action: pan-y` and captures only horizontal drag intent; no hero scroll lock. A 700ms camera/opacity entrance is removed for reduced motion, which also disables idle pointer-follow smoothing. Ordinary category buttons expose all functionality without requiring precise hotspot clicks.
+- **Loading/fallback:** local existing `hero.jpg` remains visible while the scene loads. A 15-second deadline, import/renderer/asset failure or context loss falls back to the static photo; selectors and CTA stay usable. A Photo view / 3D view control allows an explicit static mode and retry. Fallback clears old projected positions and hides the inactive canvas from accessibility. No loader or test-only URL is required in production.
+- **State:** `style-selection-provider.tsx` and `lib/style-selection.ts` validate `{hairStyleId, beardStyleId, submitted}` under **`chair.style.v1` in sessionStorage**, separate from both locale and mock data. Defaults are `skin-fade` / `stubble` / false. Hair uses the 11 existing canonical styles excluding the broad `beard-styles` category. Beard IDs are configuration-only `clean-shaven`, `stubble`, `short-beard`, `full-beard`, `goatee`, `defined`; these are not invented services or barber eligibility filters. State survives language changes, same-tab navigation and refresh; corrupt/unavailable storage safely falls back to defaults/in-memory state. Synchronous writes preserve rapid choice→CTA actions.
+- **Discovery/booking integration:** CTA submits the preference and uses existing `/discover?style=<canonical-id>`. `StyleSelectionBrief` shows the submitted combination above discovery and booking; it explicitly says services/prices are separate. Canonical service selection, appointment schema, pricing, favorites and booking actions are untouched. Changes to valid discovery hair filters update the preference; removing the hair filter, choosing broad beard-styles or Clear all clears it. Explicit URL style wins over a previous submitted session. Beard remains temporary inspiration and is not saved/transmitted as an appointment field.
+- **Responsive:** desktop copy / central model / dark panel; tablet copy above model with adjacent panel; ≤650px stacked portrait and horizontally scrollable choices. Existing light marketplace begins below the hero. Checked at 375/768/1024/1440 in all three languages without page overflow.
+- **Premium filters:** `premium-select.tsx` is a labeled select-only combobox with selected check, active descendant, arrows/Home/End/typeahead, Enter/Space, Escape/Tab and outside dismissal. `premium-filters.css` scopes desktop sidebar, filled GEL slider, sort, badges and removable chips. Price remains max-price 15–100 in steps of 5, default 100; sorting and the full filtering predicate remain unchanged. Actual state supplies all chips/counts/reset. Mobile uses the existing native dialog styled as a bottom sheet; dropdown Escape closes the dropdown first. The home More filters button submits current location/service/date plus UI-only `filters=open`, opening the sheet at ≤800px and retaining the desktop sidebar above that width.
+
 ## Localization Architecture
 
 - **Locales:** `ka` / ქართული (default), `en` / English, `ru` / Русский. Never choose the first-visit language from browser settings. Invalid/unavailable saved preferences resolve to Georgian.
 - **Preference:** `chair.locale.v1` stores only the selected locale in localStorage; storage events synchronize tabs. It is independent of `chair.prototype.v1` and survives the demo-data reset. Storage failure keeps the chosen language for the session and shows localized feedback.
 - **Provider/control:** `src/i18n/provider.tsx` exports `LocaleProvider` / `useI18n()` (`locale`, `setLocale`, `t`, display helpers). `src/components/language-selector.tsx` supplies the labeled native select/Languages icon in `shell.tsx`, including the existing mobile menu. Keyboard focus, native selection and document `lang` follow the selected language.
-- **Catalogs:** `src/i18n/messages/{core,entities,discovery,journey,workspace,calendar}.ts`, merged in `messages/index.ts`. Semantic namespaces cover navigation/shared UI/home/about/errors/toasts, canonical-entity display fields, marketplace/profiles, booking/auth/account, barber/reviews/portfolio and calendar labels. `defineMessages` rows are `[English, Georgian, Russian]`; explicit locale maps are also used. Add the same keys and placeholders in all three languages.
+- **Catalogs:** `src/i18n/messages/{core,entities,discovery,journey,workspace,calendar,style-hero,filters}.ts`, merged in `messages/index.ts`. Semantic namespaces cover navigation/shared UI/home/about/errors/toasts, canonical-entity display fields, marketplace/profiles, booking/auth/account, barber/reviews/portfolio and calendar labels. `defineMessages` rows are `[English, Georgian, Russian]`; explicit locale maps are also used. Add the same keys and placeholders in all three languages.
 - **Interpolation/plurals:** `translate.ts` supports `{name}` values, numeric count/plural variants through Intl, English fallback, and development warnings for missing keys. Pass raw numeric counts so plural selection works; do not concatenate English nouns. Error/toast state stores semantic keys, so already-visible feedback updates when language changes.
 - **Canonical content:** one fixture/state entity per shop/barber/service/style. `display.ts` translates generic seed fields only when the ID and original field still match. Names, brands, addresses, emails, URLs, IDs/slugs, prices, relationships and stored dates are untouched. Seed portfolio titles matching a generic style are translated; intentionally named works and user-edited/custom fields remain verbatim.
 - **Reviews:** customer-written text is user content and never automatically translated. Labels, dimensions, dates, service display and verification messages translate around it. No translate-review feature exists.
 - **Formatting:** display helpers use `ka-GE`, `en-GB`, `ru-RU`, preserve GEL `₾`, and display dates in `Asia/Tbilisi` without changing stored `YYYY-MM-DD` values. Lightweight Georgian calendar/number fallbacks cover browsers missing Georgian Intl data. Shared booking date arithmetic remains in `src/lib/dates.ts`.
 - **Metadata/validation:** server titles start in Georgian; a cleaned-up, idempotent head observer preserves selected-language titles/descriptions after Next streams metadata. Exact route checks retain localized 404 titles. Native form constraints stay intact; their validation messages are localized. Native date/time picker chrome and OS file-selection dialogs follow browser/OS language; app-owned labels, calendar buttons and chosen-file text are localized.
 - **Fonts/layout:** original DM fonts remain for Latin. Local Noto Sans/Serif Georgian render Georgian; Arial/Georgia system fallback supplies Cyrillic. Only required spacing/font fallback and contained profile-tab scrolling changed; routes and page composition stay intact.
+- **New studio/filter keys:** `style-hero.ts` adds `hero.*` (including six `hero.beard.<id>` labels), `styleBrief.*`, and `homeFilters.*`; `filters.ts` adds `filters.*`. All three locales include matching messages/ARIA labels, and existing `styleName`/`serviceName` helpers still present canonical entities.
 - **Development rule:** Every newly introduced user-facing UI string must be added to the localization system in Georgian, English, and Russian. Do not introduce new hardcoded interface text.
 
 ## Data Models
@@ -131,10 +147,12 @@ Entities: `User`, `Customer`, `Barber`, `BarberShop`, `Service`, `Appointment`, 
 | `/barber/portfolio`, `/barber/services`, `/barber/schedule` | Portfolio, menus/prices, hours/days off                         |
 | `/about`                                                    | Prototype explanation and confirmed local reset                 |
 
-Examples: `/shops/gentlemans-corner`, `/barbers/giorgi-kapanadze`, `/styles/skin-fade`. Booking query parameters use IDs: `shop`, `barber`, `service`, `reschedule`. Discovery accepts `q`, `location`, `service`, `style`, `date`, `availability`.
+Examples: `/shops/gentlemans-corner`, `/barbers/giorgi-kapanadze`, `/styles/skin-fade`. Booking query parameters use IDs: `shop`, `barber`, `service`, `reschedule`. Discovery accepts `q`, `location`, `service`, `style`, `date`, `availability`; `filters=open` is a UI hint for the mobile filter sheet.
 
 ## Implemented Features
 
+- Premium dark homepage 3D studio: licensed local head scan, bounded pointer/drag/keyboard rotation, hair/beard hotspots, visual choices, localized configurator, static fallback and existing discovery/booking integration.
+- Premium accessible selects, location icons/checkmarks, filled price slider/reset, actual-state chips/counts, sort controls and mobile filter sheet; all lower homepage sections/cards and filter semantics preserved.
 - Complete Georgian/English/Russian interface localization, native header/mobile language selector, persistent independent locale preference, localized metadata and form feedback.
 - Responsive editorial home, shop/barber/style directories and profiles; discovery filters (location/distance, service/style, price/rating, date/availability/experience), sorting, mobile filters and empty-state recovery.
 - Locally persistent favorites, up-to-3 barber comparison, portfolio tag filters/lightbox, review/rating breakdowns.
@@ -145,6 +163,8 @@ Examples: `/shops/gentlemans-corner`, `/barbers/giorgi-kapanadze`, `/styles/skin
 
 ## Partially Implemented Features
 
+- Hair/beard geometry variants are **not implemented**. Choices update real configuration/discovery, while the base scan only rotates and highlights categories. A professionally licensed model/variant set can replace the asset boundary later. The interface states this limitation.
+- Beard inspiration is temporary per-tab state, not a structured barber filter or persisted appointment note. Storage-disabled reload cannot preserve it; ordinary in-app navigation still works.
 - Account onboarding and role UI; independent account provisioning, shop ownership and production permissions are absent.
 - Local JPG/PNG/WebP uploads up to **600 KB** as data URLs; remote storage/image processing is absent.
 - Responsive and keyboard behavior tested; no comprehensive automated visual regression suite or formal accessibility audit.
@@ -159,6 +179,8 @@ Real database/API storage, secure authentication/server permissions, concurrent 
 
 ## Known Issues
 
+- The 3D base is shaved/stubbled with closed eyes and has no interchangeable hair/beard geometry. Do not describe it as a live hairstyle try-on. Real-device touch and hardware-WebGL-loss testing remain beyond the current desktop-browser checks.
+- During this turn, the in-app test tab crashed when opening the browser-owned native date popup; automated filling did not commit a date there. Date URL preselection/chip removal and existing date rules passed, and the unchanged native picker should be retested in an ordinary browser. Do not claim a complete native-picker interaction pass.
 - Intentional unknown static routes correctly return 404 but print Next's internal **`NoFallbackError`** in the server terminal. Valid routes and observed interactions are unaffected; do not claim all server logs are error-free.
 - Browser storage is origin-specific: `127.0.0.1:3000`, `localhost`, and other ports have separate data. Preserve the original origin and user edits. This file does not back up browser state; do not reset automatically.
 - Earlier QA left a Giorgi favorite, a review of a completed Sandro visit, a cancelled test booking, and **Hot towel finish (₾25/30min)** on Giorgi's menu. Existing unrelated appointments were preserved. Temporary price/name/schedule changes were restored and a test portfolio item removed. Current counts can differ from pristine fixtures.
@@ -168,6 +190,8 @@ Real database/API storage, secure authentication/server permissions, concurrent 
 
 ## UI / Design System
 
+The home studio adds charcoal `#171b18`, warm gold `#e2bf85`, cream text and restrained translucent panels; existing lower marketplace colors and cards remain. Hero styles live in `interactive-style-hero.css`, filter styles in `premium-filters.css`.
+
 Premium editorial barber culture: cream `#f8f7f3`, charcoal `#262821`, copper `#a56041`, availability green `#537452`, muted gray `#75766e`, borders `#dedfd7`, soft fill `#eeeee6`. DM Sans interface text, DM Serif Display/italic display accents, local Noto Georgian fallbacks and system Cyrillic fallbacks, Lucide icons, generous spacing, restrained borders and clear hierarchy.
 
 Emphasize individual reputation and portfolios alongside shop identity. Georgian names/neighborhoods, GEL `₾`, Tbilisi dates. Local images: 1 hero, 4 shops, 8 portraits, 12 haircuts. Preserve correspondence between style tags/photos; buzz cut, French crop, long hair and mid fade imagery was refined after review. Maintain illustrative-use disclosures. Main surfaces were checked at **375/768/1024/1440px**. See [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
@@ -176,6 +200,9 @@ Emphasize individual reputation and portfolios alongside shop identity. Georgian
 
 | Files in `src/components/`                       | Responsibility                                                          |
 | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `interactive-style-hero.tsx`, `style-scene.ts` | Hero UI / lazy Three.js scene, interactions and cleanup |
+| `style-selection-provider.tsx`, `style-selection-brief.tsx` | Validated session inspiration and shared journey summary |
+| `premium-filter-bar.tsx`, `premium-select.tsx` | Home search and reusable accessible premium dropdowns |
 | `provider.tsx`                                   | Shared persistence/actions, hydration gate, synchronous state reference |
 | `language-selector.tsx`, `about-preview.tsx`     | Header/mobile locale control and localized About client content         |
 | `shell.tsx`, `ui.tsx`, `cards.tsx`               | Navigation/footer, shared controls/dialogs/states, marketplace cards    |
@@ -227,6 +254,12 @@ No backend provider/account is connected. Browser localStorage remains prototype
 
 ## Verification
 
+**Fresh for 3D studio/filter polish, 2026-09-16:** TypeScript, **29/29 tests** (9 domain + 17 localization + 3 style-state checks), production build (57 pages), HTTP checks (55 valid routes/5 expected 404s/25 images) pass. No lint script exists. Verified model loads, bounded drag/rotation controls, both hotspots/categories, haircut/beard choices, locale changes and same-tab refresh persistence. Textured Crop + Short beard reached four matching barbers; booking Giorgi's Signature haircut continued through confirmation at the unchanged ₾35/45min, 18 September, 11:30 (isolated QA origin only, reference EDF66FB2).
+
+Home and discovery passed 24 combined locale/width measurements (3 languages × 4 widths × 2 surfaces). Mobile sheet, actual counts, keyboard dropdown selection/Escape, service/style/location/distance/rating/experience/availability, price bounds/reset, chip removal, Clear all and preserved ascending-price sorting were exercised. Date URL preselection/removal passed; native-picker limitation is recorded under Known Issues. Photo mode retained choices. A temporary loopback-only proxy returned 503 for the GLB: the canvas was disposed, photo/choices/CTA remained usable, and Taper Fade + Defined beard still reached four matching barbers. Actual hardware WebGL loss and physical touch were code-reviewed, not emulated. No FPS/Lighthouse benchmark is claimed. Earlier profile/dashboard coverage remains historical.
+
+The final audit confirmed lower homepage content is byte-identical from quick-discovery onward, fixture/card files unchanged, no unnecessary large assets/secrets/generated files, licensed asset hashes intact and the 3D chunk split from initial scripts. Temporary QA servers/tabs are cleaned up after verification; the user's port-3000 session is preserved. See [VERIFICATION.md](VERIFICATION.md).
+
 **Fresh for localization, 2026-09-16:** TypeScript passed; **26/26 tests** (9 domain + 17 localization/formatting/metadata checks) passed; production build passed with 57 generated pages. Production HTTP checks passed for **55 valid routes, 5 expected 404s and 25 images**. Initial restricted HTTP access failed with EPERM; the approved run passed. No lint script is configured. The known Next `NoFallbackError` diagnostics still accompany intentionally invalid static routes.
 
 Browser QA on isolated `127.0.0.1:3011`: Georgian first visit; all 22 page surfaces in KA/EN/RU; 264 route/locale/width measurements at 375/768/1024/1440, with the sole discovered profile overflow fixed and retested. Sixteen additional date-heavy final-build responsive checks passed. Visual inspections covered desktop/tablet/home/profile/dashboard/mobile navigation and Cyrillic/Georgian fonts. English/Russian persisted across navigation and refresh; localized page titles remained correct after the streaming fix. Favorites and four Skin Fade specialists remained unchanged through all locale switches. A new test booking (Giorgi, haircut, 17 September 10:45, ₾35/45min) remained identical across switching, confirmation, account navigation and refresh. Registration, localized native validation, comparison, review/portfolio dialogs, empty states and cross-tab locale changes with an open review/error/draft were checked. Customer review text stayed verbatim. Final observed browser console had no errors/warnings. Georgian review dates/calendar labels and decimal separators were confirmed after the Intl fallbacks.
@@ -243,6 +276,9 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 
 ### 2026-09-16
 
+- Replaced only the top homepage hero with the localized dark Three.js style studio, locally licensed CC-BY scan, controlled interaction/hotspots, accessible configuration and loading/photo/error fallback. Added only Three.js runtime and its types. No hairstyle mesh switching is claimed.
+- Added validated temporary hair/beard inspiration and clean existing discovery/booking handoff; polished real filters, counts/chips, slider, sorting and mobile sheet. Preserved lower homepage, data, prices, routes and booking rules.
+- Fixed review/QA findings: stale drag after pointer exit, fallback hotspot positioning/accessibility, double scene disposal, unnecessary procedural body under the scan, and dark-header mobile icon contrast. Verified 29 tests, TypeScript, production build, routes/images, three-language responsive layouts, end-to-end demo booking and forced model-load fallback. Native date-popup test limitation remains documented.
 - Implemented complete Georgian-default / English / Russian frontend localization with semantic catalogs, independent locale persistence, header/mobile selector, interpolation/plural variants, entity display helpers, translated metadata and native form validation messages.
 - Preserved canonical names, IDs/slugs, prices, bookings and user-written reviews/custom content. Translated generic services/styles/descriptions without duplicating entities. Added local Georgian fonts while retaining the visual identity.
 - Browser QA caught and fixed streamed metadata reverting after refresh, Georgian profile overflow at 375px, and browsers missing Georgian Intl date/number data. A search-scope regression found during review was corrected; 55 original canonical queries retain their original result IDs.
@@ -261,10 +297,11 @@ Upload audit: no real credential candidates/URLs, env files, private keys/certif
 
 ## Next Recommended Steps
 
-1. Localization is complete. Continue the user’s next requested improvement in the existing repository; maintain memory and commit/push meaningful reviewed changes together.
-2. For future UI changes, add Georgian/English/Russian semantic messages together and rerun relevant checks. Preserve the current design and state.
-3. When requested, expand accessibility/interaction coverage or begin backend schema/permissions/authentication and transactional bookings. Payments/notifications/public deployment remain deferred.
+1. Continue the user's next requested improvement in this existing repository, reading this memory first and preserving data. Maintain KA/EN/RU messages and commit/push reviewed meaningful work.
+2. If a more realistic live hairstyle preview is requested, obtain an appropriately licensed professional head/upper-body asset with named hair/beard mesh variants. Replace through `style-scene.ts` and `public/models/`; retain canonical IDs, attribution, fallback, reduced motion and existing booking integration.
+3. Retest the native date popup in an ordinary browser, then consider physical touch/GPU failure and broader accessibility/performance profiling before production use.
+4. Backend permissions/authentication, transactional bookings, payments/notifications and public deployment remain deferred until requested.
 
 ## Last Updated
 
-**2026-09-16 (Asia/Tbilisi)** — Georgian-default, English and Russian frontend localization is complete and verified. All 26 tests, TypeScript, production build and HTTP checks pass; multilingual/responsive/persistence/booking checks passed. Memory and translation-authoring rules are current. Use the existing `main` / `origin/main` workflow and preserve port-3000 browser data.
+**2026-09-16 (Asia/Tbilisi)** — Interactive 3D studio and premium filters implemented; 29 tests, TypeScript, build and route/image verification passed. Memory/docs updated with actual behavior, model licensing and QA limits. This handoff accompanies the feature commit; inspect Git for the current commit and upstream. Preserve port-3000 browser data.

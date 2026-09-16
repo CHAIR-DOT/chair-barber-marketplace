@@ -14,6 +14,7 @@ import "./globals.css";
 import { LocaleProvider } from "@/i18n/provider";
 import { translate } from "@/i18n/translate";
 import { MockProvider } from "@/components/provider";
+import { StyleSelectionProvider } from "@/components/style-selection-provider";
 import { Navbar, Footer } from "@/components/shell";
 import { WebMcp } from "@/components/webmcp";
 import { CompareDock } from "@/components/compare";
@@ -34,13 +35,15 @@ export default function RootLayout({
     <html lang="ka" data-scroll-behavior="smooth">
       <body>
         <LocaleProvider>
-          <MockProvider>
-            <WebMcp />
-            <Navbar />
-            <main id="main">{children}</main>
-            <CompareDock />
-            <Footer />
-          </MockProvider>
+          <StyleSelectionProvider>
+            <MockProvider>
+              <WebMcp />
+              <Navbar />
+              <main id="main">{children}</main>
+              <CompareDock />
+              <Footer />
+            </MockProvider>
+          </StyleSelectionProvider>
         </LocaleProvider>
       </body>
     </html>

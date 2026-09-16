@@ -1,0 +1,115 @@
+import { defineMessages } from "../config";
+
+export const styleHeroMessages = defineMessages({
+  "hero.eyebrow": [
+    "Your look. Your next chapter.",
+    "შენი სტილი. ახალი დასაწყისი.",
+    "Твой стиль. Новая глава.",
+  ],
+  "hero.title": ["A style that's", "იპოვე", "Найди стиль,"],
+  "hero.titleAccent": ["all you.", "შენი სტილი.", "который твой."],
+  "hero.intro": [
+    "Explore your haircut and beard. Find the barber who brings your look to life.",
+    "შეარჩიე ვარცხნილობა და წვერი. იპოვე ბარბერი, რომელიც შენს იდეას რეალობად აქცევს.",
+    "Выбери стрижку и бороду. Найди барбера, который воплотит твой образ.",
+  ],
+  "hero.explore": [
+    "Create your look",
+    "შეარჩიე შენი სტილი",
+    "Создать свой образ",
+  ],
+  "hero.studio": ["The style studio", "სტილის სტუდია", "Студия стиля"],
+  "hero.choose": ["Make it yours", "შენს გემოზე", "По твоему вкусу"],
+  "hero.hair": ["Hair", "თმა", "Волосы"],
+  "hero.beard": ["Beard", "წვერი", "Борода"],
+  "hero.hairOptions": [
+    "Choose a haircut",
+    "შეარჩიე ვარცხნილობა",
+    "Выбери стрижку",
+  ],
+  "hero.beardOptions": [
+    "Choose a beard style",
+    "შეარჩიე წვერის სტილი",
+    "Выбери стиль бороды",
+  ],
+  "hero.selected": ["Your combination", "შენი კომბინაცია", "Твоё сочетание"],
+  "hero.find": ["Find my barber", "იპოვე ჩემი ბარბერი", "Найти моего барбера"],
+  "hero.rotate": [
+    "Drag to explore",
+    "შეატრიალე შეხებით",
+    "Потяни, чтобы повернуть",
+  ],
+  "hero.rotateLeft": [
+    "Rotate model left",
+    "მოდელი მარცხნივ შეატრიალე",
+    "Повернуть модель влево",
+  ],
+  "hero.rotateRight": [
+    "Rotate model right",
+    "მოდელი მარჯვნივ შეატრიალე",
+    "Повернуть модель вправо",
+  ],
+  "hero.resetView": ["Reset view", "საწყისი ხედვა", "Исходный ракурс"],
+  "hero.modelLabel": [
+    "Interactive male head. Drag horizontally or use the rotation buttons.",
+    "მამაკაცის ინტერაქტიული თავი. გადაუსვი ჰორიზონტალურად ან გამოიყენე შემობრუნების ღილაკები.",
+    "Интерактивная модель мужской головы. Проведи по горизонтали или используй кнопки поворота.",
+  ],
+  "hero.loading": [
+    "Preparing your studio…",
+    "სტუდია იტვირთება…",
+    "Готовим студию…",
+  ],
+  "hero.fallback": [
+    "Explore your look with the style selector.",
+    "შეარჩიე შენი იერი სტილების მენიუში.",
+    "Подбери образ в меню стилей.",
+  ],
+  "hero.photo": ["Photo view", "ფოტოს ხედი", "Фото"],
+  "hero.threeD": ["3D view", "3D ხედი", "3D-вид"],
+  "hero.previewNote": [
+    "Explore a 3D base model. Style photos are inspiration; selections do not change its hair or beard.",
+    "დაათვალიერე 3D მოდელი. სტილის ფოტოები შთაგონებისთვისაა; არჩევანი მოდელის თმას ან წვერს არ ცვლის.",
+    "Исследуй базовую 3D-модель. Фото — для вдохновения; выбор не меняет её волосы и бороду.",
+  ],
+  "hero.modelCredit": ["3D scan", "3D სკანი", "3D-скан"],
+  "hero.step1": ["Choose a look", "შეარჩიე სტილი", "Выбери образ"],
+  "hero.step2": ["Find your barber", "იპოვე ბარბერი", "Найди барбера"],
+  "hero.step3": ["Make it happen", "დაჯავშნე ვიზიტი", "Запишись на визит"],
+  "hero.beard.clean-shaven": [
+    "Clean shaven",
+    "სუფთად გაპარსული",
+    "Гладкое бритьё",
+  ],
+  "hero.beard.stubble": ["Stubble", "მოკლე ჯაგარი", "Щетина"],
+  "hero.beard.short-beard": ["Short beard", "მოკლე წვერი", "Короткая борода"],
+  "hero.beard.full-beard": ["Full beard", "სრული წვერი", "Полная борода"],
+  "hero.beard.goatee": ["Goatee", "ესპანური წვერი", "Эспаньолка"],
+  "hero.beard.defined": ["Defined beard", "კონტურული წვერი", "Чёткий контур"],
+  "styleBrief.title": [
+    "Your style inspiration",
+    "შენი სტილის იდეა",
+    "Твой будущий образ",
+  ],
+  "styleBrief.preference": [
+    "An inspiration note for your visit. Choose your service separately; this does not change the price.",
+    "იდეა შენი ვიზიტისთვის. მომსახურება ცალკე შეარჩიე — ეს არჩევანი ფასს არ ცვლის.",
+    "Идея для твоего визита. Услугу выбери отдельно; этот выбор не меняет цену.",
+  ],
+  "styleBrief.clear": [
+    "Clear style inspiration",
+    "სტილის იდეის გასუფთავება",
+    "Убрать выбранный образ",
+  ],
+  "homeFilters.title": [
+    "Your next great cut is close.",
+    "შენი ახალი სტილი ახლოსაა.",
+    "Отличная стрижка — рядом.",
+  ],
+  "homeFilters.subtitle": [
+    "Find trusted barbers and shops in your neighborhood.",
+    "იპოვე გამოცდილი ბარბერები და სალონები შენს უბანში.",
+    "Найди проверенных барберов и салоны в своём районе.",
+  ],
+  "homeFilters.more": ["More filters", "მეტი ფილტრი", "Больше фильтров"],
+});

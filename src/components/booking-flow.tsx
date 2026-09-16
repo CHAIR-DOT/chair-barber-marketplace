@@ -24,6 +24,7 @@ import {
 } from "@/lib/booking";
 import { useMock } from "./provider";
 import { BackLink, Badge, EmptyState, Rating, SkeletonCard } from "./ui";
+import { StyleSelectionBrief } from "./style-selection-brief";
 export interface BookingParams {
   shop?: string;
   barber?: string;
@@ -273,6 +274,7 @@ function BookingFlow({ initial }: { initial: BookingParams }) {
         </h1>
         <p>{tr("booking.heading.description")}</p>
       </div>
+      <StyleSelectionBrief />
       <div className="booking-progress" aria-label={tr("booking.progress")}>
         {STEPS.map((title, i) => (
           <button
