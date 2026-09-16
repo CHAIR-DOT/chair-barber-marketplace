@@ -24,7 +24,7 @@ Defined in `src/app/globals.css`.
 
 - Editorial display headings use the serif. Controls, cards, and data use the sans.
 - DM fonts and Noto Georgian fonts are bundled locally. Georgian characters use the Noto faces; Cyrillic falls back to system Georgia/Arial as needed. Keep the original serif/sans distinction across all three scripts. Georgian headings have a slightly taller line height for legibility.
-- Desktop hero: 70px maximum; mobile hero: 48px. Route headings scale from 38px to 55px. Body: 16px; supporting descriptions and controls: generally 12–14px; smaller text is secondary metadata.
+- Desktop hero maximum: English 84px, Georgian 70px, Russian 72px; phone headings at ≤450px use 48px, 42px and 44px respectively. Route headings scale from 38px to 55px. Body: 16px; supporting descriptions and controls: generally 12–14px; smaller text is secondary metadata.
 - Main layout: maximum 1280px with responsive side gutters of 48px, 28px, 20px, and 18px.
 - Section rhythm: 30–60px; internal groups: 12–28px. Use consistent spaces between labels, fields, and actions.
 
@@ -37,7 +37,7 @@ Defined in `src/app/globals.css`.
 - Ratings: star plus numeric value and review count; breakdowns derive from reviews.
 - Dialogs: native `<dialog>` for focus containment, Escape dismissal, and focus restoration. Background scrolling locks while open.
 - Favorites: immediate pressed state, accessible save/unsave labels, local persistence.
-- Motion: short transform/color transitions; reduced-motion preferences suppress animation.
+- Motion: short control transitions and restrained, slow decorative hero motion. Reduced-motion preferences suppress the hero animation while keeping its still composition visible.
 - Keyboard: visible focus rings, skip link, labeled controls, accessible gallery and review rating controls.
 - Language selector: globe, current endonym and chevron with a viewport-clamped custom listbox. Local SVG GE/GB/RU flags, selected check and visible focus; arrows/Home/End/typeahead, Enter, Escape and Tab. Dark glass on the home hero, light on other routes; mobile remains inside the navigation menu.
 
@@ -57,14 +57,16 @@ Defined in `src/app/globals.css`.
 - Booking summaries move below the flow on tablets and phones; the review step always shows the full summary.
 - Profile booking actions become a fixed bottom bar on narrow screens.
 - Dashboard side navigation becomes a horizontal compact navigation row; data tables scroll within their own region.
-- Use 375, 768, 1024, and 1440px as review widths in all three languages. Check long Georgian and Russian labels, buttons, profile tabs, and navigation. Allow wrapping or contained tab scrolling while preserving the existing composition; avoid horizontal page overflow. Actual check results belong in `VERIFICATION.md`.
+- Use 375, 430, 768, 1024, 1440, and 1920px as review widths in all three languages. Check long Georgian and Russian labels, buttons, profile tabs, and navigation. Allow wrapping or contained tab scrolling while preserving the existing composition; avoid horizontal page overflow. Actual check results belong in `VERIFICATION.md`.
 
-## Interactive homepage studio
+## Cinematic homepage hero
 
-The top hero uses charcoal `#171b18`, warm gold `#e2bf85`, cream typography and a restrained translucent configurator. The existing navigation keeps its structure and changes color only on the homepage. The lower marketplace keeps its original sections/cards and light palette.
+The top hero combines charcoal, warm bronze/gold accents and cream typography with a decorative barber atelier composition. A black quilted leather chair anchors the image, with an arched mirror and neatly arranged grooming tools. The composition is integrated into the dark section; the lower marketplace keeps its existing sections, cards, filters and light palette. Preserve the improved language selector and header interactions.
 
-Desktop: copy, central 3D portrait, panel. Tablet: copy above portrait with adjacent panel. At ≤650px the portrait and panel stack, with all three choices visible in a compact grid. Use translated labels and visible focus on all category, rotation, thumbnail and CTA controls. The real category controls duplicate the hotspots for accessibility. Avoid continuous animation; respect reduced motion and never lock hero scrolling.
+Copy and discovery links remain readable independently of the artwork. The heading and supporting text come from the `homeHero` messages in all three languages. A slow CSS camera drift, restrained warm highlights and sparse atmospheric detail add depth without implying interaction. Do not add mannequin controls, style selectors, hotspots or player chrome. Respect reduced motion with a still image, and pause decorative motion outside the viewport or in a hidden document.
 
-Hair and beard choices toggle three independently authored groups per category on one CC0 human. A shared registry drives labels and same-human render thumbnails. Preserve the illustrative-style note: this temporary asset does not yet meet the photographic reference. Matching Photo View appears during loading and on failure, and is also a manual option. Keep camera framing stable across the nine combinations, and use the same portrait in every preview. See `STYLE_ASSET_GUIDE.md`. The hero grows with content; model tools and credits remain in normal flow.
+Keep important chair and station details visible when changing responsive framing. Hero dimensions must grow with translated copy; preserve clear CTA spacing, normal page scrolling and a smooth dark-to-light transition. Test short screens, menu overlap, long Georgian/Russian labels and the six review widths. The exact files, fallback sequence and replacement procedure are in [HERO_VISUAL_GUIDE.md](HERO_VISUAL_GUIDE.md).
+
+## Discovery filters
 
 `PremiumSelect` uses a labeled combobox/listbox with keyboard navigation, selected checks and outside dismissal. All filter chips and counts derive from real state. GEL max-price remains 15–100 / step 5; resetting filters keeps the selected sort. Use scoped component CSS instead of changing marketplace cards.

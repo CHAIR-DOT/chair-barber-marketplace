@@ -1,6 +1,34 @@
 # Verification record
 
-Latest checks: the 3×3 human asset replacement and language dropdown, 16 September 2026. All later sections are historical evidence for earlier implementations.
+Latest checks: the cinematic motion-poster replacement, 16 September 2026. Sections below that task are historical evidence for retired/earlier implementations.
+
+## Cinematic motion-poster replacement — 16 September 2026
+
+### Automated and preservation checks
+
+- **29/29 tests pass**, including 9 domain, 17 localization and 3 persisted-style validation tests. Obsolete model/asset tests removed; remaining state tests preserve valid canonical IDs and old saved briefs.
+- **TypeScript and production build pass**, 57 generated pages. No lint script configured. Initial restricted compiler stalled; stopped it and the approved build passed.
+- Production HTTP checks pass **55 valid routes, 5 expected unknown-route 404s, 31 local images** (25 existing photos, 3 flags, 3 hero renditions). Expected invalid static routes still emit the pre-existing Next `NoFallbackError` diagnostics.
+- New hero images: 1536×1024 /171,316 B; 960×640 /60,692 B; 480×320 /14,518 B. Same image/aspect ratio, total246,526 B; actual chosen rendition depends on width. Hashes/provenance in HERO_VISUAL_GUIDE.md. No new dependencies; removed Three.js/types, glTF Transform and Meshoptimizer; retained sharp.
+- Lower JSX from `<PremiumFilterBar />` onward is byte-identical. All31 lower-filter rules/declarations/media contexts are identical after extraction. Language selector TSX/CSS and three flag files unchanged. Mock data/provider, booking logic, discovery, cards, routes, original AGENTS and synced material unchanged. Only now-unused style-provider APIs/hero URL helper removed; saved beard/submitted fields remain.
+
+### Browser checks
+
+- Hero measured in **36 cases**: KA/EN/RU ×375/430/768/1024/1440/1920 ×667/800. No horizontal page overflow or clipped tested heading/intro/CTA/footer/signature; main image ready in all, zero canvas. Phone and desktop screenshots reviewed; full-chair desktop framing and mobile portrait crop refined. Final desktop edge fade addresses visible source-image seam.
+- Language menus checked in **18 cases**: three locales ×six widths at667px height. Correct loaded GE/GB/RU flags, selected language, no offscreen popup and working Escape dismissal. Mobile menu opened/closed correctly. Old Giorgi favorite stayed saved through language changes and discovery; no user data was reset.
+- CSS camera transform sampled during repeated visual checks spanning over100seconds; observed scale/drift progression. CSS uses continuous alternate20s endpoints (40s full camera/light cycle), so there is no timeline reset jump. This is subtle camera/light treatment, not independently moving tools or chair assembly.
+- Scrolled hero completely offscreen: `data-motion=paused` and CSS animation play state paused. Returned to top: running. Document-hidden pause is source-reviewed; the in-app background tab reports itself visible, so no OS-level hidden-tab claim.
+- Temporary localhost503 proxy failed both main rendition URLs while allowing the480px poster. Foreground image was hidden, motion paused and matching static artwork visibly remained. Hero discovery link reached `/discover`. A later successful responsive image load resets the failure flag (reviewed fix).
+- Temporary reduced-motion proxy activated the actual CSS media rules and returned a matching media condition to JS. Camera animation/transform were `none`, light/dust `display:none`, main image visible and fade0s. Hero salon link reached `/shops`. This is emulated response testing, not a change to the user's macOS accessibility settings.
+- Final production recheck at 1024/768/1920 confirmed the desktop edge fade and matching `contain/right center` main/poster framing; the deliberately failed image still showed the same composition. Fresh normal production console warnings/errors: **[]**. Failure-origin503s are intentional. No technical failure message, player controls, mannequin UI, sound or canvas remains.
+
+### Limits and cleanup
+
+Physical phones, real FPS/power/memory, formal screen-reader acceptance and native OS reduced-motion settings are not measured. Total-image failure and no-JS poster paths are source-reviewed. New hero links/navigation and existing domain tests passed; this task did not submit bookings or rerun every dashboard mutation. Earlier detailed booking/native-picker evidence below remains historical.
+
+Temporary verification proxies/listeners/tabs are cleaned up after final validation. Original localhost3000 preview and user storage stay intact. No raw generated PNG, test proxy, source cache, installer or credential is included. See HERO_VISUAL_GUIDE.md for the current source/prompt/fallback contract.
+
+---
 
 ## Human asset replacement — 16 September 2026
 
@@ -26,7 +54,7 @@ Latest checks: the 3×3 human asset replacement and language dropdown, 16 Septem
 
 A temporary loopback-only proxy on 3012 deliberately returned 503 for the GLB and the first default preview request. Automatic fallback removed the canvas and showed the localized preview error. Clicking Retry loaded the exact matching image with its retry query and removed the error. Changing to Taper Fade + Full beard loaded its correct photo and the CTA opened the matching discovery result. No test-failure switch or proxy endpoint is in production code.
 
-**The photographic target is not achieved.** The new legal temporary model has open eyes and credible anatomy, but skin is generic, pore detail is authored noise, hairlines can look geometric, and beard cards are coarse. There was no gross detached groom or displaced identity in inspected views, but this is not professional groom/skin acceptance. See STYLE_ASSET_GUIDE.md and scripts/style-assets/SOURCES.md for the required future asset work.
+**The photographic target is not achieved.** The new legal temporary model has open eyes and credible anatomy, but skin is generic, pore detail is authored noise, hairlines can look geometric, and beard cards are coarse. There was no gross detached groom or displaced identity in inspected views, but this is not professional groom/skin acceptance. Those now-retired guides and assets are archived in commit `aed398e`; the current direction is HERO_VISUAL_GUIDE.md.
 
 Physical phones, hardware WebGL loss, reduced-memory hardware, real FPS/GPU-memory measurements and a formal screen-reader audit were not available. Save-Data/device-memory and texture-decode failure paths were code-reviewed; the deliberate network failure was exercised. The older native date-picker tool limitation remains. No Lighthouse or real-device performance score is claimed.
 

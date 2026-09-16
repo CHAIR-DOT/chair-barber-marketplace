@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { shops, styles } from "@/lib/data";
-import { InteractiveStyleHero } from "@/components/interactive-style-hero";
+import { BarberHero } from "@/components/barber-hero";
 import { PremiumFilterBar } from "@/components/premium-filter-bar";
 import { useMock } from "@/components/provider";
 import { BarberCard, ShopCard, StyleCard } from "@/components/cards";
@@ -12,7 +12,7 @@ export default function Home() {
   const { t } = useI18n();
   return (
     <>
-      <InteractiveStyleHero />
+      <BarberHero />
       <PremiumFilterBar />
       <div className="container quick-discovery">
         <span>{t("home.inspiration")}</span>

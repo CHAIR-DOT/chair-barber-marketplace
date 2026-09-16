@@ -12,6 +12,7 @@ import { neighborhoods, services } from "@/lib/data";
 import { today } from "@/lib/dates";
 import { useI18n } from "@/i18n/provider";
 import { PremiumSelect } from "./premium-select";
+import "./premium-home-filter.css";
 
 export function PremiumFilterBar() {
   const { t, label, serviceName, number } = useI18n();

@@ -80,10 +80,3 @@ export function serializeStyleSelection(selection: StyleSelection): string {
     selection: normalizeStyleSelection(selection),
   });
 }
-
-export function discoveryStyleHref(hairStyleId: string): string {
-  const id = isHairStyleId(hairStyleId)
-    ? hairStyleId
-    : DEFAULT_STYLE_SELECTION.hairStyleId;
-  return `/discover?${new URLSearchParams({ style: id }).toString()}`;
-}

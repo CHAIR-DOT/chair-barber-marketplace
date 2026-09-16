@@ -1,0 +1,515 @@
+.barber-hero {
+  --atelier-gold: #e0be85;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #f3efe6;
+  background: #151816;
+}
+.barber-hero-visual {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+.atelier-architecture {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 35%, #5d453040, transparent 55%),
+    linear-gradient(100deg, #151816 25%, #1c211d, #171b18);
+}
+.atelier-architecture::after {
+  content: "";
+  position: absolute;
+  right: 14%;
+  top: 10%;
+  height: 70%;
+  width: 25%;
+  border: 1px solid #cfa76b26;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 0 75px #9e743011;
+}
+.atelier-camera {
+  position: absolute;
+  inset: -2% 0 -2% auto;
+  width: min(1180px, 84%);
+  mask-image: linear-gradient(90deg, transparent, #000 16%);
+  transform-origin: 66% 55%;
+  animation: atelier-camera 20s ease-in-out infinite alternate;
+}
+.atelier-poster,
+.atelier-image,
+.atelier-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right center;
+}
+.atelier-poster {
+  background: url("/images/hero/barber-atelier-poster.webp") right center /
+    contain no-repeat;
+}
+.atelier-image {
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+.atelier-image.is-ready {
+  opacity: 1;
+}
+.atelier-light {
+  position: absolute;
+  inset: -20% -5%;
+  opacity: 0.13;
+  background: linear-gradient(
+    112deg,
+    transparent 48%,
+    #eedcb62b 56%,
+    transparent 64%
+  );
+  transform-origin: 60% 0;
+  animation: atelier-light 20s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+.atelier-dust {
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+}
+.atelier-dust i {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #e0c59a;
+  box-shadow: 0 0 8px #e0c59a;
+  top: 35%;
+  left: 62%;
+  animation: atelier-dust 10s ease-in-out infinite alternate;
+}
+.atelier-dust i:nth-child(2) {
+  left: 81%;
+  top: 57%;
+  animation-delay: -4s;
+}
+.atelier-dust i:nth-child(3) {
+  left: 52%;
+  top: 65%;
+  animation-delay: -7s;
+}
+.atelier-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      #111613f5,
+      #111613e8 21%,
+      #11161392 40%,
+      transparent 64%
+    ),
+    linear-gradient(
+      0deg,
+      #111613 0%,
+      #11161333 18%,
+      transparent 45%,
+      #15181626 100%
+    );
+}
+.barber-hero-inner {
+  position: relative;
+  min-height: 690px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  grid-template-rows: 1fr auto;
+  gap: 28px;
+}
+.barber-hero-copy {
+  position: relative;
+  align-self: center;
+  padding: 55px 0 44px;
+  max-width: 480px;
+}
+.atelier-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--atelier-gold);
+  font-size: 10px;
+  line-height: 1.7;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.atelier-eyebrow > span {
+  width: 30px;
+  height: 1px;
+  flex: none;
+  background: currentColor;
+}
+.barber-hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(58px, 5.4vw, 84px);
+  font-weight: 400;
+  line-height: 1.07;
+  letter-spacing: -0.035em;
+  margin: 27px 0 25px;
+}
+.barber-hero h1 em {
+  display: block;
+  color: var(--atelier-gold);
+  font-weight: 400;
+}
+:lang(ka) .barber-hero h1 {
+  font-size: clamp(47px, 4.7vw, 70px);
+  line-height: 1.24;
+  letter-spacing: -0.025em;
+}
+:lang(ru) .barber-hero h1 {
+  font-size: clamp(50px, 4.7vw, 72px);
+  line-height: 1.13;
+}
+.barber-hero-intro {
+  color: #c7cbc3;
+  font-size: 14px;
+  line-height: 1.9;
+  max-width: 365px;
+  margin: 0 0 30px;
+}
+.barber-hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.barber-hero-primary {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  min-height: 52px;
+  padding: 15px 24px;
+  border-radius: 5px;
+  background: linear-gradient(110deg, #edd4a4, #d7b27a);
+  color: #20271f;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 600;
+  transition: filter 0.2s;
+}
+.barber-hero-primary:hover {
+  filter: brightness(1.08);
+}
+.barber-hero-actions svg {
+  flex: none;
+}
+.barber-hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 44px;
+  color: #e1e2d9;
+  font-size: 12px;
+  line-height: 1.5;
+  text-decoration: underline;
+  text-decoration-color: #9b9d825c;
+  text-underline-offset: 7px;
+}
+.barber-hero-secondary:hover {
+  color: var(--atelier-gold);
+}
+.atelier-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 36px;
+  color: #a7afa4;
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+.atelier-signature {
+  justify-self: end;
+  align-self: end;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 22px;
+  color: #dbc69f;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.5;
+  text-align: right;
+  max-width: 280px;
+}
+.atelier-signature-line {
+  height: 1px;
+  width: 35px;
+  background: #c9a36599;
+  flex: none;
+}
+.barber-hero-footer {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid #dfcda21c;
+  padding: 21px 0 24px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.atelier-detail {
+  color: #c2c8bc;
+  letter-spacing: 0.1em;
+}
+.atelier-invitation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #cdbb9c;
+}
+.atelier-invitation > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c9ad7b;
+}
+.barber-hero :is(a, button):focus-visible {
+  outline: 2px solid #ffe3ad;
+  outline-offset: 5px;
+}
+.barber-hero :is(.atelier-camera, .atelier-light, .atelier-dust i) {
+  animation-play-state: paused;
+}
+.barber-hero[data-motion="running"]
+  :is(.atelier-camera, .atelier-light, .atelier-dust i) {
+  animation-play-state: running;
+}
+@keyframes atelier-camera {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.035) translate3d(-0.6%, 0.2%, 0);
+  }
+}
+@keyframes atelier-light {
+  from {
+    transform: translate3d(-3%, 0, 0) rotate(-4deg);
+    opacity: 0.1;
+  }
+  to {
+    transform: translate3d(3%, 0, 0) rotate(4deg);
+    opacity: 0.32;
+  }
+}
+@keyframes atelier-dust {
+  from {
+    transform: translate3d(0, 5px, 0);
+    opacity: 0.1;
+  }
+  to {
+    transform: translate3d(8px, -14px, 0);
+    opacity: 0.5;
+  }
+}
+/* Retain the existing home-header and language-dropdown palette. */
+body:has(.barber-hero) .navbar {
+  background: #171b18;
+  color: #e6e6db;
+  border-color: #d4ccb120;
+}
+body:has(.barber-hero) .navbar .logo span {
+  color: #dfbd84;
+}
+body:has(.barber-hero) .navbar .header-book {
+  background: #e2c18b;
+  color: #252b20;
+}
+body:has(.barber-hero) .navbar nav a:hover {
+  color: #e2c18b;
+}
+body:has(.barber-hero) .navbar .mobile-nav {
+  background: #171b18;
+  color: #e6e6db;
+  border-color: #d4ccb130;
+}
+body:has(.barber-hero) .navbar .icon-button {
+  color: #e6e6db;
+  background: transparent;
+  border-color: #d4ccb14d;
+}
+body:has(.barber-hero) .navbar :focus-visible {
+  outline-color: #e2c18b;
+}
+@media (min-width: 1600px) {
+  .barber-hero-inner {
+    min-height: 750px;
+  }
+  .barber-hero-copy {
+    max-width: 490px;
+  }
+}
+@media (max-width: 1100px) and (min-width: 801px) {
+  .barber-hero-inner {
+    min-height: 635px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  }
+  .barber-hero h1 {
+    font-size: 59px;
+  }
+  :lang(ka) .barber-hero h1 {
+    font-size: 49px;
+  }
+  :lang(ru) .barber-hero h1 {
+    font-size: 51px;
+  }
+  .barber-hero-actions {
+    gap: 15px;
+  }
+  .atelier-camera {
+    width: 90%;
+  }
+}
+@media (max-width: 800px) {
+  .barber-hero-inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    gap: 0;
+  }
+  .barber-hero-copy {
+    width: 100%;
+    max-width: 520px;
+    align-self: flex-start;
+    padding: 37px 0 0;
+  }
+  .barber-hero h1 {
+    font-size: 58px;
+    margin: 20px 0 17px;
+  }
+  :lang(ka) .barber-hero h1 {
+    font-size: 47px;
+  }
+  :lang(ru) .barber-hero h1 {
+    font-size: 50px;
+  }
+  .barber-hero h1 em {
+    display: inline;
+    margin-left: 0.18em;
+  }
+  .barber-hero-intro {
+    max-width: 420px;
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 22px;
+  }
+  .barber-hero-actions {
+    gap: 20px;
+  }
+  .barber-hero-primary {
+    padding: 13px 19px;
+    min-height: 48px;
+  }
+  .atelier-location {
+    margin-top: 23px;
+  }
+  .barber-hero-visual {
+    top: auto;
+    height: 510px;
+  }
+  .atelier-camera {
+    inset: 0;
+    width: 100%;
+    mask-image: none;
+  }
+  .atelier-poster,
+  .atelier-image img {
+    object-fit: cover;
+    object-position: 64% center;
+    background-position: 64% center;
+    background-size: cover;
+  }
+  .atelier-shade {
+    background:
+      linear-gradient(
+        180deg,
+        #151816 0%,
+        #1518164d 20%,
+        transparent 40%,
+        #11161326 72%,
+        #111613 94%
+      ),
+      linear-gradient(90deg, #15181633, transparent 50%);
+  }
+  .atelier-signature {
+    align-self: flex-end;
+    margin-top: 280px;
+    padding-bottom: 25px;
+    font-size: 18px;
+    max-width: 245px;
+  }
+  .barber-hero-footer {
+    padding: 19px 0 22px;
+    width: 100%;
+  }
+}
+@media (max-width: 450px) {
+  .barber-hero h1 {
+    font-size: 48px;
+  }
+  :lang(ka) .barber-hero h1 {
+    font-size: 42px;
+  }
+  :lang(ru) .barber-hero h1 {
+    font-size: 44px;
+  }
+  .barber-hero h1 em {
+    display: block;
+    margin-left: 0;
+  }
+  .barber-hero-actions {
+    gap: 17px;
+  }
+  .barber-hero-primary {
+    gap: 18px;
+    padding: 13px 17px;
+    font-size: 11px;
+  }
+  .barber-hero-secondary {
+    font-size: 11px;
+    gap: 7px;
+  }
+  .atelier-detail {
+    max-width: 160px;
+    font-size: 9px;
+  }
+  .atelier-invitation {
+    max-width: 125px;
+    font-size: 9px;
+  }
+  .atelier-signature {
+    margin-top: 240px;
+  }
+  .barber-hero-visual {
+    height: 470px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .barber-hero :is(.atelier-camera, .atelier-light, .atelier-dust i) {
+    animation: none !important;
+    transform: none;
+  }
+  .barber-hero .atelier-image,
+  .barber-hero a {
+    transition: none;
+  }
+  .atelier-light,
+  .atelier-dust {
+    display: none;
+  }
+}

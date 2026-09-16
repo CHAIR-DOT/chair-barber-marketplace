@@ -1,6 +1,6 @@
 # CHAIR. — Barber marketplace prototype
 
-An interactive style studio and photography-led marketplace for finding a barber in Tbilisi. Built with Next.js App Router, React, TypeScript, Tailwind CSS, Lucide, and small reusable UI components. Everything is local and mocked.
+A premium barber marketplace in Tbilisi, with a cinematic animated homepage poster and photography-led discovery. Built with Next.js App Router, React, TypeScript, Tailwind CSS, Lucide, and small reusable UI components. Everything is local and mocked.
 
 Private source repository: [CHAIR-DOT/chair-barber-marketplace](https://github.com/CHAIR-DOT/chair-barber-marketplace). Primary branch: `main`; remote: `origin`.
 
@@ -24,7 +24,7 @@ npm ci
 npm run dev
 ```
 
-Open **http://127.0.0.1:3000**. The development server binds only to this computer. Photos, the licensed 3D model, and fonts are included locally, so the running app does not depend on external asset services.
+Open **http://127.0.0.1:3000**. The development server binds only to this computer. Hero artwork, marketplace photos, flags, and fonts are included locally, so the running app does not depend on external asset services.
 
 ```bash
 npm run typecheck
@@ -77,22 +77,24 @@ src/i18n/                KA/EN/RU locale context, translation, display helpers, 
 src/i18n/messages/       Semantic dictionaries grouped by interface area and fixture content
 src/components/language-selector.tsx   Accessible desktop/mobile language selector
 src/lib/i18n.ts          Compatibility exports for the active localization system
-public/images/           Local licensed illustrative photography
+public/images/           Local hero artwork, licensed illustrative photography, and SVG flags
+public/images/hero/      Responsive cinematic poster images
+src/components/barber-hero.tsx   Decorative hero composition and motion lifecycle
 tests/domain.test.ts     Data relationships and booking/review domain checks
 tests/i18n.test.ts       Dictionary coverage, formatting, fallback, and canonical-data preservation
 ```
 
 The store owns mutations; screens consume shared entities and actions. Services have global definitions and per-barber price/eligibility relationships. Appointments snapshot price and duration. Reviews reference the customer, barber, and a completed appointment. The UI mounts after local storage is read, avoiding stale editor values and time-dependent server/client hydration differences.
 
-## Homepage style studio
+## Cinematic homepage hero
 
-The top homepage uses a lazy-loaded Three.js scene with one temporary CC0 MakeHuman male, open eyes, warm lighting, bounded drag/keyboard rotation and Hair/Beard hotspots. Three hair styles and three beard styles toggle actual independently authored geometry. The CTA opens existing `/discover?style=...`; an inspiration brief follows into the normal booking flow without changing services or prices.
+The top homepage is a decorative motion poster: a black quilted leather barber chair, bronze metalwork, an arched mirror and an orderly grooming station in warm light. Local generated artwork provides the composition; restrained CSS movement adds a slow camera drift, light and atmosphere. It is part of the layout, with localized copy and links to barber discovery and salons.
 
-Choices live in `chair.style.v1` **sessionStorage**, independently of mock data and language. They survive same-tab navigation/refresh and locale changes. Unsupported older marketplace choices remain stored until deliberate interaction; the hero explains its supported preview. The broader marketplace still has its original catalog.
+`src/components/barber-hero.tsx` and its scoped CSS own the hero. No video player, canvas renderer or animation library is needed. The image remains visible with reduced motion, and animation pauses while the hero is offscreen or the document is hidden. Local static artwork supplies loading and media-failure fallbacks. Asset provenance, replacement instructions and the precise motion/fallback behavior are documented in [HERO_VISUAL_GUIDE.md](HERO_VISUAL_GUIDE.md).
 
-`src/lib/style-assets.ts` drives labels, variant groups and all nine combination previews. `interactive-style-hero.tsx` owns presentation; dynamically imported `style-scene.ts` loads one compressed GLB and toggles cached groups. A same-human render appears while loading and in manual/automatic Photo View. The temporary face and groom cards remain below the supplied photographic target. The renderer caps DPR, renders on demand, pauses offscreen and cleans up resources. Asset/license/replacement details are in [STYLE_ASSET_GUIDE.md](STYLE_ASSET_GUIDE.md).
+The mannequin, grooming selectors, hotspots, rotation controls, Photo View and their renderer/assets/authoring pipeline have been removed. Three.js, its types, glTF Transform and Meshoptimizer dependencies are removed. The existing style inspiration provider/brief and `chair.style.v1` sessionStorage are retained for previously selected inspiration in discovery and booking. The hero does not create or change that state.
 
-The existing light marketplace content remains intact. `PremiumSelect` and scoped filter CSS add keyboard-accessible dropdowns, price fill/reset, real-state chips/counts and a mobile bottom sheet. The home More filters button passes current search fields plus `filters=open` to open that sheet on mobile. Existing filter meanings and sorting are unchanged.
+The improved flag language selector and existing light marketplace content remain intact. `PremiumSelect` and scoped filter CSS retain keyboard-accessible dropdowns, price fill/reset, real-state chips/counts and a mobile bottom sheet. The home More filters button passes current search fields plus `filters=open` to open that sheet on mobile. Existing filter meanings and sorting are unchanged.
 
 ## Localization
 
@@ -115,6 +117,7 @@ The preference is stored under **`chair.locale.v1`**, separately from applicatio
 | `src/i18n/messages/journey.ts`   | Booking, authentication, customer accounts, shared dashboard navigation                              |
 | `src/i18n/messages/workspace.ts` | Barber management, reviews, portfolio                                                                |
 | `src/i18n/messages/entities.ts`  | Generic service/style names, fixture descriptions, known role/location/status labels                 |
+| `src/i18n/messages/style-hero.ts` | Current `homeHero` copy, shared legacy beard/inspiration labels and lower homepage filters          |
 | `src/i18n/messages/index.ts`     | Combines all message groups for each locale                                                          |
 
 Display uses `Intl` with `ka-GE`, `en-GB`, and `ru-RU`. If a browser lacks Georgian locale data, `src/i18n/dates.ts` uses the bundled month and weekday names in `messages/calendar.ts`, while `src/i18n/numbers.ts` preserves numeric precision, signs, and percentages with Georgian separators and grouping. The number helper is shared by display values, GEL amounts, and translation interpolation; it does not import dictionaries. Supported native locale formatting stays unchanged. Currency remains GEL with **₾** in every language. Dates remain in **Asia/Tbilisi**; stored `YYYY-MM-DD` dates and time values are unchanged. Native date/time picker panels and other browser-owned controls may follow browser or operating-system language. App labels, validation messages, date cards, and formatted date text use the selected app language.
@@ -143,7 +146,7 @@ Entity display helpers translate supported fixture fields only when the entity I
 - Slot rules use Tbilisi time, working hours, days off, blocked start times, service eligibility/duration, and overlapping local appointments. “Any barber” resolves to a named eligible barber. Booking dates extend 30 days ahead.
 - Review eligibility is simulated: only a completed appointment for the demo customer can receive a review, once. Optional dimension ratings are separate from overall rating.
 - Profile views are explicitly illustrative. Other dashboard booking/revenue totals derive from sample appointments; no money is collected.
-- Photos are illustrative stock images. They are not the work, identities, or premises of the fictional profiles. Sources and credits are in `ASSET-SOURCES.md`.
+- Marketplace photos are illustrative stock images. The hero is a generated decorative scene. Neither establishes the real work, identities, premises or endorsement of fictional profiles. Sources and credits are in `ASSET-SOURCES.md`.
 - No backend, database, production API, real authentication, payment processing, SMS, email, analytics, or remote uploads exist.
 
 Photo uploads accept JPG, PNG, or WebP up to 600 KB and are saved as local data URLs. This is appropriate only for a small prototype. Booking availability is not coordinated across users or devices; backend transactions are needed before real reservations.
@@ -152,7 +155,7 @@ The optional, feature-detected WebMCP `set_saved_barber` tool uses the same favo
 
 ## Verification
 
-`npm test` includes domain, localization, actual model/texture/preview integrity checks, including canonical style IDs, temporary persistence validation and safe corrupt-state handling. It covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
+`npm test` includes domain and localization checks, canonical style IDs, temporary persistence validation and safe corrupt-state handling. It covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
 
 Localization tests also cover dictionary parity and placeholders, default/fallback behavior, critical translated actions, plural and numeric formatting, unchanged canonical records, custom content, portfolio title rules, dates/GEL, and localized domain errors.
 
@@ -163,9 +166,3 @@ The browser verification log is in `VERIFICATION.md`. The design tokens and comp
 See `BACKEND_PLAN.md`: PostgreSQL/Supabase schema, server-enforced permissions, transactional bookings, verified reviews, object storage, payments, and notification jobs. Replace the local action boundary gradually while retaining the UI components.
 
 Framework references: [Next.js documentation](https://nextjs.org/docs), [Tailwind CSS for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs).
-
-## Human style studio
-
-The hero uses one temporary CC0 MakeHuman/MPFB model, three hair styles and three beard styles. Each changes actual loaded geometry. Nine same-human renders power thumbnails and manual/automatic Photo View. The face and strand quality remain below the supplied photorealistic target.
-
-Read [STYLE_ASSET_GUIDE.md](STYLE_ASSET_GUIDE.md) for exact model/preview/registry locations, reproduction, budgets and adding a style. [Asset sources](scripts/style-assets/SOURCES.md) records the researched alternatives and licenses. The old scan/procedural variants are removed; marketplace styles and saved data remain independent.

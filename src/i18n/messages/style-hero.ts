@@ -1,101 +1,43 @@
 import { defineMessages } from "../config";
 
 export const styleHeroMessages = defineMessages({
-  "hero.eyebrow": [
-    "Your look. Your next chapter.",
-    "შენი სტილი. ახალი დასაწყისი.",
-    "Твой стиль. Новая глава.",
+  "homeHero.eyebrow": [
+    "THE ART OF A GOOD CUT",
+    "კარგი ვარცხნილობის ხელოვნება",
+    "ИСКУССТВО ХОРОШЕЙ СТРИЖКИ",
   ],
-  "hero.title": ["A style that's", "იპოვე", "Найди стиль,"],
-  "hero.titleAccent": ["all you.", "შენი სტილი.", "который твой."],
-  "hero.intro": [
-    "Explore your haircut and beard. Find the barber who brings your look to life.",
-    "შეარჩიე ვარცხნილობა და წვერი. იპოვე ბარბერი, რომელიც შენს იდეას რეალობად აქცევს.",
-    "Выбери стрижку и бороду. Найди барбера, который воплотит твой образ.",
+  "homeHero.title": ["Your next", "შენი ახალი", "Твоя новая"],
+  "homeHero.titleAccent": ["great cut.", "სტილი.", "стрижка."],
+  "homeHero.intro": [
+    "Exceptional barbers. Thoughtful spaces. Find your place, and make time for yourself.",
+    "გამორჩეული ბარბერები. დახვეწილი გარემო. იპოვე შენი ადგილი და დაუთმე დრო საკუთარ თავს.",
+    "Отличные барберы. Продуманные пространства. Найди своё место и удели время себе.",
   ],
-  "hero.explore": [
-    "Create your look",
-    "შეარჩიე შენი სტილი",
-    "Создать свой образ",
+  "homeHero.primary": ["Find a barber", "იპოვე ბარბერი", "Найти барбера"],
+  "homeHero.secondary": [
+    "Explore salons",
+    "აღმოაჩინე სალონები",
+    "Посмотреть салоны",
   ],
-  "hero.studio": ["The style studio", "სტილის სტუდია", "Студия стиля"],
-  "hero.choose": ["Make it yours", "შენს გემოზე", "По твоему вкусу"],
-  "hero.hair": ["Hair", "თმა", "Волосы"],
-  "hero.beard": ["Beard", "წვერი", "Борода"],
-  "hero.hairOptions": [
-    "Choose a haircut",
-    "შეარჩიე ვარცხნილობა",
-    "Выбери стрижку",
+  "homeHero.location": [
+    "Tbilisi, Georgia",
+    "თბილისი, საქართველო",
+    "Тбилиси, Грузия",
   ],
-  "hero.beardOptions": [
-    "Choose a beard style",
-    "შეარჩიე წვერის სტილი",
-    "Выбери стиль бороды",
+  "homeHero.caption": [
+    "A little time. A better you.",
+    "ცოტა დრო. მეტი თავდაჯერება.",
+    "Немного времени. Больше уверенности.",
   ],
-  "hero.selected": ["Your combination", "შენი კომბინაცია", "Твоё сочетание"],
-  "hero.find": ["Find my barber", "იპოვე ჩემი ბარბერი", "Найти моего барбера"],
-  "hero.rotate": [
-    "Drag to explore",
-    "შეატრიალე შეხებით",
-    "Потяни, чтобы повернуть",
+  "homeHero.detail": [
+    "Craft. Care. Confidence.",
+    "ოსტატობა. ზრუნვა. თავდაჯერება.",
+    "Мастерство. Забота. Уверенность.",
   ],
-  "hero.rotateLeft": [
-    "Rotate model left",
-    "მოდელი მარცხნივ შეატრიალე",
-    "Повернуть модель влево",
-  ],
-  "hero.rotateRight": [
-    "Rotate model right",
-    "მოდელი მარჯვნივ შეატრიალე",
-    "Повернуть модель вправо",
-  ],
-  "hero.resetView": ["Reset view", "საწყისი ხედვა", "Исходный ракурс"],
-  "hero.modelLabel": [
-    "Interactive male head. Drag horizontally or use the rotation buttons.",
-    "მამაკაცის ინტერაქტიული თავი. გადაუსვი ჰორიზონტალურად ან გამოიყენე შემობრუნების ღილაკები.",
-    "Интерактивная модель мужской головы. Проведи по горизонтали или используй кнопки поворота.",
-  ],
-  "hero.loading": [
-    "Preparing your studio…",
-    "სტუდია იტვირთება…",
-    "Готовим студию…",
-  ],
-  "hero.fallback": [
-    "Explore your look with the style selector.",
-    "შეარჩიე შენი იერი სტილების მენიუში.",
-    "Подбери образ в меню стилей.",
-  ],
-  "hero.previewNote": [
-    "Illustrative 3D styles. Your barber tailors the final look.",
-    "3D სტილები საილუსტრაციოა. საბოლოო იერს ბარბერი შენ მოგარგებს.",
-    "3D-стили — для ориентира. Барбер адаптирует образ под тебя.",
-  ],
-  "hero.modelCredit": [
-    "Portrait assets",
-    "პორტრეტის მასალები",
-    "Материалы портрета",
-  ],
-  "hero.previewUnavailable": [
-    "This preview could not load. You can still choose your style below.",
-    "გადახედვა ვერ ჩაიტვირთა. სტილის არჩევა ქვემოთ კვლავ შეგიძლია.",
-    "Не удалось загрузить превью. Выбрать стиль по-прежнему можно ниже.",
-  ],
-  "hero.retryPreview": [
-    "Load preview again",
-    "ხელახლა ჩატვირთვა",
-    "Загрузить превью снова",
-  ],
-  "hero.photoView": ["Photo view", "ფოტო ხედი", "Фото"],
-  "hero.threeDView": ["Explore in 3D", "დათვალიერება 3D-ში", "Смотреть в 3D"],
-  "hero.previewLabel": [
-    "{hair} with {beard} on the studio model",
-    "სტუდიის მოდელი: {hair}, {beard}",
-    "Модель студии: {hair}, {beard}",
-  ],
-  "hero.supportedNotice": [
-    "Your earlier choice is outside this studio collection. Choose a look here to update your inspiration.",
-    "შენი წინა არჩევანი სტუდიის ამ კოლექციაში არ არის. იდეის გასაახლებლად აქ აირჩიე სტილი.",
-    "Предыдущий выбор не входит в эту коллекцию студии. Выбери здесь образ, чтобы обновить свою идею.",
+  "homeHero.availability": [
+    "Your chair is waiting.",
+    "შენი სავარძელი გელოდება.",
+    "Твоё кресло ждёт.",
   ],
   "hero.beard.clean-shaven": [
     "Clean shaven",

@@ -5,7 +5,6 @@ import {
   BEARD_STYLE_IDS,
   DEFAULT_STYLE_SELECTION,
   HAIR_STYLE_IDS,
-  discoveryStyleHref,
   isBeardStyleId,
   isHairStyleId,
   normalizeStyleSelection,
@@ -18,17 +17,11 @@ test("hair inspiration maps to existing discoverable haircut IDs, independently 
   assert.ok(!isHairStyleId("beard-styles"));
   for (const id of HAIR_STYLE_IDS) {
     assert.ok(styles.some((style) => style.id === id));
-    const url = new URL(discoveryStyleHref(id), "https://chair.example");
-    assert.equal(url.pathname, "/discover");
-    assert.equal(url.searchParams.get("style"), id);
-    assert.deepEqual([...url.searchParams.keys()], ["style"]);
+    assert.ok(isHairStyleId(id));
   }
   assert.ok(BEARD_STYLE_IDS.every(isBeardStyleId));
   assert.ok(BEARD_STYLE_IDS.every((id) => !isHairStyleId(id)));
-  assert.equal(
-    discoveryStyleHref("javascript:invalid"),
-    "/discover?style=skin-fade",
-  );
+  assert.ok(!isHairStyleId("javascript:invalid"));
 });
 
 test("temporary style persistence round-trips canonical IDs and ignores locale and booking data", () => {
