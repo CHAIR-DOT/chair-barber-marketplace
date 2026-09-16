@@ -86,11 +86,11 @@ The store owns mutations; screens consume shared entities and actions. Services 
 
 ## Homepage style studio
 
-The top homepage uses a lazy-loaded Three.js scene with a licensed male head scan, warm lighting, bounded drag/keyboard rotation and Hair/Beard hotspots. The configurator reuses the existing 11 haircut IDs and adds six temporary beard preferences. The CTA opens existing `/discover?style=...`; an inspiration brief follows into the normal booking flow without changing services or prices.
+The top homepage uses a lazy-loaded Three.js scene with one temporary CC0 MakeHuman male, open eyes, warm lighting, bounded drag/keyboard rotation and Hair/Beard hotspots. Three hair styles and three beard styles toggle actual independently authored geometry. The CTA opens existing `/discover?style=...`; an inspiration brief follows into the normal booking flow without changing services or prices.
 
-Choices live in `chair.style.v1` **sessionStorage**, independently of mock data and language. They survive same-tab navigation/refresh and locale changes. Each choice switches real cached hair/beard geometry on the scan. Eleven canonical hairstyles and six beard choices coexist independently. These procedural shapes illustrate a style; they are not a photorealistic prediction. Loading uses a stable silhouette placeholder. A local photo appears automatically only if WebGL/model loading fails; selectors and CTA remain available. There is no selectable Photo View mode.
+Choices live in `chair.style.v1` **sessionStorage**, independently of mock data and language. They survive same-tab navigation/refresh and locale changes. Unsupported older marketplace choices remain stored until deliberate interaction; the hero explains its supported preview. The broader marketplace still has its original catalog.
 
-`interactive-style-hero.tsx` owns presentation; dynamically imported `style-scene.ts` owns the renderer and replacement boundary. `style-hair-variants.ts` fits scalp shells/locks by raycasting the actual scan, while `style-beard-variants.ts` samples its UV-mapped cheeks/chin/lip region for fitted shells and strands. The groups are built once and attached beneath the head mesh; selections toggle visibility without downloading or rebuilding the scene. Three.js and its matching development types are the only added 3D packages. The renderer caps DPR, renders on demand, pauses offscreen and cleans up resources. Asset/license/replacement details are in [public/models/README.md](public/models/README.md).
+`src/lib/style-assets.ts` drives labels, variant groups and all nine combination previews. `interactive-style-hero.tsx` owns presentation; dynamically imported `style-scene.ts` loads one compressed GLB and toggles cached groups. A same-human render appears while loading and in manual/automatic Photo View. The temporary face and groom cards remain below the supplied photographic target. The renderer caps DPR, renders on demand, pauses offscreen and cleans up resources. Asset/license/replacement details are in [STYLE_ASSET_GUIDE.md](STYLE_ASSET_GUIDE.md).
 
 The existing light marketplace content remains intact. `PremiumSelect` and scoped filter CSS add keyboard-accessible dropdowns, price fill/reset, real-state chips/counts and a mobile bottom sheet. The home More filters button passes current search fields plus `filters=open` to open that sheet on mobile. Existing filter meanings and sorting are unchanged.
 
@@ -98,7 +98,7 @@ The existing light marketplace content remains intact. `PremiumSelect` and scope
 
 The frontend supports **ქართული (`ka`), English (`en`), and Русский (`ru`)**. Georgian is the first-visit default, including server-rendered text and metadata. Browser language does not select the initial language. After hydration, a valid saved preference is applied; switching language updates the interface immediately and keeps the existing URLs.
 
-`LocaleProvider` and `useI18n()` in `src/i18n/provider.tsx` supply the selected locale, setter, translation function, and display helpers. `LanguageSelector` in `src/components/language-selector.tsx` is a labeled native select with a Lucide language icon; the header includes it on desktop and within the mobile menu. The provider updates `<html lang>`, page titles, and the description to match the selected language.
+`LocaleProvider` and `useI18n()` in `src/i18n/provider.tsx` supply the selected locale, setter, translation function, and display helpers. `LanguageSelector` in `src/components/language-selector.tsx` is a labeled custom combobox with a globe, local SVG flags and selected check; the header includes it on desktop and within the mobile menu. The provider updates `<html lang>`, page titles, and the description to match the selected language.
 
 The preference is stored under **`chair.locale.v1`**, separately from application data under **`chair.prototype.v1`**. Choosing a language changes presentation; it does not change prices, selected entities, booking state, favorites, account identity, or stored records. Invalid or absent preferences resolve to Georgian. If storage is unavailable, the selected language remains usable for the current session and a localized notice explains that it could not be saved.
 
@@ -152,7 +152,7 @@ The optional, feature-detected WebMCP `set_saved_barber` tool uses the same favo
 
 ## Verification
 
-`npm test` includes 29 checks, including canonical style IDs, temporary persistence validation and safe corrupt-state handling. It covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
+`npm test` includes domain, localization, actual model/texture/preview integrity checks, including canonical style IDs, temporary persistence validation and safe corrupt-state handling. It covers fixture relationships, schedule validity, overlapping durations, rescheduling, cancellation release, invalid and past dates, service eligibility, closing hours, the availability horizon, and completed-booking review eligibility.
 
 Localization tests also cover dictionary parity and placeholders, default/fallback behavior, critical translated actions, plural and numeric formatting, unchanged canonical records, custom content, portfolio title rules, dates/GEL, and localized domain errors.
 
@@ -163,3 +163,9 @@ The browser verification log is in `VERIFICATION.md`. The design tokens and comp
 See `BACKEND_PLAN.md`: PostgreSQL/Supabase schema, server-enforced permissions, transactional bookings, verified reviews, object storage, payments, and notification jobs. Replace the local action boundary gradually while retaining the UI components.
 
 Framework references: [Next.js documentation](https://nextjs.org/docs), [Tailwind CSS for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs).
+
+## Human style studio
+
+The hero uses one temporary CC0 MakeHuman/MPFB model, three hair styles and three beard styles. Each changes actual loaded geometry. Nine same-human renders power thumbnails and manual/automatic Photo View. The face and strand quality remain below the supplied photorealistic target.
+
+Read [STYLE_ASSET_GUIDE.md](STYLE_ASSET_GUIDE.md) for exact model/preview/registry locations, reproduction, budgets and adding a style. [Asset sources](scripts/style-assets/SOURCES.md) records the researched alternatives and licenses. The old scan/procedural variants are removed; marketplace styles and saved data remain independent.

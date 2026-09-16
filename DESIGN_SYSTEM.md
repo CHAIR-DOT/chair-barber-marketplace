@@ -39,7 +39,7 @@ Defined in `src/app/globals.css`.
 - Favorites: immediate pressed state, accessible save/unsave labels, local persistence.
 - Motion: short transform/color transitions; reduced-motion preferences suppress animation.
 - Keyboard: visible focus rings, skip link, labeled controls, accessible gallery and review rating controls.
-- Language selector: a compact Lucide language icon and labeled native select, with `ქართული`, `English`, and `Русский` as self-names. Desktop placement is in the header; mobile placement is inside the existing navigation menu. Retain native keyboard behavior and visible focus.
+- Language selector: globe, current endonym and chevron with a viewport-clamped custom listbox. Local SVG GE/GB/RU flags, selected check and visible focus; arrows/Home/End/typeahead, Enter, Escape and Tab. Dark glass on the home hero, light on other routes; mobile remains inside the navigation menu.
 
 ## Language and content
 
@@ -63,8 +63,8 @@ Defined in `src/app/globals.css`.
 
 The top hero uses charcoal `#171b18`, warm gold `#e2bf85`, cream typography and a restrained translucent configurator. The existing navigation keeps its structure and changes color only on the homepage. The lower marketplace keeps its original sections/cards and light palette.
 
-Desktop: copy, central 3D portrait, panel. Tablet: copy above portrait with adjacent panel. At ≤650px the portrait and panel stack, and choices become a horizontal carousel. Use translated labels and visible focus on all category, rotation, thumbnail and CTA controls. The real category controls duplicate the hotspots for accessibility. Avoid continuous animation; respect reduced motion and never lock hero scrolling.
+Desktop: copy, central 3D portrait, panel. Tablet: copy above portrait with adjacent panel. At ≤650px the portrait and panel stack, with all three choices visible in a compact grid. Use translated labels and visible focus on all category, rotation, thumbnail and CTA controls. The real category controls duplicate the hotspots for accessibility. Avoid continuous animation; respect reduced motion and never lock hero scrolling.
 
-Hair and beard choices change fitted procedural geometry independently. Keep the concise illustrative-style note and visible asset attribution; do not present the preview as a photorealistic prediction. The hero grows with its content. Model stage, rotation guidance/buttons, and credit occupy normal flow, and the redundant three-step strip is removed. Loading uses a stable silhouette; an automatic photo fallback handles rendering failure. No manual Photo View exists. Rotation/category controls and card comparison targets are at least 44px. Dropdowns use viewport-bounded portals inside the active native dialog or body, keeping long translated options scrollable.
+Hair and beard choices toggle three independently authored groups per category on one CC0 human. A shared registry drives labels and same-human render thumbnails. Preserve the illustrative-style note: this temporary asset does not yet meet the photographic reference. Matching Photo View appears during loading and on failure, and is also a manual option. Keep camera framing stable across the nine combinations, and use the same portrait in every preview. See `STYLE_ASSET_GUIDE.md`. The hero grows with content; model tools and credits remain in normal flow.
 
 `PremiumSelect` uses a labeled combobox/listbox with keyboard navigation, selected checks and outside dismissal. All filter chips and counts derive from real state. GEL max-price remains 15–100 / step 5; resetting filters keeps the selected sort. Use scoped component CSS instead of changing marketplace cards.

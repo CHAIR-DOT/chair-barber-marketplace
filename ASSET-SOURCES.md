@@ -96,10 +96,10 @@ The checked-in site uses `/public/images/shop-1.jpg`, `/public/images/barber-1.j
 - All four hold up in landscape shop cards and small gallery tiles. Keep equal image heights with object-fit: cover. Shop-1 needs the most cropping; the other three naturally fit.
 - The current shop gallery pairs different shops' interiors as if they were one location. For visual coherence, use the primary shop image plus haircut/process details, or show one interior photo, rather than unrelated black-chair, red-chair and marble interiors in the same location gallery.
 
-## Interactive 3D studio asset — 16 September 2026
+## Human configurator assets — 16 September 2026
 
-- **Infinite, 3D Head Scan — Lee Perry-Smith**, based on work at [triplegangers.com](https://www.triplegangers.com/), licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
-- Local assets: `public/models/lee-perry-smith/LeePerrySmith.glb`, `Map-COL.jpg`, `Infinite-Level_02_Tangent_SmoothUV.jpg` (700,038 bytes total).
-- Source: [official Three.js asset directory, pinned commit](https://github.com/mrdoob/three.js/tree/8f24439631c052231f9661b81633e7ab514f25a5/examples/models/gltf/LeePerrySmith). The original asset-specific license and full license text accompany the files.
-- Upstream geometry and textures are unmodified. CHAIR. adds scene lighting, material, framing and interactions. Visible attribution accompanies the viewer. This model illustrates a base head; it is not a marketplace barber or an endorsement and does not supply interchangeable hairstyle meshes.
-- See [model manifest](public/models/README.md) for source URLs, exact byte counts, SHA-256 hashes and professional asset replacement guidance. The photo fallback reuses the credited `hero.jpg`; hair thumbnails reuse the existing mapping. Beard icons are original inline SVG illustrations.
+The retired Lee Perry-Smith model and its fallback mapping have been replaced. The hero now uses one **CC0 MakeHuman human**, separately fitted core hair and RehmanPolanski beard/moustache derivatives, and original cape/fiber/normal work. [Model/license inventory](public/models/README.md) and [pinned source research](scripts/style-assets/SOURCES.md) record the selected files, source URLs and rights. The authoring addon uses its own GPL license; its code is not in the browser bundle.
+
+All nine hero thumbnails and Photo View images are rendered from the same exported human and grooming groups. Existing stock portraits remain only in the marketplace. The blurred hero room reuses cottonbro studio's credited `shop-1.jpg` above. The GE/GB/RU flags are simple project-authored SVG geometry in `public/images/flags/`, with no external flag library or remote request.
+
+This generic illustrative model is not a customer face scan or a fictional barber's identity. Its skin and groom fidelity remain below the target photographic reference. See [STYLE_ASSET_GUIDE.md](STYLE_ASSET_GUIDE.md) for adding/replacing assets safely.

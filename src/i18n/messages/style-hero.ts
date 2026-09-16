@@ -70,7 +70,33 @@ export const styleHeroMessages = defineMessages({
     "3D სტილები საილუსტრაციოა. საბოლოო იერს ბარბერი შენ მოგარგებს.",
     "3D-стили — для ориентира. Барбер адаптирует образ под тебя.",
   ],
-  "hero.modelCredit": ["3D scan", "3D სკანი", "3D-скан"],
+  "hero.modelCredit": [
+    "Portrait assets",
+    "პორტრეტის მასალები",
+    "Материалы портрета",
+  ],
+  "hero.previewUnavailable": [
+    "This preview could not load. You can still choose your style below.",
+    "გადახედვა ვერ ჩაიტვირთა. სტილის არჩევა ქვემოთ კვლავ შეგიძლია.",
+    "Не удалось загрузить превью. Выбрать стиль по-прежнему можно ниже.",
+  ],
+  "hero.retryPreview": [
+    "Load preview again",
+    "ხელახლა ჩატვირთვა",
+    "Загрузить превью снова",
+  ],
+  "hero.photoView": ["Photo view", "ფოტო ხედი", "Фото"],
+  "hero.threeDView": ["Explore in 3D", "დათვალიერება 3D-ში", "Смотреть в 3D"],
+  "hero.previewLabel": [
+    "{hair} with {beard} on the studio model",
+    "სტუდიის მოდელი: {hair}, {beard}",
+    "Модель студии: {hair}, {beard}",
+  ],
+  "hero.supportedNotice": [
+    "Your earlier choice is outside this studio collection. Choose a look here to update your inspiration.",
+    "შენი წინა არჩევანი სტუდიის ამ კოლექციაში არ არის. იდეის გასაახლებლად აქ აირჩიე სტილი.",
+    "Предыдущий выбор не входит в эту коллекцию студии. Выбери здесь образ, чтобы обновить свою идею.",
+  ],
   "hero.beard.clean-shaven": [
     "Clean shaven",
     "სუფთად გაპარსული",

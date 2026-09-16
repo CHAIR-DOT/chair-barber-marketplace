@@ -1,6 +1,36 @@
 # Verification record
 
-Latest checks: real style switching and focused UI fixes, 16 September 2026. The initial studio, localization and baseline checks below are historical evidence.
+Latest checks: the 3×3 human asset replacement and language dropdown, 16 September 2026. All later sections are historical evidence for earlier implementations.
+
+## Human asset replacement — 16 September 2026
+
+### Automated and source checks
+
+- **36/36 tests pass**. Registry/build-contract parity; decoded compressed GLB group/material/shared-human/texture contracts; nine distinct same-human preview files and exact output hashes; model/preview/texture/triangle budgets; existing domain, localization and style-state regressions.
+- **TypeScript passes. Production build passes**, with 57 generated pages. No lint script is configured. Formatting and diff whitespace checks pass.
+- Production HTTP checks on 3011 pass: **55 valid routes, 5 expected unknown-route 404 responses, 37 local images and the human GLB**. The image set is 25 existing photos, 3 flags and 9 new previews. Intentional invalid static routes still cause the known Next `NoFallbackError` diagnostics; these are not valid-route failures.
+- Final GLB: **7,556,172 bytes**, 239,004 cached triangles, **133,528 maximum visible** for one pair; all embedded textures decode and are ≤2K. Nine transparent 640×800 WebPs total **225,666 bytes**. Model has no external URI or machine path. Local Meshopt decoder; WebP color and lossless WebP normal.
+- Verified pinned addon and all **31 selected CC0 source files** from a fresh cache. Base, hair and beard repository builders reproduce reviewed geometry; assembled raw GLB is byte-identical to the reviewed export. A fresh nine-preview assembler smoke run succeeds. The final 40-sample render set was individually inspected. Optimizer source contract and final assets pass validation.
+- Original read-only AGENTS.md is unchanged. No source caches, installers, Blender files, environment files or credential candidates are included. Largest pending file is the intended GLB. Removed the obsolete scan/assets/procedural modules and their tests. Existing app/page.tsx, fixtures, provider, booking rules, prices and lower marketplace source are unchanged.
+
+### Browser checks
+
+- Inspected all nine live 3D pairs, confirming distinct visible hair/beard geometry, retained identity and fixed camera/lighting. Full beard remained while hair changed; hair remained while beard changed. Examined angled views and rotation/reset. Face and groom boundaries still look synthetic; these visual limits are recorded below.
+- Exercised **all nine Photo View pairs**: correct filenames, decoded images, matching labels, and no retained canvas. Static renders are from the same exported human/grooms. Corrected poster sizing so stage-height framing matches the orthographic viewer. Offline shading is visibly different from WebGL; no pixel-identical claim.
+- Hero and open language dropdown measured across **36 combinations**: KA/EN/RU × widths **375, 430, 768, 1024, 1440, 1920** × heights **667, 800**. No horizontal page overflow, clipped tested labels/controls, or offscreen listbox. Correct selected endonym, loaded local flags, and unchanged selected pair throughout. Screenshots inspected on desktop and mobile in all three languages.
+- Six additional live-3D width checks stayed ready, with canvas and hotspots within the stage. Earlier language-only checks this same task covered keyboard arrows/Home/End/typeahead, Enter/Escape/Tab, mobile Escape/focus behavior, light header and 375×360 short menu. Those checks preceded the completed asset integration.
+- Reload preserved **Taper Fade + Full beard**. CTA produced four matching specialists and the submitted style brief. Existing favorite remained saved. Continued via Giorgi's profile to booking review: Signature haircut, 17 September 2026 10:00, **₾35 / 45 minutes**. No new booking or product record was submitted.
+- Fresh production tab loaded the actual GLB with one ready canvas, hidden matching poster and equal poster/stage heights; observed console warnings/errors **[]**. Main development tab also showed no warnings/errors after the final runtime fixes.
+
+### Failure checks and limits
+
+A temporary loopback-only proxy on 3012 deliberately returned 503 for the GLB and the first default preview request. Automatic fallback removed the canvas and showed the localized preview error. Clicking Retry loaded the exact matching image with its retry query and removed the error. Changing to Taper Fade + Full beard loaded its correct photo and the CTA opened the matching discovery result. No test-failure switch or proxy endpoint is in production code.
+
+**The photographic target is not achieved.** The new legal temporary model has open eyes and credible anatomy, but skin is generic, pore detail is authored noise, hairlines can look geometric, and beard cards are coarse. There was no gross detached groom or displaced identity in inspected views, but this is not professional groom/skin acceptance. See STYLE_ASSET_GUIDE.md and scripts/style-assets/SOURCES.md for the required future asset work.
+
+Physical phones, hardware WebGL loss, reduced-memory hardware, real FPS/GPU-memory measurements and a formal screen-reader audit were not available. Save-Data/device-memory and texture-decode failure paths were code-reviewed; the deliberate network failure was exercised. The older native date-picker tool limitation remains. No Lighthouse or real-device performance score is claimed.
+
+The Mac/app restart left the agent's old 3011 development process unresponsive; it was identified and stopped, and testing resumed with fresh tabs. No unrelated server or browser storage was reset. Temporary QA listeners were stopped; the normal localhost preview is restored on 3000. Temporary browser overrides are reset. Error tabs created during the server switch are left to normal temporary-tab cleanup if the browser URL policy prevents explicit closure.
 
 ## Real 3D style switching and focused UI fixes — 16 September 2026
 

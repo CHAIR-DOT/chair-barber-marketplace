@@ -9,64 +9,57 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCcw,
+  Image as ImageIcon,
+  Box,
 } from "lucide-react";
-import { styles } from "@/lib/data";
 import {
-  BEARD_STYLE_IDS,
-  discoveryStyleHref,
-  type BeardStyleId,
-} from "@/lib/style-selection";
+  STYLE_ASSET_MANIFEST,
+  resolveStudioSelection,
+  getStyleCombination,
+  getStyleThumbnail,
+} from "@/lib/style-assets";
+import { discoveryStyleHref } from "@/lib/style-selection";
 import { useStyleSelection } from "./style-selection-provider";
 import { useI18n } from "@/i18n/provider";
 import type { StyleCategory, StyleScene } from "./style-scene";
 import "./interactive-style-hero.css";
 
-const hairStyles = styles.filter((style) => style.id !== "beard-styles");
-
-function BeardIllustration({ style }: { style: BeardStyleId }) {
-  const shapes: Record<BeardStyleId, string> = {
-    "clean-shaven": "",
-    stubble: "M22 36L27 47Q40 60 53 47L58 36L55 51Q40 68 25 51Z",
-    "short-beard":
-      "M21 31L27 42L34 44L40 42L46 44L53 42L59 31L57 52Q40 74 23 52Z",
-    "full-beard":
-      "M21 29L27 41L34 44L40 41L46 44L53 41L59 29L60 51L51 66L40 73L29 66L20 51Z",
-    goatee:
-      "M32 46Q40 42 48 46L47 60Q40 68 33 60ZM30 42Q40 36 50 42L47 46Q40 42 33 46Z",
-    defined: "M21 28L27 43L34 46L40 43L46 46L53 43L59 28L57 53L47 64H33L23 53Z",
-  };
-  return (
-    <svg
-      viewBox="0 0 80 80"
-      aria-hidden="true"
-      className={`beard-illustration beard-${style}`}
-    >
-      <path
-        d="M23 22Q23 7 40 7Q57 7 57 22L58 38Q55 56 40 61Q25 56 22 38Z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        opacity=".65"
-      />
-      <path
-        d="M28 29h5m14 0h5m-13 5-2 8h5m-9 7q7 4 14 0"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        opacity=".6"
-      />
-      {shapes[style] && (
-        <path
-          d={shapes[style]}
-          fill="currentColor"
-          opacity={style === "stubble" ? ".35" : ".85"}
-        />
-      )}
-      {style === "clean-shaven" && (
-        <path d="m61 47 3-6 3 6 6 3-6 3-3 6-3-6-6-3Z" fill="currentColor" />
-      )}
-    </svg>
+function MatchingPoster({
+  src,
+  label,
+  hidden,
+}: {
+  src: string;
+  label: string;
+  hidden: boolean;
+}) {
+  const { t } = useI18n();
+  const [failed, setFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
+  return failed ? (
+    <div className="portrait-unavailable" aria-hidden={hidden}>
+      <ImageIcon size={28} aria-hidden="true" />
+      <p>{t("hero.previewUnavailable")}</p>
+      <button
+        type="button"
+        onClick={() => {
+          setFailed(false);
+          setRetry((value) => value + 1);
+        }}
+      >
+        {t("hero.retryPreview")}
+      </button>
+    </div>
+  ) : (
+    <img
+      key={retry}
+      src={retry ? `${src}?retry=${retry}` : src}
+      alt={label}
+      aria-hidden={hidden}
+      className="model-poster"
+      fetchPriority="high"
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -85,13 +78,34 @@ function ModelPortrait({
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
     "loading",
   );
-  const { selection } = useStyleSelection();
+  const { selection: storedSelection } = useStyleSelection();
+  const visibleSelection = resolveStudioSelection(storedSelection);
+  const selection = { ...storedSelection, ...visibleSelection };
+  const combination = getStyleCombination(visibleSelection);
+  const [mode, setMode] = useState<"3d" | "photo">("3d");
+  const [attempt, setAttempt] = useState(0);
   const latestSelection = useRef(selection);
   latestSelection.current = selection;
   const latestCategory = useRef(category);
   latestCategory.current = category;
 
   useEffect(() => {
+    if (mode === "photo") {
+      setStatus("fallback");
+      return;
+    }
+    const device = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { saveData?: boolean };
+    };
+    if (
+      attempt === 0 &&
+      (device.connection?.saveData ||
+        (device.deviceMemory && device.deviceMemory <= 2))
+    ) {
+      setMode("photo");
+      return;
+    }
     let cancelled = false;
     let sceneReady = false;
     let scene: StyleScene | undefined;
@@ -99,11 +113,12 @@ function ModelPortrait({
     const timer = window.setTimeout(() => {
       if (!cancelled) {
         setStatus("fallback");
+        setMode("photo");
         scene?.dispose();
         controller.current = null;
         cancelled = true;
       }
-    }, 15000);
+    }, 12000);
     import("./style-scene")
       .then(({ createStyleScene }) => {
         if (cancelled || !host.current) return;
@@ -119,6 +134,7 @@ function ModelPortrait({
             if (!cancelled) {
               window.clearTimeout(timer);
               setStatus("fallback");
+              setMode("photo");
               scene?.dispose();
               controller.current = null;
               cancelled = true;
@@ -142,6 +158,7 @@ function ModelPortrait({
         if (!cancelled) {
           window.clearTimeout(timer);
           setStatus("fallback");
+          setMode("photo");
         }
       });
     return () => {
@@ -150,7 +167,7 @@ function ModelPortrait({
       scene?.dispose();
       controller.current = null;
     };
-  }, []);
+  }, [mode, attempt]);
 
   useEffect(() => {
     controller.current?.setCategory(category);
@@ -158,17 +175,28 @@ function ModelPortrait({
   useEffect(() => {
     controller.current?.setSelection(selection);
   }, [selection]);
-  const ready = status === "ready";
+  const ready = mode === "3d" && status === "ready";
   return (
     <div className={`model-portrait ${ready ? "model-ready" : ""}`}>
       <div className="model-stage" aria-busy={status === "loading"}>
         <div className="portrait-aura" />
-        {status === "loading" && (
-          <div className="model-skeleton" aria-hidden="true" />
-        )}
-        {status === "fallback" && (
-          <img src="/images/hero.jpg" alt="" className="model-poster" />
-        )}
+        <MatchingPoster
+          key={combination.id}
+          src={combination.previewSrc}
+          hidden={ready}
+          label={t("hero.previewLabel", {
+            hair: t(
+              STYLE_ASSET_MANIFEST.hairStyles.find(
+                (item) => item.id === visibleSelection.hairStyleId,
+              )!.labelKey,
+            ),
+            beard: t(
+              STYLE_ASSET_MANIFEST.beardStyles.find(
+                (item) => item.id === visibleSelection.beardStyleId,
+              )!.labelKey,
+            ),
+          })}
+        />
         <div
           ref={host}
           className="model-canvas"
@@ -197,6 +225,17 @@ function ModelPortrait({
           ))}
       </div>
       <div className="model-tools">
+        <button
+          type="button"
+          className="portrait-mode"
+          onClick={() => {
+            setAttempt((value) => value + 1);
+            setMode(mode === "3d" ? "photo" : "3d");
+          }}
+        >
+          {mode === "3d" ? <ImageIcon size={15} /> : <Box size={15} />}
+          {t(mode === "3d" ? "hero.photoView" : "hero.threeDView")}
+        </button>
         <p aria-live="polite">
           {t(
             ready
@@ -236,11 +275,11 @@ function ModelPortrait({
       <div className="model-credit">
         {t("hero.modelCredit")}:{" "}
         <a
-          href="https://creativecommons.org/licenses/by/3.0/"
+          href="https://static.makehumancommunity.org/makehuman/faq/are_makehuman_files_free.html"
           target="_blank"
           rel="noreferrer"
         >
-          Lee Perry-Smith / Infinite · CC BY 3.0
+          MakeHuman · CC0
         </a>
       </div>
     </div>
@@ -254,10 +293,19 @@ function StyleConfigurator({
   category: StyleCategory;
   onCategory: (category: StyleCategory) => void;
 }) {
-  const { t, styleName, locale } = useI18n();
+  const { t, locale } = useI18n();
   const optionList = useRef<HTMLDivElement>(null);
-  const { selection, setHairStyle, setBeardStyle, submitSelection } =
-    useStyleSelection();
+  const {
+    selection: storedSelection,
+    setHairStyle,
+    setBeardStyle,
+    submitSelection,
+  } = useStyleSelection();
+  const selection = resolveStudioSelection(storedSelection);
+  function commitVisiblePair() {
+    setHairStyle(selection.hairStyleId);
+    setBeardStyle(selection.beardStyleId);
+  }
   useEffect(() => {
     const list = optionList.current;
     if (!list) return;
@@ -282,9 +330,9 @@ function StyleConfigurator({
     observer.observe(list);
     return () => observer.disconnect();
   }, [category, selection.hairStyleId, selection.beardStyleId, locale]);
-  const selectedHair =
-    hairStyles.find((style) => style.id === selection.hairStyleId) ??
-    hairStyles[0];
+  const selectedHair = STYLE_ASSET_MANIFEST.hairStyles.find(
+    (style) => style.id === selection.hairStyleId,
+  )!;
   return (
     <div className="style-configurator" id="style-configurator">
       <div className="configurator-heading">
@@ -313,45 +361,59 @@ function StyleConfigurator({
         )}
       >
         {category === "hair"
-          ? hairStyles.map((style) => (
+          ? STYLE_ASSET_MANIFEST.hairStyles.map((style) => (
               <button
                 type="button"
                 key={style.id}
                 className="style-option"
                 aria-pressed={selection.hairStyleId === style.id}
-                onClick={() => setHairStyle(style.id)}
+                onClick={() => {
+                  commitVisiblePair();
+                  setHairStyle(style.id);
+                }}
               >
                 <span className="style-thumbnail">
-                  <img src={style.image} alt="" loading="lazy" />
+                  <img
+                    src={getStyleThumbnail("hair", style.id, selection)}
+                    alt=""
+                    loading="lazy"
+                  />
                   {selection.hairStyleId === style.id && (
                     <Check size={12} className="style-check" />
                   )}
                 </span>
-                <span>{styleName(style)}</span>
+                <span>{t(style.labelKey)}</span>
               </button>
             ))
-          : BEARD_STYLE_IDS.map((id) => (
+          : STYLE_ASSET_MANIFEST.beardStyles.map(({ id, labelKey }) => (
               <button
                 type="button"
                 key={id}
                 className="style-option"
                 aria-pressed={selection.beardStyleId === id}
-                onClick={() => setBeardStyle(id)}
+                onClick={() => {
+                  commitVisiblePair();
+                  setBeardStyle(id);
+                }}
               >
                 <span className="style-thumbnail">
-                  <BeardIllustration style={id} />
+                  <img
+                    src={getStyleThumbnail("beard", id, selection)}
+                    alt=""
+                    loading="lazy"
+                  />
                   {selection.beardStyleId === id && (
                     <Check size={12} className="style-check" />
                   )}
                 </span>
-                <span>{t(`hero.beard.${id}`)}</span>
+                <span>{t(labelKey)}</span>
               </button>
             ))}
       </div>
       <div className="style-current" aria-live="polite">
         <span>{t("hero.selected")}</span>
         <strong>
-          {styleName(selectedHair)}
+          {t(selectedHair.labelKey)}
           <span className="combination-plus"> + </span>
           {t(`hero.beard.${selection.beardStyleId}`)}
         </strong>
@@ -359,11 +421,17 @@ function StyleConfigurator({
       <Link
         href={discoveryStyleHref(selection.hairStyleId)}
         className="style-cta"
-        onClick={submitSelection}
+        onClick={() => {
+          commitVisiblePair();
+          submitSelection();
+        }}
       >
         {t("hero.find")}
         <ArrowRight size={18} />
       </Link>
+      {!selection.isExactMatch && (
+        <p className="style-availability-note">{t("hero.supportedNotice")}</p>
+      )}
       <p className="style-preview-note">{t("hero.previewNote")}</p>
     </div>
   );

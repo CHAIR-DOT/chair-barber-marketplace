@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "description": "Pinned source assets for the CHAIR temporary CC0 male. Generated output is not a photorealistic scan.",
+  "blender": {
+    "version": "4.5.9 LTS",
+    "url": "https://download.blender.org/release/Blender4.5/blender-4.5.9-macos-arm64.dmg",
+    "sha256": "e3a3d7aac381fb4e4d05197f99cd8899484d7e8bc4497c134066e6733f372238",
+    "checksumUrl": "https://download.blender.org/release/Blender4.5/blender-4.5.9.sha256",
+    "note": "Verified macOS arm64 build used for authoring; Blender is supplied separately and not installed by fetch_sources.py."
+  },
+  "addon": {
+    "id": "mpfb",
+    "version": "2.0.17",
+    "url": "https://extensions.blender.org/download/sha256:4f0a879d64a39bf646fbf5f53601ac678855da329d650617dca5737548239a87/add-on-mpfb-v2.0.17.zip",
+    "sha256": "4f0a879d64a39bf646fbf5f53601ac678855da329d650617dca5737548239a87",
+    "size": 45031536,
+    "codeLicense": "GPL-3.0-or-later",
+    "assetLicense": "CC0-1.0",
+    "licenseUrl": "https://github.com/makehumancommunity/mpfb2/blob/v2.0.17/LICENSE.ASSETS.md"
+  },
+  "packs": [
+    {
+      "id": "makehuman_system_assets",
+      "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://static.makehumancommunity.org/about/license.html",
+      "authors": [
+        "MakeHuman Community",
+        "Data Collection AB",
+        "Joel Palmius",
+        "Jonas Hauquier"
+      ],
+      "files": [
+        {
+          "path": "eyebrows/eyebrow001/eyebrow001.mhclo",
+          "size": 9141,
+          "sha256": "54c8892c2ba577f4152d779ce1f20f7cd323beb8cbd9cb701796165c221b4f5b",
+          "crc32": "593a400e"
+        },
+        {
+          "path": "eyebrows/eyebrow001/eyebrow001.mhmat",
+          "size": 1098,
+          "sha256": "976e5f4f1d3922d7a11c6e2db233f8b4584b068d00619d5749687e81c92d61fc",
+          "crc32": "63d073c4"
+        },
+        {
+          "path": "eyebrows/eyebrow001/eyebrow001.obj",
+          "size": 8227,
+          "sha256": "88b13146395133f3901715e11706cdfd293e5d6087ad7c5e01efe1485a26b513",
+          "crc32": "07e9d5f6"
+        },
+        {
+          "path": "eyebrows/eyebrow001/eyebrow001.png",
+          "size": 89619,
+          "sha256": "9940f7d0b1b223709a19b05156ba6f6e9e4dbdbced02d7574f4d51d72c58967b",
+          "crc32": "d5ee806a"
+        },
+        {
+          "path": "eyelashes/eyelashes01/eyelashes01.mhclo",
+          "size": 2265,
+          "sha256": "5a86b29c15649273d723084954b7fa7bf199112571d4f58539b46734d397ee6b",
+          "crc32": "5bc81988"
+        },
+        {
+          "path": "eyelashes/eyelashes01/eyelashes01.mhmat",
+          "size": 1074,
+          "sha256": "8029c99d94f3d87a1e81825fad6b90eec773ae6955a5b2592222ef237377e190",
+          "crc32": "8e1cee4a"
+        },
+        {
+          "path": "eyelashes/eyelashes01/eyelashes01.obj",
+          "size": 18832,
+          "sha256": "f78f5b93fea1946fcae103d32c4f082dd9612a1ec2e7e2f90b03ebe59b0baf20",
+          "crc32": "c57f8242"
+        },
+        {
+          "path": "eyelashes/eyelashes01/eyelashes01.png",
+          "size": 91600,
+          "sha256": "4b69c0fff2648874460e9caf80c31413c444218a5c50afebc425aeaa65484a35",
+          "crc32": "c9506eef"
+        },
+        {
+          "path": "eyes/high-poly/high-poly.mhclo",
+          "size": 72490,
+          "sha256": "b183cfe37120ab726f9b3f2ea6cd3a64c44ce7b4bd91a77c841cf70c04f83a0d",
+          "crc32": "df644500"
+        },
+        {
+          "path": "eyes/high-poly/high-poly.obj",
+          "size": 100882,
+          "sha256": "da2493215b708a344c33dc72f2a9a5b8fa985dcc5a70ad3b208995cf871da8e1",
+          "crc32": "ed195a06"
+        },
+        {
+          "path": "eyes/materials/brown.mhmat",
+          "size": 1247,
+          "sha256": "4abad93ce50541c08127721e77bce035640c9f16bed16cd0f5524b1cd5908465",
+          "crc32": "81e28c32"
+        },
+        {
+          "path": "eyes/materials/brown_eye.png",
+          "size": 610817,
+          "sha256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b",
+          "crc32": "633ddf33"
+        },
+        {
+          "path": "skins/young_caucasian_male2/young_caucasian_male2.mhmat",
+          "size": 1464,
+          "sha256": "60022513803f7b68f30c4f91235b827ace9d36757dc07bdac157d58b7cbc226d",
+          "crc32": "6bbaec65"
+        },
+        {
+          "path": "skins/young_caucasian_male2/young_lightskinned_male_diffuse2.png",
+          "size": 3595270,
+          "sha256": "03efe1f6b0ae52429649dcefc9dcaef6058032f874a251169cc3e2ed473c3874",
+          "crc32": "34164816"
+        },
+        {
+          "path": "hair/short01/short01.mhclo",
+          "size": 201588,
+          "sha256": "ae1ffaa98da5753b803b3a173bede4895d2215e6bb94763f3765a71f0e984f35",
+          "crc32": "7b56f0f1"
+        },
+        {
+          "path": "hair/short01/short01.mhmat",
+          "size": 1314,
+          "sha256": "01e2e12ce3f3d3c859225456660acadcdd27d4f4b4d888bcbd6f11998cadd975",
+          "crc32": "583235b1"
+        },
+        {
+          "path": "hair/short01/short01.obj",
+          "size": 194450,
+          "sha256": "d998d8416f9b5d5591f1d756f4d292288d000a6951bc0f4d2e8e72727bbc44fa",
+          "crc32": "05e068c9"
+        },
+        {
+          "path": "hair/short01/short01_diffuse.png",
+          "size": 2354146,
+          "sha256": "f34a0957184e3d1e911ed59245f874f8d4843f61ee44ff49f43edb4be0196949",
+          "crc32": "8a56cb2e"
+        },
+        {
+          "path": "hair/short02/short02.obj",
+          "size": 139742,
+          "sha256": "48f979114adfa712165a69cc55c45a70831af1fb3cba8e2a89120f0c87407b64",
+          "crc32": "3bf3a7f3"
+        },
+        {
+          "path": "hair/short02/short02.mhclo",
+          "size": 119240,
+          "sha256": "625736cdb73e6d094df6e5a2df18f371781f1d2cd37b0ae15795c5d7051c3ec2",
+          "crc32": "167acceb"
+        },
+        {
+          "path": "hair/short02/short02.mhmat",
+          "size": 1323,
+          "sha256": "2ed04c8aad9c1a35d858ca72091525d32b1da3b61b5a031634dd528fd8530f6d",
+          "crc32": "15ecc99c"
+        },
+        {
+          "path": "hair/short02/short02_diffuse.png",
+          "size": 3553543,
+          "sha256": "47fe33831a3929567c733356dd66243116e05df2ace1f884ddca0080b728229f",
+          "crc32": "58be4110"
+        },
+        {
+          "path": "hair/short02/short02_normal.png",
+          "size": 1626745,
+          "sha256": "2cfac7619f8eec77dd90df979d912415058f4f0fc16940cba40a8eb1ae6d74b5",
+          "crc32": "cd9d1dbd"
+        }
+      ]
+    },
+    {
+      "id": "bodyparts05_cc0",
+      "url": "https://files2.makehumancommunity.org/asset_packs/bodyparts05/bodyparts05_cc0.zip",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://static.makehumancommunity.org/assets/assetpacks/bodyparts05.html",
+      "authors": ["RehmanPolanski"],
+      "archiveSize": 6616507,
+      "archiveSha256": "262bba42246f85b2a91f493dd920296b258a3b4544eb495c91c4d08e57c528fd",
+      "files": [
+        {
+          "path": "clothes/rehmanpolanski_beard_viking/BeardViking.png",
+          "size": 1050703,
+          "sha256": "5e2d2163cd7157a3a53fc128495f3a86c7a7c91810943d62eb18e2cfc6c0aed2",
+          "crc32": "ac901421"
+        },
+        {
+          "path": "clothes/rehmanpolanski_beard_viking/beardviking.mhmat",
+          "size": 729,
+          "sha256": "e1e7c48c0931d5cd17db9088258bcb670fc3483aa4173998ad995336a305cf85",
+          "crc32": "f2546b54"
+        },
+        {
+          "path": "clothes/rehmanpolanski_beard_viking/beardviking.obj",
+          "size": 381389,
+          "sha256": "517f4005fecc8b63e05115103295d755e6eaa22e9a72f94cbe1431808e81d515",
+          "crc32": "5349ce00"
+        },
+        {
+          "path": "clothes/rehmanpolanski_beard_viking/rehmanpolanski_beard_viking.mhclo",
+          "size": 444944,
+          "sha256": "87e313af6cb9aaa66dc99f81a1fc537bd3fb134a2df83c80e51e590dbb970344",
+          "crc32": "7cc6f950"
+        },
+        {
+          "path": "clothes/rehmanpolanski_moustache_viking/MoustacheViking.png",
+          "size": 248381,
+          "sha256": "a04f14f45e2beb1fee055a87754846057fb8cd15c4f84f76d57fcb86d3f949ee",
+          "crc32": "a8830fd9"
+        },
+        {
+          "path": "clothes/rehmanpolanski_moustache_viking/moustacheviking.mhmat",
+          "size": 733,
+          "sha256": "38eaa94425e54214bad95240f92362393b63986625930f0dd2f93eae1ab17052",
+          "crc32": "2fb3bb03"
+        },
+        {
+          "path": "clothes/rehmanpolanski_moustache_viking/moustacheviking.obj",
+          "size": 89790,
+          "sha256": "297c14a76a9d0796d95129afdf8e614efa0a080558b4034d56926932bc69ed3e",
+          "crc32": "719139db"
+        },
+        {
+          "path": "clothes/rehmanpolanski_moustache_viking/rehmanpolanski_moustache_viking.mhclo",
+          "size": 108786,
+          "sha256": "7623518490914b5f968db07d6fd744c048bae02da4cde54003d896fc0489d6c1",
+          "crc32": "8112dcd5"
+        }
+      ]
+    }
+  ]
+}

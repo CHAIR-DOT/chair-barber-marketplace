@@ -1,5 +1,9 @@
 import { shops, barbers, styles } from "../src/lib/data";
 import { readdir } from "node:fs/promises";
+import {
+  STYLE_ASSET_MANIFEST,
+  STYLE_COMBINATIONS,
+} from "../src/lib/style-assets";
 async function main() {
   const origin = process.argv[2] ?? "http://127.0.0.1:3000";
   const routes = [
@@ -47,10 +51,15 @@ async function main() {
     if (response.status !== 404)
       failures.push(`${path}: expected 404, got ${response.status}`);
   }
-  const assets = await readdir(`${process.cwd()}/public/images`);
+  const assets = (
+    await readdir(`${process.cwd()}/public/images`, { recursive: true })
+  )
+    .filter((asset) => /\.(jpg|png|webp|svg)$/i.test(asset))
+    .map((asset) => `/images/${asset}`);
+  assets.push(...STYLE_COMBINATIONS.map((entry) => entry.previewSrc));
   await Promise.all(
     assets.map(async (asset) => {
-      const response = await fetch(`${origin}/images/${asset}`);
+      const response = await fetch(`${origin}${asset}`);
       if (
         response.status !== 200 ||
         !response.headers.get("content-type")?.startsWith("image/")
@@ -58,12 +67,15 @@ async function main() {
         failures.push(`Image ${asset}: ${response.status}`);
     }),
   );
+  const model = await fetch(origin + STYLE_ASSET_MANIFEST.model.src);
+  if (model.status !== 200 || (await model.arrayBuffer()).byteLength < 100_000)
+    failures.push(`Model: ${model.status} or incomplete response`);
   if (failures.length) {
     console.error(failures.join("\n"));
     process.exitCode = 1;
   } else {
     console.log(
-      `PASS: ${routes.length} routes, 5 unknown-route responses, and ${assets.length} local images.`,
+      `PASS: ${routes.length} routes, 5 unknown-route responses, ${assets.length} local images and the human GLB.`,
     );
   }
 }
