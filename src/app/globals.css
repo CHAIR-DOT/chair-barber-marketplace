@@ -549,11 +549,6 @@ small {
   .nav-actions {
     gap: 15px;
   }
-  .nav-actions > .button {
-    padding: 8px 12px;
-    font-size: 12px;
-    min-height: 38px;
-  }
   .nav-actions > a:first-of-type {
     display: none;
   }
@@ -995,6 +990,7 @@ small {
   color: var(--accent);
 }
 .how-section {
+  align-items: center;
   border-top: 1px solid var(--line);
   margin-top: 30px;
   padding-block: 60px;
@@ -1008,9 +1004,6 @@ small {
 }
 .how-intro h2 em {
   color: var(--accent);
-}
-.how-intro .button {
-  margin-top: 28px;
 }
 .how-steps > div {
   display: flex;
@@ -1038,34 +1031,13 @@ small {
   color: var(--muted);
   margin-top: 5px;
 }
-.barber-invite {
-  padding: 44px 45px;
-  background: var(--ink);
-  color: var(--paper);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 35px;
-  border-radius: 6px;
-  margin-bottom: 60px;
-}
-.barber-invite .eyebrow {
-  font-size: 10px;
-  color: #c4c9b9;
-}
-.barber-invite h2 {
-  font-size: 35px;
-  line-height: 1.18;
-  margin-top: 14px;
-}
-.button-light {
-  background: var(--paper);
-  color: var(--ink);
-}
 .footer {
   background: #efefe8;
   padding-block: 48px 0;
   margin-top: 30px;
+}
+.home-footer {
+  margin-top: 0;
 }
 .footer-grid {
   display: grid;
@@ -1477,9 +1449,6 @@ small {
   .nav-actions {
     gap: 16px;
   }
-  .join-link {
-    display: none;
-  }
   .barber-grid {
     gap: 18px;
   }
@@ -1525,6 +1494,9 @@ small {
   }
 }
 @media (max-width: 800px) {
+  .join-link {
+    display: none;
+  }
   .mobile-menu-button {
     display: inline-flex !important;
   }
@@ -1597,12 +1569,6 @@ small {
   .how-intro h2 {
     font-size: 35px;
   }
-  .barber-invite {
-    padding: 32px;
-  }
-  .barber-invite h2 {
-    font-size: 29px;
-  }
   .footer-grid {
     grid-template-columns: 1.2fr 1fr 1fr;
     gap: 25px;
@@ -1627,9 +1593,6 @@ small {
 @media (max-width: 600px) {
   .nav-actions > a:first-of-type {
     display: none;
-  }
-  .header-book {
-    display: inline-flex !important;
   }
   .mobile-nav {
     top: 72px;
@@ -1750,15 +1713,6 @@ small {
   }
   .how-steps > div {
     gap: 20px;
-  }
-  .barber-invite {
-    padding: 27px;
-    flex-direction: column;
-    align-items: start;
-    margin-bottom: 35px;
-  }
-  .barber-invite h2 {
-    font-size: 30px;
   }
   .footer {
     padding-top: 35px;
@@ -5472,9 +5426,6 @@ input[type="range"] {
   }
   .service-description p {
     font-size: 12px;
-  }
-  .header-book {
-    min-height: 40px !important;
   }
   .time-option,
   .date-option {

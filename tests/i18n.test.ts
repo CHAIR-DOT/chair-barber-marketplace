@@ -73,7 +73,8 @@ test("every translation namespace has complete, nonempty, matching dictionaries 
 
 test("critical customer and barber journeys contain real translations in all three languages", () => {
   const keys = [
-    "navigation.book",
+    "navigation.discover",
+    "navigation.join",
     "home.title1",
     "discovery.filtersTitle",
     "booking.confirmDemo",
@@ -93,9 +94,9 @@ test("critical customer and barber journeys contain real translations in all thr
     assert.match(translate("ru", key), /[\u0400-\u04FF]/u, key);
     assert.match(translate("en", key), /[a-z]/i, key);
   }
-  assert.equal(translate(DEFAULT_LOCALE, "navigation.book"), "დაჯავშნა");
-  assert.equal(translate("en", "navigation.book"), "Book a chair");
-  assert.equal(translate("ru", "navigation.book"), "Записаться");
+  assert.equal(translate(DEFAULT_LOCALE, "navigation.discover"), "აღმოაჩინე");
+  assert.equal(translate("en", "navigation.discover"), "Discover");
+  assert.equal(translate("ru", "navigation.discover"), "Найти");
 });
 
 test("interpolation preserves canonical names and references while formatting displayed numbers", () => {

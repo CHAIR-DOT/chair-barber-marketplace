@@ -70,7 +70,6 @@ export const coreMessages = defineMessages({
   "navigation.account": ["My account", "ჩემი ანგარიში", "Мой аккаунт"],
   "navigation.signIn": ["Sign in", "შესვლა", "Войти"],
   "navigation.forBarbers": ["For barbers", "ბარბერებისთვის", "Для барберов"],
-  "navigation.book": ["Book a chair", "დაჯავშნა", "Записаться"],
   "navigation.join": [
     "Join as a barber",
     "ბარბერად რეგისტრაცია",
@@ -278,21 +277,6 @@ export const coreMessages = defineMessages({
     "Take a seat. Get a great cut. Share your experience and save your new regular.",
     "ესტუმრე ბარბერს, განაახლე სტილი, გაგვიზიარე შთაბეჭდილება და შეინახე რჩეულებში.",
     "Устройтесь в кресле, обновите образ, поделитесь впечатлениями и сохраните мастера в избранном.",
-  ],
-  "home.inviteEyebrow": [
-    "YOUR CRAFT DESERVES AN AUDIENCE",
-    "შენი ოსტატობა მეტმა ადამიანმა უნდა ნახოს",
-    "ВАШЕ МАСТЕРСТВО ЗАСЛУЖИВАЕТ ВНИМАНИЯ",
-  ],
-  "home.invite1": [
-    "Great with a pair of scissors?",
-    "მაკრატელს ოსტატურად ფლობ?",
-    "Виртуозно владеете ножницами?",
-  ],
-  "home.invite2": [
-    "Let’s find your people.",
-    "ერთად ვიპოვოთ შენი კლიენტები.",
-    "Давайте найдём ваших клиентов.",
   ],
   "about.eyebrow": [
     "A LOOK AT WHAT’S POSSIBLE",

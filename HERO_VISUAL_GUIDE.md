@@ -2,7 +2,7 @@
 
 ## Current direction
 
-The homepage hero is a **decorative CSS motion poster**. It depicts a black quilted leather barber chair with bronze metalwork, an arched mirror, warm lamps and an orderly grooming station with a towel, brush, spray bottle, clipper, comb and scissors. The visual is silent and non-interactive; the heading, supporting copy and discovery links remain ordinary accessible HTML.
+The homepage hero is a **decorative CSS motion poster**. It depicts a black quilted leather barber chair with bronze metalwork, an arched mirror, warm lamps and an orderly grooming station with a towel, brush, spray bottle, clipper, comb and scissors. The visual is silent and non-interactive; the heading, supporting copy and captions remain ordinary accessible HTML. As of 22 September 2026, the hero contains no discovery or booking CTAs; its role is branding and atmosphere.
 
 The user retired the mannequin direction on 16 September 2026. Do not restore grooming selectors, model rotation, hotspots or Photo View when changing this hero. The former GLB, combination previews, renderer, asset registry and Blender authoring pipeline were removed. Their historical implementation is available through Git history.
 
@@ -49,15 +49,15 @@ The hero uses CSS transforms and opacity with restrained warm light and atmosphe
 
 The camera and light each use a 20-second `ease-in-out` alternate animation: 20 seconds forward and 20 seconds back, for a **40-second full cycle**. The camera moves from scale 1 to 1.035 with a −0.6% horizontal / 0.2% vertical drift. Three sparse dust points alternate over 10 seconds per direction, with staggered starting positions in their timelines. Each return follows the same path instead of snapping from the final transform back to the first. The component pauses animation when the hero is outside the viewport, the document is hidden, reduced motion is requested, or the main image has not loaded/has failed. It releases its observers/listeners when unmounted.
 
-`prefers-reduced-motion: reduce` shows a still composition. Keep all heading and CTA content visible in that mode. Decorative imagery and effects must stay out of the accessibility tree and must not intercept clicks, keyboard focus or touch scrolling.
+`prefers-reduced-motion: reduce` shows a still composition. Keep the heading and supporting text visible in that mode. Decorative imagery and effects must stay out of the accessibility tree and must not intercept clicks, keyboard focus or touch scrolling.
 
 ## Loading and fallback
 
 The visual layers reserve their layout space immediately. A 480px CSS poster remains underneath the main picture. The picture uses the 960px rendition at viewport widths ≤800px and the 1536px rendition above that, with explicit image dimensions and high fetch priority. Its opacity becomes visible after the image load event with a 700ms fade; reduced motion removes this transition. Before that event, without JavaScript, or after a main-image error, the matching poster remains visible and the camera/light/dust stay paused.
 
-If the poster also fails, a charcoal/bronze gradient and a faint CSS architectural arch remain. The failed foreground image stays transparent, preventing a broken-image icon over the composition. The heading, CTAs and localized caption remain ordinary independent HTML throughout. There is no external asset request or loading spinner.
+If the poster also fails, a charcoal/bronze gradient and a faint CSS architectural arch remain. The failed foreground image stays transparent, preventing a broken-image icon over the composition. The heading, supporting copy and localized caption remain ordinary independent HTML throughout. There is no external asset request or loading spinner.
 
-The section retains the `style-hero` class only as a compatibility hook for the unchanged language-selector styling. This is not retained mannequin behavior. Do not add retry/model controls or expose implementation details to visitors. The hero contains ordinary navigation CTAs rather than a configurator. The existing `chair.style.v1` inspiration state remains available elsewhere in discovery and booking, and this hero neither clears nor changes it.
+The section retains the `style-hero` class only as a compatibility hook for the unchanged language-selector styling. This is not retained mannequin behavior. Do not add retry/model controls or expose implementation details to visitors. The hero contains no links, buttons or configurator; the header and lower marketplace handle navigation. The existing `chair.style.v1` inspiration state remains available elsewhere in discovery and booking, and this hero neither clears nor changes it.
 
 ## Updating the visual
 
@@ -67,9 +67,9 @@ The section retains the `style-hero` class only as a compatibility hook for the 
 4. Update component source selection, reserved dimensions and responsive positions together. Maintain a stable first frame, restrained transforms and endpoint continuity. Do not lazily defer the main above-the-fold hero until it scrolls into view.
 5. Add or change user-facing text through `homeHero.*` in all three languages. Retain the shared `hero.beard.*`, `styleBrief.*` and `homeFilters.*` labels used outside the removed mannequin.
 6. Refresh this file's byte counts/hashes and `ASSET-SOURCES.md` when artwork changes. Keep raw generator downloads, caches and temporary inspection output outside the committed application.
-7. Inspect 375, 430, 768, 1024, 1440 and 1920px in KA/EN/RU, including short heights. Check the chair/tools crop, loop return, loading/failure, reduced motion, offscreen/hidden pausing, title wrapping, CTA visibility, header/menu stacking and transition into the lower section.
-8. Run the configured TypeScript, tests and production build, then route/asset checks against an owned local server. Record actual results in memory/verification, review the diff and staged files, commit and push to the existing private repository.
+7. Inspect 375, 430, 768, 1024, 1440 and 1920px in KA/EN/RU, including short heights. Check the chair/tools crop, loop return, loading/failure, reduced motion, offscreen/hidden pausing, title wrapping, balanced copy spacing, header/menu stacking and transition into the lower section.
+8. Run the configured TypeScript, tests and production build, then route/asset checks against an owned local server. Record actual results in memory/verification, review the diff and staged files, commit and push to the existing public repository.
 
 ## Limits
 
-The scene is generated artwork with a camera/light motion treatment, not live footage, a physical simulation or a multi-shot assembly sequence. Device-specific animation performance and formal accessibility acceptance require separate measured checks; do not infer them from file size or desktop screenshots. The site remains a localhost-only mock frontend.
+The scene is generated artwork with a camera/light motion treatment, not live footage, a physical simulation or a multi-shot assembly sequence. Device-specific animation performance and formal accessibility acceptance require separate measured checks; do not infer them from file size or desktop screenshots. The site remains a mock frontend available locally and on GitHub Pages.

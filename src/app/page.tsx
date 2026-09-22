@@ -116,10 +116,6 @@ export default function Home() {
             <br />
             <em>{t("home.howAccent")}</em>
           </h2>
-          <Link href="/discover" className="button button-dark">
-            {t("footer.find")}
-            <ArrowUpRight size={17} />
-          </Link>
         </div>
         <div className="how-steps">
           {[1, 2, 3].map((n) => (
@@ -132,20 +128,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
-      <section className="barber-invite container">
-        <div>
-          <span className="eyebrow">{t("home.inviteEyebrow")}</span>
-          <h2>
-            {t("home.invite1")}
-            <br />
-            {t("home.invite2")}
-          </h2>
-        </div>
-        <Link href="/register?role=barber" className="button button-light">
-          {t("navigation.join")}
-          <ArrowUpRight size={18} />
-        </Link>
       </section>
     </>
   );

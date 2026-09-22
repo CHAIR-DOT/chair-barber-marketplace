@@ -230,3 +230,22 @@ Deployment-only task; no redesign or product change. User explicitly authorized 
 - Temporary Python static preview initially hit its default connection backlog during concurrent requests. Increasing only that temporary server queue fixed the check; application code required no change. Own QA server/tab closed after checks; public site and original localhost tabs retained.
 
 Limitations remain those of the existing prototype: JavaScript is required; only generated profile/section slugs exist; unknown routes return 404. All accounts/bookings/uploads are browser-local mock state. Public hosting adds no real backend/auth/payment/shared reservation service. Localhost and the public origin keep separate storage. Physical-device performance and formal accessibility were not tested in this deployment task.
+
+
+## Homepage CTA cleanup — 22 September 2026
+
+### Scope and fresh automated checks
+
+- Removed header Book, hero discovery/salon links, How It Works CTA and entire bottom professional-registration banner. Also removed homepage-only generic footer Discover and booking prompts; other-route footers retain their prior links. Header Discover and professional registration remain, including registration at 801–1100px where it was previously hidden.
+- Preserved all lower search/shortcut/shop/style/barber markup and logic. Routes, mock store, fixtures, booking, ratings, pricing, filters, assets, localization controls, dependencies and deployment configuration unchanged. Removed six unused translation keys and dead CTA/banner CSS; retained catalog parity and updated existing navigation translation assertions.
+- **30/30 tests**, TypeScript and both normal and Pages production builds pass; each build generates **57 pages**. No lint script configured. Static HTTP route checks under `/chair-barber-marketplace/`: **55 valid routes, 5 expected unknown-route 404s, 31 images**, exit 0. Diff review and `git diff --check` pass; no detected secrets or unrelated/environment/generated files in the change list.
+
+### Fresh browser checks
+
+- Isolated static origin `http://127.0.0.1:3015/chair-barber-marketplace/` tested in **KA/EN/RU × 375/430/768/1024/1440px** (15 cases, 800px height). No horizontal overflow or header overlap; no hero links/buttons, header/home direct-booking links, bottom registration banner or How It Works CTA. All three explanatory steps remain. How/footer boundary has zero redundant gap. All cases retain 3 shop, 6 style and 4 barber cards and have no completed broken images.
+- Desktop/tablet cases expose one header Discover and one professional-registration entry. All nine mobile locale/width combinations have a working in-viewport menu containing one Discover and one professional-registration entry, with no booking link. Actual language switching updates each locale; isolated first visit defaults to Georgian.
+- Viewport screenshots inspected for English 1440px hero and How/footer, English 375px How/footer, and Russian 1024/375px hero. Balanced copy/artwork and clean footer transition; no replacement CTA added. A stitched full-page screenshot produced repeated visual bands, so layout conclusions use ordinary viewport screenshots and DOM measurements.
+- Actual header Discover navigation succeeds. Desktop and mobile registration links open `/register/?role=barber` and the barber-role form. Native homepage Vake search retains the query and returns 4 barbers / 2 shops. Giorgi card opens his profile; its contextual booking link retains shop-1/barber-1/haircut, 45 minutes and ₾35. No appointment or account submitted. Off-home footer discovery/booking links remain after client navigation.
+- Clean QA browser warning/error log is empty. No localStorage reset or product-data mutation. Existing artwork/motion logic was unchanged; physical-device, reduced-motion and failure-recovery coverage from earlier work was not rerun in this focused CTA task.
+
+Release status at this checkpoint: local checks complete; commit, push and public deployment confirmation pending.

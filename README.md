@@ -106,7 +106,7 @@ The store owns mutations; screens consume shared entities and actions. Services 
 
 ## Cinematic homepage hero
 
-The top homepage is a decorative motion poster: a black quilted leather barber chair, bronze metalwork, an arched mirror and an orderly grooming station in warm light. Local generated artwork provides the composition; restrained CSS movement adds a slow camera drift, light and atmosphere. It is part of the layout, with localized copy and links to barber discovery and salons.
+The top homepage is a decorative motion poster: a black quilted leather barber chair, bronze metalwork, an arched mirror and an orderly grooming station in warm light. Local generated artwork provides the composition; restrained CSS movement adds a slow camera drift, light and atmosphere. It is part of the layout, with localized branding copy and no discovery or booking buttons. The existing header Discover link is the primary general discovery entry; professional registration remains in the header/mobile menu. Lower search, cards and contextual directory links remain intact. How It Works is informational only, and the bottom registration poster and homepage footer discovery/booking prompts are removed.
 
 `src/components/barber-hero.tsx` and its scoped CSS own the hero. No video player, canvas renderer or animation library is needed. The image remains visible with reduced motion, and animation pauses while the hero is offscreen or the document is hidden. Local static artwork supplies loading and media-failure fallbacks. Asset provenance, replacement instructions and the precise motion/fallback behavior are documented in [HERO_VISUAL_GUIDE.md](HERO_VISUAL_GUIDE.md).
 

@@ -2,8 +2,7 @@
 import { publicPath } from "@/lib/public-path";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { ArrowRight, ArrowUpRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useI18n } from "@/i18n/provider";
 import "./barber-hero.css";
 
@@ -104,16 +103,6 @@ export function BarberHero() {
             {t("homeHero.title")} <em>{t("homeHero.titleAccent")}</em>
           </h1>
           <p className="barber-hero-intro">{t("homeHero.intro")}</p>
-          <div className="barber-hero-actions">
-            <Link href="/discover" className="barber-hero-primary">
-              {t("homeHero.primary")}
-              <ArrowRight size={19} aria-hidden="true" />
-            </Link>
-            <Link href="/shops" className="barber-hero-secondary">
-              {t("homeHero.secondary")}
-              <ArrowUpRight size={17} aria-hidden="true" />
-            </Link>
-          </div>
           <div className="atelier-location">
             <MapPin size={13} aria-hidden="true" />
             {t("homeHero.location")}

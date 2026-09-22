@@ -13,12 +13,6 @@ export const styleHeroMessages = defineMessages({
     "გამორჩეული ბარბერები. დახვეწილი გარემო. იპოვე შენი ადგილი და დაუთმე დრო საკუთარ თავს.",
     "Отличные барберы. Продуманные пространства. Найди своё место и удели время себе.",
   ],
-  "homeHero.primary": ["Find a barber", "იპოვე ბარბერი", "Найти барбера"],
-  "homeHero.secondary": [
-    "Explore salons",
-    "აღმოაჩინე სალონები",
-    "Посмотреть салоны",
-  ],
   "homeHero.location": [
     "Tbilisi, Georgia",
     "თბილისი, საქართველო",

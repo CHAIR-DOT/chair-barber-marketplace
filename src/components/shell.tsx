@@ -105,13 +105,6 @@ export function Navbar() {
             <Link href="/register?role=barber" className="join-link">
               {t("navigation.forBarbers")} <ArrowUpRight size={13} />
             </Link>
-            <Link
-              href="/booking"
-              className="button button-dark header-book"
-              onClick={() => setOpen(false)}
-            >
-              {t("navigation.book")} <ArrowUpRight size={15} />
-            </Link>
             <button
               ref={toggleRef}
               type="button"
@@ -160,8 +153,9 @@ export function Navbar() {
 }
 export function Footer() {
   const { t } = useI18n();
+  const isHome = usePathname() === "/";
   return (
-    <footer className="footer">
+    <footer className={`footer${isHome ? " home-footer" : ""}`}>
       <div className="container footer-grid">
         <div>
           <Link className="logo" href="/">
@@ -178,7 +172,7 @@ export function Footer() {
         </div>
         <div>
           <h4>{t("footer.find")} </h4>
-          <Link href="/discover">{t("navigation.discover")} </Link>
+          {!isHome && <Link href="/discover">{t("navigation.discover")} </Link>}
           <Link href="/shops">{t("navigation.shops")} </Link>
           <Link href="/barbers">{t("navigation.barbers")} </Link>
           <Link href="/styles">{t("footer.styles")} </Link>
@@ -197,9 +191,11 @@ export function Footer() {
             <br />
             {t("footer.connections")}
           </span>
-          <Link href="/booking" className="text-link">
-            {t("footer.nextCut")} <ArrowUpRight size={17} />
-          </Link>
+          {!isHome && (
+            <Link href="/booking" className="text-link">
+              {t("footer.nextCut")} <ArrowUpRight size={17} />
+            </Link>
+          )}
         </div>
       </div>
       <div className="container footer-bottom">
